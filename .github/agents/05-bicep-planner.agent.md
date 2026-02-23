@@ -143,17 +143,19 @@ handoffs:
 
 **Step 4** of the 7-step workflow: `requirements → architect → design → [bicep-plan] → bicep-code → deploy → as-built`
 
-## MANDATORY: Read Skills First
+## MANDATORY: Orientation & Skills
 
-**Before doing ANY work**, read these skills for configuration and template structure:
+**Before doing ANY work**, read in this order:
 
-1. **Read** `.github/skills/azure-defaults/SKILL.md` — regions, tags, AVM modules, governance discovery, naming
-2. **Read** `.github/skills/azure-artifacts/SKILL.md` — H2 templates for `04-implementation-plan.md` and `04-governance-constraints.md`
-3. **Read** the template files for your artifacts:
+1. **Read** `AGENTS.md` — lightweight map of the entire project
+2. **Read** `.github/skills/golden-principles/SKILL.md` — 10 operating principles
+3. **Read** `.github/skills/azure-defaults/SKILL.md` — regions, tags, AVM modules, governance discovery, naming
+4. **Read** `.github/skills/azure-artifacts/SKILL.md` — H2 templates for `04-implementation-plan.md` and `04-governance-constraints.md`
+5. **Read** the template files for your artifacts:
    - `.github/skills/azure-artifacts/templates/04-implementation-plan.template.md`
    - `.github/skills/azure-artifacts/templates/04-governance-constraints.template.md`
      Use as structural skeletons (replicate badges, TOC, navigation, attribution exactly).
-4. **Read** `.github/skills/azure-bicep-patterns/SKILL.md` — reusable patterns for hub-spoke,
+6. **Read** `.github/skills/azure-bicep-patterns/SKILL.md` — reusable patterns for hub-spoke,
    private endpoints, diagnostic settings, module composition
 
 These skills are your single source of truth. Do NOT use hardcoded values.

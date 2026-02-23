@@ -14,6 +14,18 @@ metadata:
 Single source of truth for all Azure infrastructure configuration used across agents.
 Replaces individual `_shared/` file lookups with one consolidated reference.
 
+## Progressive Loading Order
+
+Agents load context in layers — not all at once. This skill is step 3:
+
+1. **`AGENTS.md`** — lightweight map for orientation (~75 lines)
+2. **`golden-principles`** — 10 operating principles that govern all agents
+3. **This skill (`azure-defaults`)** — Azure conventions, naming, AVM, security
+4. **Task-specific skills** — loaded only when needed (e.g., `azure-diagrams`, `azure-bicep-patterns`)
+5. **Instructions** — applied automatically by glob pattern
+
+Only read deeper skills when your current task requires them.
+
 ---
 
 ## Quick Reference (Load First)
@@ -505,13 +517,13 @@ Before creating implementation plans, discover active policies:
 
 ### Agent-Specific Research Focus
 
-| Agent        | Primary Research                      | Skip (Already in Artifacts)      |
-| ------------ | ------------------------------------- | -------------------------------- |
-| Requirements | User needs, business context          | —                                |
-| Architect    | WAF gaps, SKU comparisons, pricing    | Service list (from 01)           |
-| Bicep Plan   | AVM availability, governance policies | Architecture decisions (from 02) |
-| Bicep Code   | AVM schemas, parameter types          | Resource list (from 04). NOTE: Governance constraints from `04-governance-constraints.md` MUST still be read and enforced — "trust artifact chain" means accepting decisions, not skipping compliance checks.          |
-| Deploy       | Azure state (what-if), credentials    | Template structure (from 05)     |
+| Agent        | Primary Research                      | Skip (Already in Artifacts)                                                                                                                                                                                   |
+| ------------ | ------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Requirements | User needs, business context          | —                                                                                                                                                                                                             |
+| Architect    | WAF gaps, SKU comparisons, pricing    | Service list (from 01)                                                                                                                                                                                        |
+| Bicep Plan   | AVM availability, governance policies | Architecture decisions (from 02)                                                                                                                                                                              |
+| Bicep Code   | AVM schemas, parameter types          | Resource list (from 04). NOTE: Governance constraints from `04-governance-constraints.md` MUST still be read and enforced — "trust artifact chain" means accepting decisions, not skipping compliance checks. |
+| Deploy       | Azure state (what-if), credentials    | Template structure (from 05)                                                                                                                                                                                  |
 
 ---
 

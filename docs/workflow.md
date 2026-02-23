@@ -10,6 +10,19 @@ through artifact handoffs to transform Azure infrastructure requirements into de
 The **InfraOps Conductor** (🎼 Maestro) orchestrates the complete workflow, delegating to
 specialized agents at each phase while enforcing mandatory approval gates.
 
+### Progressive Disclosure Model
+
+Agents load context in layers, not all at once:
+
+1. **`AGENTS.md`** — lightweight map (~75 lines) for orientation
+2. **`golden-principles`** — 10 operating principles that govern all agents
+3. **`azure-defaults`** — Azure conventions, naming, AVM, security baseline
+4. **Task-specific skills** — loaded only when needed for the current step
+5. **Instructions** — applied automatically by glob pattern (file-type rules)
+
+This keeps agent context windows efficient while ensuring access to deeper knowledge on demand.
+See `QUALITY_SCORE.md` for current project health grades and `docs/exec-plans/` for active plans.
+
 ## Agent Architecture
 
 ### The Conductor Pattern

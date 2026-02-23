@@ -143,21 +143,23 @@ handoffs:
 
 **Step 5** of the 7-step workflow: `requirements → architect → design → bicep-plan → [bicep-code] → deploy → as-built`
 
-## MANDATORY: Read Skills First
+## MANDATORY: Orientation & Skills
 
-**Before doing ANY work**, read these skills:
+**Before doing ANY work**, read in this order:
 
-1. **Read** `.github/skills/azure-defaults/SKILL.md` — regions, tags, naming, AVM, security, unique suffix
-2. **Read** `.github/skills/azure-artifacts/SKILL.md` — H2 templates for `04-preflight-check.md` and `05-implementation-reference.md`
-3. **Read** the template files for your artifacts:
+1. **Read** `AGENTS.md` — lightweight map of the entire project
+2. **Read** `.github/skills/golden-principles/SKILL.md` — 10 operating principles
+3. **Read** `.github/skills/azure-defaults/SKILL.md` — regions, tags, naming, AVM, security, unique suffix
+4. **Read** `.github/skills/azure-artifacts/SKILL.md` — H2 templates for `04-preflight-check.md` and `05-implementation-reference.md`
+5. **Read** the template files for your artifacts:
    - `.github/skills/azure-artifacts/templates/04-preflight-check.template.md`
    - `.github/skills/azure-artifacts/templates/05-implementation-reference.template.md`
      Use as structural skeletons (replicate badges, TOC, navigation, attribution exactly).
-4. **Read** `.github/skills/microsoft-code-reference/SKILL.md` — verify AVM module parameters,
+6. **Read** `.github/skills/microsoft-code-reference/SKILL.md` — verify AVM module parameters,
    check API versions, find correct Bicep patterns via official docs
-5. **Read** `.github/skills/azure-bicep-patterns/SKILL.md` — hub-spoke, private endpoints,
+7. **Read** `.github/skills/azure-bicep-patterns/SKILL.md` — hub-spoke, private endpoints,
    diagnostic settings, managed identity, module composition patterns
-6. **Read** `.github/instructions/bicep-policy-compliance.instructions.md` — governance
+8. **Read** `.github/instructions/bicep-governance.instructions.md` — governance
    compliance mandate, dynamic tag list, anti-patterns
 
 These skills are your single source of truth. Do NOT use hardcoded values.
@@ -231,7 +233,7 @@ Before writing ANY Bicep code, validate AVM compatibility:
 
 > [!CAUTION]
 > This is a **HARD GATE**. Do NOT proceed to Phase 2 with unresolved policy violations.
-> See `.github/instructions/bicep-policy-compliance.instructions.md` for the full mandate.
+> See `.github/instructions/bicep-governance.instructions.md` for the full mandate.
 
 1. **Read** `agent-output/{project}/04-governance-constraints.json`
 2. **Extract** all `Deny` policies and their `bicepPropertyPath` + `requiredValue` fields

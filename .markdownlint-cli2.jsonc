@@ -142,5 +142,8 @@
 
     // Agent-generated output (validated by artifact-templates validator)
     "agent-output/**",
+
+    // Plan/prompt input files (authored externally, not deliverables)
+    ".github/prompts/plan-*.prompt.md",
   ],
 }

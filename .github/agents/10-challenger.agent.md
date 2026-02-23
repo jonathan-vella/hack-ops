@@ -39,13 +39,15 @@ handoffs:
     send: false
 ---
 
-## MANDATORY: Read Skills First
+## MANDATORY: Orientation & Skills
 
-**Before doing ANY work**, read these skills:
+**Before doing ANY work**, read in this order:
 
-1. **Read** `.github/skills/azure-defaults/SKILL.md` — regions, tags, naming, AVM, security baselines, governance
-2. **Read** `.github/skills/azure-artifacts/SKILL.md` — artifact H2 templates (to validate structural completeness)
-3. **Read** `.github/instructions/bicep-policy-compliance.instructions.md` — governance enforcement rules
+1. **Read** `AGENTS.md` — lightweight map of the entire project
+2. **Read** `.github/skills/golden-principles/SKILL.md` — 10 operating principles (use as a review lens)
+3. **Read** `.github/skills/azure-defaults/SKILL.md` — regions, tags, naming, AVM, security baselines, governance
+4. **Read** `.github/skills/azure-artifacts/SKILL.md` — artifact H2 templates (to validate structural completeness)
+5. **Read** `.github/instructions/bicep-governance.instructions.md` — governance enforcement rules
 
 # Plan Challenger
 
@@ -98,14 +100,15 @@ When challenging artifacts in this repository, be skeptical about:
 
 1. **Read the artifact completely** — understand the proposed approach end to end
 2. **Read prior artifacts** — check `agent-output/{project}/` for context from earlier steps
-3. **Verify claims against skills and instructions** — cross-reference azure-defaults, bicep-policy-compliance,
-   and governance-discovery instructions. Do not trust claims like "all policies covered" — verify them
+3. **Verify claims against skills and instructions** — cross-reference azure-defaults and bicep-governance
+   instructions. Do not trust claims like "all policies covered" — verify them
 4. **Challenge every assumption** — what is taken for granted that could be wrong?
 5. **Find failure modes** — where could deployment fail? What edge cases would break it?
 6. **Uncover hidden dependencies** — what unstated requirements exist? What must be true for this to work?
 7. **Question optimism** — where is the plan overly optimistic about complexity, cost, or timeline?
 8. **Identify architectural weaknesses** — what design decisions create risk? What alternatives were ignored?
 9. **Test scope boundaries** — what happens at the edges? What is excluded that should be included?
+10. **Check golden-principles alignment** — does the proposal violate any of the 10 operating principles?
 
 ## Analysis Categories
 

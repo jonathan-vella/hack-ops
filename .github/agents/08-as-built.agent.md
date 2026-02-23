@@ -124,14 +124,16 @@ handoffs:
 
 **Step 7** of the 7-step workflow: `requirements → architect → design → bicep-plan → bicep-code → deploy → [as-built]`
 
-## MANDATORY: Read Skills First
+## MANDATORY: Orientation & Skills
 
-**Before doing ANY work**, read these skills:
+**Before doing ANY work**, read in this order:
 
-1. **Read** `.github/skills/azure-defaults/SKILL.md` — regions, tags, naming, pricing MCP names
-2. **Read** `.github/skills/azure-artifacts/SKILL.md` — H2 templates for all 07-\* artifacts
-3. **Read** `.github/skills/azure-diagrams/SKILL.md` — diagram generation contract
-4. **Read** the template files for your artifacts (all in `.github/skills/azure-artifacts/templates/`):
+1. **Read** `AGENTS.md` — lightweight map of the entire project
+2. **Read** `.github/skills/golden-principles/SKILL.md` — 10 operating principles
+3. **Read** `.github/skills/azure-defaults/SKILL.md` — regions, tags, naming, pricing MCP names
+4. **Read** `.github/skills/azure-artifacts/SKILL.md` — H2 templates for all 07-\* artifacts
+5. **Read** `.github/skills/azure-diagrams/SKILL.md` — diagram generation contract
+6. **Read** the template files for your artifacts (all in `.github/skills/azure-artifacts/templates/`):
    - `07-design-document.template.md`
    - `07-operations-runbook.template.md`
    - `07-ab-cost-estimate.template.md`

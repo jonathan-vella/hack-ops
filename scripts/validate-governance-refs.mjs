@@ -9,7 +9,7 @@
  * 1. Bicep Code Generator references 04-governance-constraints
  * 2. bicep-review-subagent has Governance Compliance checklist
  * 3. Bicep Planner references JSON output schema completeness
- * 4. bicep-policy-compliance.instructions.md exists with correct applyTo
+ * 4. bicep-governance.instructions.md exists with correct applyTo
  *
  * @example
  * node scripts/validate-governance-refs.mjs
@@ -59,8 +59,8 @@ check(
   fileContains(codeGenPath, "Phase 1.5"),
 );
 check(
-  "References bicep-policy-compliance.instructions.md",
-  fileContains(codeGenPath, "bicep-policy-compliance.instructions.md"),
+  "References bicep-governance.instructions.md",
+  fileContains(codeGenPath, "bicep-governance.instructions.md"),
 );
 check(
   "DO list includes governance constraint parsing",
@@ -118,10 +118,10 @@ check(
   fileContains(plannerPath, "Code Generator Action"),
 );
 
-// 4. bicep-policy-compliance.instructions.md exists and is valid
-console.log("\n📄 bicep-policy-compliance.instructions.md");
+// 4. bicep-governance.instructions.md exists and is valid
+console.log("\n📄 bicep-governance.instructions.md");
 const policyInstrPath =
-  ".github/instructions/bicep-policy-compliance.instructions.md";
+  ".github/instructions/bicep-governance.instructions.md";
 check("File exists", fileExists(policyInstrPath));
 check(
   "Has correct applyTo scope including *.bicep",
@@ -140,9 +140,9 @@ check(
   fileContains(policyInstrPath, "04-governance-constraints.json"),
 );
 
-// 5. Governance discovery instructions include downstream enforcement
-console.log("\n📄 governance-discovery.instructions.md");
-const govDiscPath = ".github/instructions/governance-discovery.instructions.md";
+// 5. Governance discovery rules included in bicep-governance.instructions.md
+console.log("\n📄 governance-discovery (merged into bicep-governance)");
+const govDiscPath = ".github/instructions/bicep-governance.instructions.md";
 check("applyTo includes *.bicep", fileContains(govDiscPath, "**/*.bicep"));
 check(
   "Has Downstream Enforcement section",

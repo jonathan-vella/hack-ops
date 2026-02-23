@@ -148,14 +148,16 @@ handoffs:
 This agent is **supplementary** to the 7-step workflow. Use it after Step 6 (Deploy) or
 for troubleshooting existing deployments.
 
-## MANDATORY: Read Skills First
+## MANDATORY: Orientation & Skills
 
-**Before doing ANY work**, read:
+**Before doing ANY work**, read in this order:
 
-1. **Read** `.github/skills/azure-defaults/SKILL.md` — regions, tags, security baseline
-2. **Read** `.github/skills/microsoft-docs/SKILL.md` — look up official troubleshooting guides,
+1. **Read** `AGENTS.md` — lightweight map of the entire project
+2. **Read** `.github/skills/golden-principles/SKILL.md` — 10 operating principles
+3. **Read** `.github/skills/azure-defaults/SKILL.md` — regions, tags, security baseline
+4. **Read** `.github/skills/microsoft-docs/SKILL.md` — look up official troubleshooting guides,
    metric thresholds, KQL syntax, and diagnostic setting schemas
-3. **Read** `.github/skills/azure-troubleshooting/SKILL.md` — KQL templates, per-resource health checks,
+5. **Read** `.github/skills/azure-troubleshooting/SKILL.md` — KQL templates, per-resource health checks,
    severity classification, remediation playbooks
 
 ## Core Principles
@@ -176,6 +178,7 @@ for troubleshooting existing deployments.
 - ✅ Use Azure Resource Graph as primary discovery tool
 - ✅ Present findings in structured tables with severity ratings
 - ✅ Save diagnostic report to `agent-output/{project}/08-resource-health-report.md`
+- ✅ When findings reveal systemic issues, create an exec-plan in `docs/exec-plans/active/`
 - ✅ Offer remediation options with rollback guidance
 
 ### DON'T

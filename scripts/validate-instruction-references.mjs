@@ -219,7 +219,13 @@ function stripCodeBlocks(content) {
 
 const crossRefs = new Map();
 
-for (const filePath of allMdFiles) {
+// Exclude prompt files — they are plan/template documents that may mention
+// instruction names in historical context without needing valid references
+const crossRefFiles = allMdFiles.filter(
+  (f) => !path.relative(ROOT, f).startsWith(".github/prompts/"),
+);
+
+for (const filePath of crossRefFiles) {
   const rawContent = fs.readFileSync(filePath, "utf-8");
   const content = stripCodeBlocks(rawContent);
   const relFile = path.relative(ROOT, filePath);

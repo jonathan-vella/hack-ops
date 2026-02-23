@@ -157,14 +157,16 @@ handoffs:
 
 This step is **optional**. Users can skip directly to Step 4 (Implementation Planning).
 
-## MANDATORY: Read Skills First
+## MANDATORY: Orientation & Skills
 
-**Before doing ANY work**, read these skills:
+**Before doing ANY work**, read in this order:
 
-1. **Read** `.github/skills/azure-defaults/SKILL.md` — regions, tags, naming
-2. **Read** `.github/skills/azure-artifacts/SKILL.md` — H2 template for `03-des-cost-estimate.md`
-3. **Read** `.github/skills/azure-diagrams/SKILL.md` — diagram generation instructions
-4. **Read** `.github/skills/azure-adr/SKILL.md` — ADR format and conventions
+1. **Read** `AGENTS.md` — lightweight map of the entire project
+2. **Read** `.github/skills/golden-principles/SKILL.md` — 10 operating principles
+3. **Read** `.github/skills/azure-defaults/SKILL.md` — regions, tags, naming
+4. **Read** `.github/skills/azure-artifacts/SKILL.md` — H2 template for `03-des-cost-estimate.md`
+5. **Read** `.github/skills/azure-diagrams/SKILL.md` — diagram generation instructions
+6. **Read** `.github/skills/azure-adr/SKILL.md` — ADR format and conventions
 
 ## DO / DON'T
 

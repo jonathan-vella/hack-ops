@@ -1,0 +1,86 @@
+name: Entropy Check
+
+on:
+  schedule:
+    - cron: "0 9 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  entropy-check:
+    name: Repository Entropy Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+
+      - run: npm ci
+
+      - name: Check documentation freshness
+        id: freshness
+        run: node scripts/check-docs-freshness.mjs
+        continue-on-error: true
+
+      - name: Validate instruction references
+        id: instructions
+        run: node scripts/validate-instruction-references.mjs
+        continue-on-error: true
+
+      - name: Validate skills format
+        id: skills
+        run: node scripts/validate-skills-format.mjs
+        continue-on-error: true
+
+      - name: Validate agent frontmatter
+        id: agents
+        run: node scripts/validate-agent-frontmatter.mjs
+        continue-on-error: true
+
+      - name: Check for orphaned instructions
+        id: orphans
+        run: |
+          echo "## Orphaned Instruction Check" >> "$GITHUB_STEP_SUMMARY"
+          for f in .github/instructions/*.instructions.md; do
+            name=$(basename "$f")
+            if ! grep -rql "$name" .github/agents/ .github/skills/ .github/copilot-instructions.md 2>/dev/null; then
+              echo "- ⚠️ No agent/skill references: $name" >> "$GITHUB_STEP_SUMMARY"
+              echo "::warning::Orphaned instruction: $name"
+            fi
+          done
+        continue-on-error: true
+
+      - name: Open issue on failures
+        if: steps.freshness.outcome == 'failure' || steps.instructions.outcome == 'failure' || steps.skills.outcome == 'failure' || steps.agents.outcome == 'failure'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const title = `🧹 Entropy check found issues (${new Date().toISOString().split('T')[0]})`;
+            const body = [
+              '## Entropy Check Results',
+              '',
+              `| Check | Status |`,
+              `| --- | --- |`,
+              `| Documentation freshness | ${('${{ steps.freshness.outcome }}' === 'success') ? '✅' : '❌'} |`,
+              `| Instruction references | ${('${{ steps.instructions.outcome }}' === 'success') ? '✅' : '❌'} |`,
+              `| Skills format | ${('${{ steps.skills.outcome }}' === 'success') ? '✅' : '❌'} |`,
+              `| Agent frontmatter | ${('${{ steps.agents.outcome }}' === 'success') ? '✅' : '❌'} |`,
+              '',
+              'Run the doc-gardening prompt (`.github/prompts/doc-gardening.prompt.md`) to investigate and fix.',
+              '',
+              `Workflow run: ${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`
+            ].join('\n');
+
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title,
+              body,
+              labels: ['entropy', 'maintenance']
+            });

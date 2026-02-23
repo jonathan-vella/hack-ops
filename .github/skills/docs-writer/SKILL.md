@@ -94,10 +94,14 @@ When a new agent or skill is added to the repo:
    - Agent/skill counts match filesystem
    - Tables list all entities present in filesystem
    - No references to removed/renamed agents
-3. **Report findings**: Present a table of issues found with:
+3. **Check project health files**:
+   - Read `QUALITY_SCORE.md` — verify grades still reflect reality
+   - Read `docs/exec-plans/tech-debt-tracker.md` — verify items still relevant
+4. **Report findings**: Present a table of issues found with:
    - File path, line number, issue description, suggested fix
-4. **Auto-fix**: For each issue, propose the exact edit and apply it
+5. **Auto-fix**: For each issue, propose the exact edit and apply it
    after user confirmation (or immediately if user said "fix all").
+6. **Update health metrics**: If fixes change quality grades, update `QUALITY_SCORE.md`.
 
 ### Workflow 4: Explain the Repo Architecture
 

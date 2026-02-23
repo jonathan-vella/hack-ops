@@ -160,13 +160,15 @@ handoffs:
 
 **Step 6** of the 7-step workflow: `requirements → architect → design → bicep-plan → bicep-code → [deploy] → as-built`
 
-## MANDATORY: Read Skills First
+## MANDATORY: Orientation & Skills
 
-**Before doing ANY work**, read these skills:
+**Before doing ANY work**, read in this order:
 
-1. **Read** `.github/skills/azure-defaults/SKILL.md` — regions, tags, security baseline
-2. **Read** `.github/skills/azure-artifacts/SKILL.md` — H2 template for `06-deployment-summary.md`
-3. **Read** `.github/skills/azure-artifacts/templates/06-deployment-summary.template.md`
+1. **Read** `AGENTS.md` — lightweight map of the entire project
+2. **Read** `.github/skills/golden-principles/SKILL.md` — 10 operating principles
+3. **Read** `.github/skills/azure-defaults/SKILL.md` — regions, tags, security baseline
+4. **Read** `.github/skills/azure-artifacts/SKILL.md` — H2 template for `06-deployment-summary.md`
+5. **Read** `.github/skills/azure-artifacts/templates/06-deployment-summary.template.md`
    — use as structural skeleton (replicate badges, TOC, navigation, attribution)
 
 ## DO / DON'T

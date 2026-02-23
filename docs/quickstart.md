@@ -156,11 +156,31 @@ infra/bicep/my-webapp/
 
 | Goal                           | Resource                                 |
 | ------------------------------ | ---------------------------------------- |
+| Understand the project map     | [AGENTS.md](../AGENTS.md)                |
 | Understand the full workflow   | [workflow.md](workflow.md)               |
 | Try a complete workflow        | [Prompt Guide](prompt-guide/)            |
 | Generate architecture diagrams | Use `azure-diagrams` skill               |
 | Create documentation           | Use `azure-artifacts` skill              |
 | Troubleshoot issues            | [troubleshooting.md](troubleshooting.md) |
+
+---
+
+## How Agents Load Context
+
+Agents use **progressive disclosure** — they don't load everything at once:
+
+```text
+AGENTS.md (map)
+  └─→ golden-principles (10 operating invariants)
+       └─→ azure-defaults (Azure conventions)
+            └─→ task-specific skills (loaded per step)
+                 └─→ instructions (applied by glob pattern)
+```
+
+- **`AGENTS.md`**: Lightweight table of contents with pointers
+- **Skills**: Deep domain knowledge loaded on demand
+- **Instructions**: File-type rules applied mechanically (e.g., Bicep best practices on `*.bicep`)
+- **`QUALITY_SCORE.md`**: Project health grades — agents check this to avoid known-bad patterns
 
 ---
 

@@ -170,12 +170,15 @@ handoffs:
 
 Master orchestrator for the 7-step Azure infrastructure development workflow.
 
-## MANDATORY: Read Skills First
+## MANDATORY: Orientation
 
-**Before doing ANY work**, read:
+**Before doing ANY work**, read in this order:
 
-1. **Read** `.github/skills/azure-defaults/SKILL.md` — regions, tags
-2. **Read** `.github/skills/azure-artifacts/SKILL.md` — artifact file naming and structure overview
+1. **Read** `AGENTS.md` — lightweight map of the entire project
+2. **Read** `.github/skills/golden-principles/SKILL.md` — 10 operating principles that govern all agents
+3. **Read** `.github/skills/azure-defaults/SKILL.md` — regions, tags
+4. **Read** `.github/skills/azure-artifacts/SKILL.md` — artifact file naming and structure overview
+5. **Check** `QUALITY_SCORE.md` — current project health grades (avoid replicating known-bad patterns)
 
 ## Core Principles
 
@@ -193,7 +196,9 @@ Master orchestrator for the 7-step Azure infrastructure development workflow.
 - ✅ Track progress by checking artifact files in `agent-output/{project}/`
 - ✅ Summarize subagent results concisely (don't dump raw output)
 - ✅ Create `agent-output/{project}/` directory at project start
+- ✅ Create an exec-plan in `docs/exec-plans/active/` for multi-step projects
 - ✅ Ensure `agent-output/{project}/README.md` exists — Requirements agent creates it, all agents update it
+- ✅ Check `docs/exec-plans/tech-debt-tracker.md` before starting to avoid known anti-patterns
 
 ### DON'T
 

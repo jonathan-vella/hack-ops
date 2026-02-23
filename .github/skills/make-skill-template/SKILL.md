@@ -144,6 +144,17 @@ my-awesome-skill/
 - [ ] Body content is under 500 lines
 - [ ] Bundled assets are under 5MB each
 
+### Golden Principles Alignment
+
+Every new skill should align with the 10 golden operating principles
+(`.github/skills/golden-principles/SKILL.md`). Before finalizing, verify:
+
+- [ ] **Map, not manual** — skill points to deeper sources instead of duplicating content
+- [ ] **Context is scarce** — skill stays focused; doesn't dump unrelated information
+- [ ] **Progressive disclosure** — starts with essentials, links to details when needed
+- [ ] **Mechanical enforcement** — if any rule in the skill could be a linter check, note it
+- [ ] **Repository is the system of record** — all knowledge lives in-repo, not external
+
 ## Troubleshooting
 
 | Issue                    | Solution                                                 |
@@ -155,7 +166,7 @@ my-awesome-skill/
 
 ## Project-Specific Scaffold Templates
 
-When creating skills for *this* project, use one of these skeletons that match
+When creating skills for _this_ project, use one of these skeletons that match
 the conventions already established in the repository.
 
 ### Azure Knowledge Skill Skeleton
@@ -170,7 +181,7 @@ compatibility: Requires Azure CLI with Bicep extension
 ---
 ```
 
-```markdown
+````markdown
 # Azure {Topic} Skill
 
 One-sentence overview of what this skill provides.
@@ -197,10 +208,10 @@ Explanation and code example:
 
 ## Learn More
 
-| Topic | How to Find |
-| ----- | ----------- |
+| Topic | How to Find                          |
+| ----- | ------------------------------------ |
 | ...   | `microsoft_docs_search(query="...")` |
-```
+````
 
 ### Integration Skill Skeleton
 
@@ -232,6 +243,7 @@ Overview of the integration.
 ## Workflow
 
 ### Step 1: ...
+
 ### Step 2: ...
 
 ---

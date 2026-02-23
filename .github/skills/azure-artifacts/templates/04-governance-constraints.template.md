@@ -224,7 +224,7 @@ flowchart TD
 ---
 
 _Governance constraints discovered from Azure Resource Graph._
-_See [governance-discovery.instructions.md](/.github/instructions/governance-discovery.instructions.md) for discovery methodology._
+_See [bicep-governance.instructions.md](/.github/instructions/bicep-governance.instructions.md) for discovery methodology._
 
 ---
 

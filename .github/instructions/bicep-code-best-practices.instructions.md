@@ -17,7 +17,7 @@ applyTo: "**/*.bicep"
 > [!IMPORTANT]
 > The 4 tags above are baseline defaults. Discovered Azure Policy constraints
 > (`04-governance-constraints.md`) ALWAYS take precedence. See
-> `bicep-policy-compliance.instructions.md`.
+> `bicep-governance.instructions.md`.
 
 ## Naming Conventions
 
@@ -64,7 +64,7 @@ param uniqueSuffix string
 > [!IMPORTANT]
 > The security settings below are baseline defaults. Discovered Azure Policy
 > security constraints (`04-governance-constraints.md`) ALWAYS take precedence.
-> See `bicep-policy-compliance.instructions.md`.
+> See `bicep-governance.instructions.md`.
 
 ```bicep
 // Storage

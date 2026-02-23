@@ -60,6 +60,20 @@ Contributions land via pull requests with required checks and review.
 - Document prerequisites
 - Use Mermaid for diagrams
 
+### When to Add an Instruction vs. Skill vs. Golden Principle
+
+| Layer              | When to Use                                                  | Format                                     |
+| ------------------ | ------------------------------------------------------------ | ------------------------------------------ |
+| **Instruction**    | File-type rules enforced by glob (`applyTo`)                 | `.github/instructions/*.instructions.md`   |
+| **Skill**          | Deep domain knowledge loaded on demand by agents             | `.github/skills/*/SKILL.md`                |
+| **Golden principle** | Universal operating invariant that rarely changes           | Add to `.github/skills/golden-principles/` |
+
+**Decision criteria:**
+- If it applies mechanically to a file type → **instruction**
+- If it educates an agent about a domain → **skill**
+- If it governs *how all agents behave* → **golden principle**
+- If a rule can be a linter/CI check → make it mechanical enforcement, not just documentation
+
 ### Markdown Linting
 
 This repository uses [markdownlint](https://github.com/DavidAnson/markdownlint) for consistent formatting.

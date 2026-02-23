@@ -30,9 +30,10 @@ See the [conductor agent](../.github/agents/01-conductor.agent.md) for orchestra
 
 ---
 
-## Agents (8 + 3 Subagents)
+## Agents (10 + 5 Subagents)
 
 Agents are interactive AI assistants for specific workflow phases. Invoke via `Ctrl+Shift+A`.
+See `AGENTS.md` at the repo root for the lightweight map.
 
 ### Conductor (Master Orchestrator)
 
@@ -62,9 +63,15 @@ Agents are interactive AI assistants for specific workflow phases. Invoke via `C
 
 ---
 
-## Skills (8)
+## Skills (14)
 
 Skills are reusable capabilities that agents invoke or that activate automatically based on prompts.
+
+### Operating Principles
+
+| Skill               | Purpose                                | Triggers                           |
+| ------------------- | -------------------------------------- | ---------------------------------- |
+| `golden-principles` | 10 operating principles for all agents | Always loaded first by every agent |
 
 ### Azure Conventions (Category 1)
 
@@ -123,14 +130,18 @@ See [prompt-guide/](prompt-guide/) for the full guide.
 
 ```text
 azure-agentic-infraops/
+├── AGENTS.md             # Lightweight map (start here)
+├── QUALITY_SCORE.md      # Project health grades
 ├── .github/
-│   ├── agents/           # 8 agent definitions + 3 subagents
-│   ├── skills/           # 8 skill definitions
-│   └── instructions/     # File-type rules
+│   ├── agents/           # 10 agent definitions + 5 subagents
+│   ├── skills/           # 14 skill definitions (incl. golden-principles)
+│   └── instructions/     # ~20 file-type rules (consolidated)
 ├── agent-output/         # Generated artifacts
 ├── infra/bicep/          # Bicep templates
-├── docs/prompt-guide/    # Prompt examples for agents & skills
-└── docs/                 # This documentation
+├── docs/
+│   ├── exec-plans/       # Active and completed execution plans
+│   ├── prompt-guide/     # Prompt examples for agents & skills
+│   └── *.md              # Reference documentation
 ```
 
 ---

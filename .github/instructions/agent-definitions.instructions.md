@@ -164,7 +164,7 @@ handles isolated, tool-heavy work (pricing queries, REST API calls, lint runs).
 
 When an agent outputs a specific document type, it MUST treat these as authoritative:
 
-- Cost estimates: `.github/instructions/cost-estimate.instructions.md`
+- Cost estimates: `.github/instructions/azure-artifacts.instructions.md`
 - Workload docs: `.github/instructions/workload-documentation.instructions.md`
 - Markdown style: `.github/instructions/markdown.instructions.md`
 - Bicep: `.github/instructions/bicep-code-best-practices.instructions.md`

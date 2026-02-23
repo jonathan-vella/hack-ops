@@ -1,5 +1,5 @@
 ---
-applyTo: "**/agent-output/**/*.md"
+applyTo: "**/agent-output/**/*.md, **/03-des-cost-estimate.md, **/07-ab-cost-estimate.md, **/docs/*-cost-estimate.md"
 description: "MANDATORY template compliance rules for artifact generation"
 ---
 
@@ -222,6 +222,20 @@ description: "MANDATORY template compliance rules for artifact generation"
 ## 🧾 Detailed Cost Breakdown
 ## References <!-- Required -->
 ```
+
+## Cost Estimate Standards
+
+Cost estimates (`03-des-cost-estimate.md`, `07-ab-cost-estimate.md`) must additionally:
+
+- Start from the canonical template in `.github/skills/azure-artifacts/templates/`
+- Include the required header (Generated date, Region, Environment, MCP Tools, Architecture Reference)
+- Use emoji visual standards consistently (status indicators, category icons, trend indicators)
+- Include Cost At-a-Glance, Decision Summary, and Detailed Cost Breakdown sections
+- Document pricing data accuracy and assumptions
+- Source ALL prices from `cost-estimate-subagent` — never hardcode dollar amounts
+
+For full cost estimate section guidance (20+ optional sections like Cost Risk Indicators,
+Quick Decision Matrix, Savings Opportunities), read the `azure-artifacts` skill.
 
 ## Enforcement Layers
 
