@@ -10,254 +10,175 @@
 [![Azure][azure-shield]][azure-url]
 
 <div align="center">
-  <img
-    src="https://capsule-render.vercel.app/api?type=waving&height=180&color=0:0A66C2,50:0078D4,100:00B7C3&text=Agentic%20InfraOps&fontSize=44&fontColor=FFFFFF&fontAlignY=34&desc=Azure%20infrastructure%20engineered%20by%20agents&descAlignY=56"
-    alt="Agentic InfraOps banner" />
-</div>
-
-<br />
-<div align="center">
-  <a href="https://github.com/jonathan-vella/azure-agentic-infraops">
-    <img
-      src="https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Robot/3D/robot_3d.png"
-      alt="Logo" width="120" height="120">
-  </a>
-
-  <h1 align="center">Agentic InfraOps</h1>
-
+  <h1 align="center">HackOps</h1>
   <p align="center">
-    <strong>A multi-agent orchestration system for Azure infrastructure development</strong>
+    <strong>Hackathon management platform for structured Microsoft Azure learning events</strong>
     <br />
-    <em>Requirements → Architecture → Plan → Code → Deploy → Documentation</em>
+    <em>Register · Score · Approve · Leaderboard · Ship</em>
     <br /><br />
     <a href="#-quick-start"><strong>Quick Start »</strong></a>
     ·
-    <a href="agent-output/">Sample Outputs</a>
+    <a href="docs/quickstart.md">Docs</a>
     ·
-    <a href="docs/prompt-guide/">Prompt Guide</a>
-    ·
-    <a href="https://github.com/jonathan-vella/azure-agentic-infraops/issues/new?labels=bug">Report Bug</a>
+    <a href="https://github.com/jonathan-vella/hack-ops/issues/new?labels=bug">Report Bug</a>
   </p>
 </div>
 
 ---
 
-Agentic InfraOps coordinates specialized AI agents through a complete infrastructure development
-cycle. Instead of context-switching between requirements, architecture decisions, Bicep authoring,
-and documentation, you get a **structured 7-step workflow** with built-in WAF alignment, AVM-first
-code generation, and mandatory human approval gates.
+HackOps manages the complete lifecycle of a **MicroHack** event — from team registration and
+hacker onboarding through rubric-driven scoring, coach review, and a live leaderboard. Built on
+Azure App Service + Cosmos DB NoSQL with GitHub OAuth authentication.
 
 ---
 
-## Agentic Workflow
+## What It Does
 
-```mermaid
-sequenceDiagram
-    autonumber
-    participant U as 👤 User
-    participant C as 🎼 Conductor
-    participant R as 📋 Requirements
-    participant X as ⚔️ Challenger
-    participant A as 🏛️ Architect
-    participant P as 📐 Bicep Plan
-    participant B as ⚒️ Bicep Code
-    participant D as 🚀 Deploy
-    participant W as 📚 As-Built
+| Feature | Description |
+|---------|-------------|
+| **Team & Hacker Management** | Self-service onboarding via 4-digit event code; Fisher-Yates team shuffle; manual reassignment |
+| **Rubric-Driven Scoring** | Markdown-defined rubric drives all forms, validation, and grade computation — nothing hardcoded |
+| **Submission Workflow** | Form or JSON file upload → staging queue → coach/admin approve/reject → immutable score record |
+| **Live Leaderboard** | Auto-refresh every 30s; expandable rows; grade badges (A/B/C/D); award badges; SSR for fast first paint |
+| **Challenge Gating** | Challenge N+1 unlocks only after Challenge N is approved |
+| **Role Management** | Admin, Coach, Hacker, Anonymous — invite by GitHub username; primary admin protected from demotion |
+| **Audit Trail** | Every reviewer action logged with `reviewedBy`, `reviewedAt`, `reviewReason` |
 
-    Note over C: ORCHESTRATION LAYER<br/>AI prepares. Humans decide.
+---
 
-    %% --- Step 1: Requirements ---
-    U->>C: Describe infrastructure intent
-    C->>R: Translate intent into structured requirements
-    R-->>C: 01-requirements.md
-    C->>X: Challenge requirements
-    X-->>C: challenge-findings.json
-    C->>U: Present requirements + challenge findings
+## Tech Stack
 
-    rect rgba(255, 200, 0, 0.15)
-    Note over U,C: 🛑 HUMAN APPROVAL GATE
-    U-->>C: Approve requirements
-    end
+| Layer | Technology |
+|-------|-----------|
+| **Frontend** | Next.js 15 (App Router), Tailwind CSS 4, shadcn/ui |
+| **Backend** | Next.js Route Handlers, TypeScript, Zod |
+| **Database** | Cosmos DB NoSQL (Serverless), 10 containers |
+| **Auth** | Azure App Service Easy Auth — GitHub OAuth only |
+| **Compute** | Azure App Service (Linux, Node 22 LTS) |
+| **IaC** | Bicep + Azure Verified Modules (AVM), GitHub Actions |
+| **Observability** | Application Insights, Log Analytics |
+| **Secrets** | Azure Key Vault — zero hardcoded values |
 
-    %% --- Step 2: Architecture Assessment ---
-    C->>A: Assess architecture (WAF + Cost)
-    Note right of A: cost-estimate-subagent<br/>handles pricing queries
-    A-->>C: 02-assessment.md + 03-cost-estimate.md
-    C->>X: Challenge architecture
-    X-->>C: challenge-findings.json
-    C->>U: Present architecture + challenge findings
+All database traffic flows over a **Private Endpoint** — Cosmos DB is never exposed to the
+public internet.
 
-    rect rgba(255, 200, 0, 0.15)
-    Note over U,C: 🛑 HUMAN APPROVAL GATE
-    U-->>C: Approve architecture
-    end
+---
 
-    %% --- Step 4: Planning & Governance ---
-    C->>P: Create implementation plan + governance
-    Note right of P: governance-discovery-subagent<br/>queries Azure Policy via REST API
-    P-->>C: 04-plan.md + governance constraints
-    C->>X: Challenge implementation plan
-    X-->>C: challenge-findings.json
-    C->>U: Present plan + challenge findings
+## Architecture
 
-    rect rgba(255, 200, 0, 0.15)
-    Note over U,C: 🛑 HUMAN APPROVAL GATE
-    U-->>C: Approve plan
-    end
-
-    %% --- Step 5: IaC Generation & Validation ---
-    C->>B: Generate Bicep templates (AVM-first)
-    B-->>C: infra/bicep/{project}
-
-    rect rgba(0, 150, 255, 0.08)
-    Note over C,B: 🔍 Subagent Validation Loop
-    Note right of B: bicep-lint-subagent → PASS/FAIL<br/>bicep-review-subagent → APPROVED/REVISION
-    alt ✅ Validation passes
-        C->>U: Present templates for deployment
-        rect rgba(255, 200, 0, 0.15)
-        Note over U,C: 🛑 HUMAN APPROVAL GATE
-        U-->>C: Approve for deployment
-        end
-    else ⚠️ Validation fails
-        C->>B: Revise with feedback
-    end
-    end
-
-    %% --- Step 6: Deployment ---
-    C->>D: Execute deployment
-    Note right of D: bicep-whatif-subagent<br/>previews changes first
-    D-->>C: 06-deployment-summary.md
-    C->>U: Present deployment summary
-
-    rect rgba(255, 200, 0, 0.15)
-    Note over U,D: 🛑 HUMAN VERIFICATION
-    U-->>C: Verify deployment
-    end
-
-    %% --- Step 7: As-Built Documentation ---
-    C->>W: Generate workload documentation
-    Note right of W: Reads all prior artifacts (01-06)<br/>+ queries deployed resource state
-    W-->>C: 07-*.md documentation suite
-    C->>U: Present as-built docs
-
-    Note over U,W: ✅ AI Orchestrated. Human Governed. Azure Ready.
+```text
+GitHub OAuth
+     │
+     ▼
+Azure App Service (Linux / Node 22)
+  ├── Next.js SSR + API Route Handlers
+  ├── Easy Auth middleware
+  └── VNet Integration
+          │
+          ▼  (private endpoint — snet-pe)
+     Cosmos DB NoSQL (serverless)
+     10 containers, swedencentral
+          │
+     Key Vault  ·  App Insights  ·  Log Analytics
 ```
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
 ---
 
-## ⚡ Quick Start
+## Quick Start
 
-**Prerequisites:** Docker Desktop (or Podman/Rancher), VS Code with Dev Containers, GitHub Copilot.
+**Prerequisites:** Docker Desktop, VS Code with Dev Containers extension, GitHub Copilot.
 
 ```bash
-git clone https://github.com/jonathan-vella/azure-agentic-infraops.git
-cd azure-agentic-infraops
+git clone https://github.com/jonathan-vella/hack-ops.git
+cd hack-ops
 code .
 ```
 
-1. Press `F1` → **Dev Containers: Reopen in Container** _(first build: ~2-3 min, all tools pre-installed)_
-2. Enable the required VS Code setting:
-   ```json
-   { "chat.customAgentInSubagent.enabled": true }
-   ```
-3. Press `Ctrl+Shift+I` → select **InfraOps Conductor** → describe your infrastructure
+1. Press `F1` → **Dev Containers: Reopen in Container**
+2. Copy the environment template and configure:
 
-```text
-Create a web app with Azure App Service, Key Vault, and SQL Database
+   ```bash
+   cp apps/web/.env.example apps/web/.env.local
+   ```
+
+3. Start the Cosmos DB emulator and dev server:
+
+   ```bash
+   npm run dev
+   ```
+
+4. Open [http://localhost:3000](http://localhost:3000)
+
+> For local dev, set `DEV_USER_ROLE=Admin` and `DEV_USER_ID=your-github-id` in `.env.local`
+> to bypass Easy Auth (Easy Auth does not work on localhost).
+
+---
+
+## Infrastructure Deployment
+
+All infrastructure is managed via Bicep AVM modules. Every resource includes a 6-character
+deterministic suffix (`take(uniqueString(resourceGroup().id), 6)`) for guaranteed uniqueness.
+
+```bash
+# Deploy dev environment
+cd infra/bicep/hackops
+./deploy.ps1 -Environment dev -Location swedencentral
 ```
 
-The Conductor guides you through all 7 steps with approval gates.
-
-📖 **[Full Quick Start Guide →](docs/quickstart.md)**
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
+See [infra/bicep/README.md](infra/bicep/README.md) for full deployment instructions and
+governance discovery requirements.
 
 ---
 
-## Agents
+## Roles
 
-<details>
-<summary>View full agent roster</summary>
-
-### Conductor
-
-| Agent                  | Role                                      |
-| ---------------------- | ----------------------------------------- |
-| **InfraOps Conductor** | Master orchestrator — manages all 7 steps |
-
-### Core Agents
-
-| Step | Agent          | Role                                            |
-| ---- | -------------- | ----------------------------------------------- |
-| 1    | `requirements` | Captures functional, NFR, and compliance needs  |
-| 2    | `architect`    | WAF assessment, design decisions, cost estimate |
-| 3    | `design`       | Architecture diagrams and ADRs (optional)       |
-| 4    | `bicep-plan`   | Implementation planning with governance         |
-| 5    | `bicep-code`   | AVM-first Bicep template generation             |
-| 6    | `deploy`       | Azure resource provisioning                     |
-| 7    | `as-built`     | As-built documentation suite                    |
-
-### Subagents
-
-| Subagent                        | Role                                          |
-| ------------------------------- | --------------------------------------------- |
-| `cost-estimate-subagent`        | Azure Pricing MCP queries                     |
-| `governance-discovery-subagent` | Azure Policy REST API discovery               |
-| `bicep-lint-subagent`           | Syntax validation (bicep lint, bicep build)   |
-| `bicep-review-subagent`         | Code review (AVM standards, security, naming) |
-| `bicep-whatif-subagent`         | Deployment preview (az deployment what-if)    |
-
-### Standalone Agents
-
-| Agent        | Role                                                                                    |
-| ------------ | --------------------------------------------------------------------------------------- |
-| `challenger` | Adversarial reviewer — challenges requirements, architecture, and plans for blind spots |
-| `diagnose`   | Resource health assessment and troubleshooting                                          |
-
-</details>
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
+| Role | Capabilities |
+|------|-------------|
+| **Admin** | Full control — create/launch/archive hackathons, manage roles, override scores, view audit log |
+| **Coach** | Review and approve/reject submissions, view all teams |
+| **Hacker** | Submit scores for own team, view leaderboard |
+| **Anonymous** | Blocked entirely — login required |
 
 ---
 
-## 🧩 MCP Integration
+## Azure Constraints
 
-| MCP Server                                                                                        | Purpose                                                 |
-| ------------------------------------------------------------------------------------------------- | ------------------------------------------------------- |
-| [Azure MCP Server](https://github.com/microsoft/mcp/blob/main/servers/Azure.Mcp.Server/README.md) | 40+ Azure service tools — governance, monitoring, RBAC  |
-| [Pricing MCP](mcp/azure-pricing-mcp/)                                                             | Real-time Azure retail pricing for cost-aware decisions |
+Designed for enterprise Azure landing zones:
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
----
-
-## Related Repositories
-
-### 🚀 [azure-agentic-infraops-accelerator](https://github.com/jonathan-vella/azure-agentic-infraops-accelerator)
-
-A curated collection of pre-built, production-ready Azure infrastructure patterns generated and
-validated by the Agentic InfraOps workflow. Use it as a starting point for common workload
-archetypes—each pattern ships with Bicep templates, agent artifacts, and deployment scripts.
-
-### 🎓 [azure-agentic-infraops-workshops](https://github.com/jonathan-vella/azure-agentic-infraops-workshops)
-
-Hands-on workshop material for teams and individuals learning the Agentic InfraOps workflow.
-Structured labs walk you through each of the 7 steps with guided exercises, sample prompts, and
-reference solutions—from first Conductor run to full deployment.
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
+- Zero hardcoded values — all config in Key Vault or environment variables
+- Private Endpoint only — `publicNetworkAccess: 'Disabled'` on Cosmos DB
+- Managed Identity for all service-to-service authentication
+- Azure Policy compliant — governance discovery required before production deployment
+- Minimum 4 tags enforced: `Environment`, `ManagedBy`, `Project`, `Owner`
+- Default region: `swedencentral` (EU GDPR-compliant)
 
 ---
 
-## 🤝 Contributing & License
+## Project Structure
+
+```text
+apps/
+  web/                  # Next.js 15 application
+packages/
+  shared/               # Shared TypeScript types
+infra/
+  bicep/hackops/        # Bicep AVM templates
+.github/
+  agents/               # Copilot agent definitions
+  skills/               # Domain knowledge skills
+  instructions/         # File-type coding rules
+agent-output/           # Generated infrastructure artifacts
+docs/                   # Documentation
+```
+
+See [AGENTS.md](AGENTS.md) for the agent workflow used to generate infrastructure artifacts.
+
+---
+
+## Contributing & License
 
 Contributions are welcome — see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 MIT License — see [LICENSE](LICENSE) for details.
-
-Built upon [copilot-orchestra](https://github.com/ShepAlderson/copilot-orchestra) and
-[Github-Copilot-Atlas](https://github.com/bigguy345/Github-Copilot-Atlas).
 
 ---
 
@@ -267,15 +188,15 @@ Built upon [copilot-orchestra](https://github.com/ShepAlderson/copilot-orchestra
 
 <!-- MARKDOWN LINKS & IMAGES -->
 
-[contributors-shield]: https://img.shields.io/github/contributors/jonathan-vella/azure-agentic-infraops.svg?style=for-the-badge
-[contributors-url]: https://github.com/jonathan-vella/azure-agentic-infraops/graphs/contributors
-[forks-shield]: https://img.shields.io/github/forks/jonathan-vella/azure-agentic-infraops.svg?style=for-the-badge
-[forks-url]: https://github.com/jonathan-vella/azure-agentic-infraops/network/members
-[stars-shield]: https://img.shields.io/github/stars/jonathan-vella/azure-agentic-infraops.svg?style=for-the-badge
-[stars-url]: https://github.com/jonathan-vella/azure-agentic-infraops/stargazers
-[issues-shield]: https://img.shields.io/github/issues/jonathan-vella/azure-agentic-infraops.svg?style=for-the-badge
-[issues-url]: https://github.com/jonathan-vella/azure-agentic-infraops/issues
-[license-shield]: https://img.shields.io/github/license/jonathan-vella/azure-agentic-infraops.svg?style=for-the-badge
-[license-url]: https://github.com/jonathan-vella/azure-agentic-infraops/blob/main/LICENSE
+[contributors-shield]: https://img.shields.io/github/contributors/jonathan-vella/hack-ops.svg?style=for-the-badge
+[contributors-url]: https://github.com/jonathan-vella/hack-ops/graphs/contributors
+[forks-shield]: https://img.shields.io/github/forks/jonathan-vella/hack-ops.svg?style=for-the-badge
+[forks-url]: https://github.com/jonathan-vella/hack-ops/network/members
+[stars-shield]: https://img.shields.io/github/stars/jonathan-vella/hack-ops.svg?style=for-the-badge
+[stars-url]: https://github.com/jonathan-vella/hack-ops/stargazers
+[issues-shield]: https://img.shields.io/github/issues/jonathan-vella/hack-ops.svg?style=for-the-badge
+[issues-url]: https://github.com/jonathan-vella/hack-ops/issues
+[license-shield]: https://img.shields.io/github/license/jonathan-vella/hack-ops.svg?style=for-the-badge
+[license-url]: https://github.com/jonathan-vella/hack-ops/blob/main/LICENSE
 [azure-shield]: https://img.shields.io/badge/Azure-Ready-0078D4?style=for-the-badge&logo=microsoftazure&logoColor=white
 [azure-url]: https://azure.microsoft.com

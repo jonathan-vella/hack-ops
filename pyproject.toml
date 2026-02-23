@@ -1,7 +1,7 @@
 [project]
-name = "azure-agentic-infraops"
-version = "0.9.0"
-description = "Agentic InfraOps - Azure infrastructure engineered by agents"
+name = "hackops"
+version = "0.1.0"
+description = "HackOps - Hackathon management platform for structured Microsoft Azure learning events"
 requires-python = ">=3.10"
 
 [tool.ruff]

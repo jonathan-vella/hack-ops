@@ -1,7 +1,7 @@
 {
-  "name": "azure-agentic-infraops",
-  "version": "0.9.0",
-  "description": "Agentic InfraOps - Azure infrastructure engineered by agents. Verified. Well-Architected. Deployable.",
+  "name": "hackops",
+  "version": "0.1.0",
+  "description": "HackOps - Hackathon management platform for structured Microsoft Azure learning events.",
   "private": true,
   "scripts": {
     "prepare": "lefthook install",
@@ -43,17 +43,17 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/jonathan-vella/azure-agentic-infraops.git"
+    "url": "https://github.com/jonathan-vella/hack-ops.git"
   },
   "keywords": [
     "azure",
-    "bicep",
-    "github-copilot",
-    "infrastructure-as-code",
-    "agents",
-    "agentic",
-    "well-architected",
-    "azure-verified-modules"
+    "hackathon",
+    "microhack",
+    "leaderboard",
+    "scoring",
+    "cosmos-db",
+    "nextjs",
+    "bicep"
   ],
   "author": "Jonathan Vella",
   "license": "MIT"
