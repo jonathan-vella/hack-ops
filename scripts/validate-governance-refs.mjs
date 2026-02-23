@@ -120,8 +120,7 @@ check(
 
 // 4. bicep-governance.instructions.md exists and is valid
 console.log("\n📄 bicep-governance.instructions.md");
-const policyInstrPath =
-  ".github/instructions/bicep-governance.instructions.md";
+const policyInstrPath = ".github/instructions/bicep-governance.instructions.md";
 check("File exists", fileExists(policyInstrPath));
 check(
   "Has correct applyTo scope including *.bicep",
