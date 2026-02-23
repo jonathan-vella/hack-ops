@@ -1,0 +1,157 @@
+{
+  "challenged_artifact": ".github/prompts/plan-hackOps.prompt.md",
+  "artifact_type": "implementation-plan",
+  "challenge_date": "2026-02-23",
+  "resolution_date": "2026-02-23",
+  "challenge_summary": "All 13 findings have been resolved. Governance moved to Phase 1.5, Cosmos DB RBAC corrected to SQL role assignments, rubric uses pointer+versioned docs pattern, Easy Auth verified at deploy time, CORS/rate-limiting/Zod middleware added to Phase 5, VNet resized to /24 with 3 subnets, deployment stacks for rollback, event codes auto-generated with uniqueness check, Private DNS zones configurable, periodic backup policy, Turborepo for monorepo, cost estimates marked as parametric, emulator smoke test in Phase 1.",
+  "risk_level": "low",
+  "must_fix_count": 0,
+  "should_fix_count": 0,
+  "suggestion_count": 0,
+  "resolved_count": 13,
+  "issues": [
+    {
+      "status": "resolved",
+      "resolution": "Added Phase 1.5: Governance Discovery as a dedicated hard gate before any IaC. Phase 12 converted to Production Hardening & Compliance Validation.",
+      "severity": "must_fix",
+      "category": "governance_gap",
+      "title": "Governance discovery deferred to Phase 12 but IaC deploys in Phases 2-4",
+      "description": "The plan deploys networking, Key Vault, Cosmos DB, and App Service in Phases 2-4, but governance discovery is not performed until Phase 12. Per bicep-governance.instructions.md, governance discovery is a MANDATORY GATE — 'ALL Bicep code generation MUST cross-reference 04-governance-constraints.md and 04-governance-constraints.json before writing templates.' The plan explicitly says 'governance discovery deferred to Phase 12' which directly violates this hard requirement.",
+      "failure_scenario": "Phases 2-4 deploy resources with assumed 4-tag baseline. Actual Azure Policy enforces 9 tags via management-group-inherited Deny policies. Every deployment attempt fails with PolicyViolation. All IaC work from Phases 2-4 must be reworked after discovering actual constraints in Phase 12.",
+      "artifact_section": "Phase 12: Governance Discovery & Hardening",
+      "suggested_mitigation": "Move governance discovery to Phase 1.5 (after scaffold, before any IaC). Run the REST API-based governance discovery subagent, produce 04-governance-constraints.md and .json, and make all subsequent IaC phases cross-reference these files. This is non-negotiable per repo rules."
+    },
+    {
+      "status": "resolved",
+      "resolution": "Phase 3 step 7 now specifies Cosmos DB SQL role assignment with Built-in Data Contributor (ID 00000000-0000-0000-0000-000000000002) using sqlRoleAssignments resource type.",
+      "severity": "must_fix",
+      "category": "untested_assumption",
+      "title": "Wrong Cosmos DB role for data-plane access — Account Reader is metadata-only",
+      "description": "Phase 3 and the Key Azure Services table reference 'Cosmos DB Account Reader' (fbdf93bf-df7d-467e-a4d2-9458aa1360c8) and 'Cosmos DB Built-in Data Contributor' interchangeably. The Account Reader role is a CONTROL-PLANE role that allows reading account metadata (list keys, read connection strings) — it does NOT grant data-plane access to read/write documents. The plan needs the 'Cosmos DB Built-in Data Contributor' role which is a DATA-PLANE role with ID 00000000-0000-0000-0000-000000000002 (a Cosmos DB built-in RBAC definition, NOT an Azure RBAC role definition).",
+      "failure_scenario": "App Service gets Account Reader role. Application attempts to read/write documents via @azure/cosmos with managed identity (DefaultAzureCredential). All data operations fail with 403 Forbidden because control-plane RBAC does not grant data-plane access. Cosmos DB data-plane RBAC uses its own built-in role definitions, not Azure resource-level roles.",
+      "artifact_section": "Phase 3: Database IaC & Schema",
+      "suggested_mitigation": "Use Cosmos DB's built-in data-plane RBAC: assign 'Cosmos DB Built-in Data Contributor' (ID: 00000000-0000-0000-0000-000000000002) via the sqlRoleAssignment resource type (Microsoft.DocumentDB/databaseAccounts/sqlRoleAssignments). This is NOT a standard Azure RBAC role assignment — it requires a dedicated Cosmos DB-specific Bicep resource. The AVM module for Cosmos DB may support this via sqlRoleDefinitions/sqlRoleAssignments parameters."
+    },
+    {
+      "status": "resolved",
+      "resolution": "Phase 7 rubric CRUD now uses pointer + versioned docs pattern. Rubric versions stored as separate docs; pointer doc identifies active version. Atomic swap = single-doc pointer update.",
+      "severity": "must_fix",
+      "category": "missing_failure_mode",
+      "title": "Rubric 'atomic swap' has no transactional guarantee in Cosmos DB Serverless",
+      "description": "Phase 7 states: 'Only one can be active at a time (atomic swap pattern: deactivate current → activate new in single transaction).' Cosmos DB NoSQL with Serverless capacity does NOT support multi-document transactions across different partition keys. The rubrics container uses /id as partition key, so deactivating rubric A (id=X) and activating rubric B (id=Y) are two separate operations on different logical partitions — they cannot be wrapped in a transactional batch.",
+      "failure_scenario": "Admin activates a new rubric. Step 1 (deactivate old) succeeds. Step 2 (activate new) fails due to a transient error. Now zero rubrics are active. All scoring forms break because they depend on exactly one active rubric. There is no rollback mechanism described.",
+      "artifact_section": "Phase 7: Scoring Engine & Submission Workflow",
+      "suggested_mitigation": "Option A: Use a single 'active-rubric' pointer document in the config container (single partition) that references the active rubric ID. Swapping is a single-document update — atomic by definition. Option B: Repartition rubrics by a fixed key (e.g., /type='rubric') so all rubrics share a partition, enabling transactional batch. Option A is simpler and recommended."
+    },
+    {
+      "status": "resolved",
+      "resolution": "GitHub-only auth retained. Phase 4 Gotchas now includes explicit verification step: test Easy Auth GitHub login immediately after first deployment; pivot to Entra ID if blocked.",
+      "severity": "should_fix",
+      "category": "untested_assumption",
+      "title": "Easy Auth GitHub provider may be deprecated or superseded",
+      "description": "The plan assumes Azure App Service Easy Auth with GitHub as an identity provider. Microsoft has been evolving authentication, and the built-in GitHub provider in Easy Auth (v1) was limited. Easy Auth v2 uses the 'OpenID Connect' provider pattern for GitHub. The plan does not specify which Easy Auth version or confirm that the GitHub provider is still a first-class option in the target API version. The non-negotiable constraint says 'or a compatible modern equivalent if Easy Auth has been superseded.'",
+      "failure_scenario": "Team reaches Phase 4 and discovers that the built-in GitHub provider requires manual OpenID Connect configuration (GitHub does not expose a /.well-known/openid-configuration endpoint natively). The callback URL pattern, token endpoint, and claims mapping differ from the 'just enable GitHub in Easy Auth portal' assumption.",
+      "artifact_section": "Phase 4: Compute IaC & Deployment",
+      "suggested_mitigation": "Research the exact Easy Auth v2 configuration for GitHub OAuth before Phase 4. Document the required Bicep config properties (authSettingsV2 resource type), confirm GitHub's OAuth endpoints, and verify the callback URL pattern. Consider documenting a fallback to a lightweight custom auth middleware using passport-github2 if Easy Auth proves too restrictive."
+    },
+    {
+      "status": "resolved",
+      "resolution": "Phase 5 now includes CORS whitelist (step 4), rate limiting at 100 req/min/IP (step 5), and centralized Zod validation middleware (step 6).",
+      "severity": "should_fix",
+      "category": "missing_failure_mode",
+      "title": "No CORS configuration or rate limiting on API endpoints",
+      "description": "The plan defines ~16 API endpoints but neither CORS policy nor rate limiting is mentioned anywhere. For a live leaderboard polling every 30 seconds, and public-facing URLs, this is a gap. Without CORS, the browser will block cross-origin requests if the frontend is ever served from a different origin (e.g., during local dev hitting a deployed API). Without rate limiting, the health endpoint and leaderboard API are vulnerable to abuse.",
+      "failure_scenario": "During local development, the Next.js dev server runs on localhost:3000 and tries to call the deployed API on app-hackops-dev-x7k2m9.azurewebsites.net. Browser CORS blocks all requests. Separately, a bot scrapes /api/leaderboard every second, consuming Cosmos DB RUs rapidly and exceeding the serverless burst limit.",
+      "artifact_section": "Phase 5: Authentication & Authorization Middleware",
+      "suggested_mitigation": "Add CORS configuration to App Service (allowed origins for the app's own domain + localhost for dev). Add rate limiting middleware to Next.js API routes (e.g., express-rate-limit or a custom token bucket). Document both in Phase 5."
+    },
+    {
+      "status": "resolved",
+      "resolution": "VNet changed to /24 (10.0.0.0/24) with 3 subnets: /26 app (64 IPs), /27 PE (32 IPs), /27 spare (32 IPs). Avoids over-claiming enterprise address space.",
+      "severity": "should_fix",
+      "category": "architectural_weakness",
+      "title": "Two /24 subnets in a /16 VNet wastes address space and limits future growth",
+      "description": "Phase 2 allocates a /16 VNet (65,536 IPs) but only creates two /24 subnets (256 IPs each). This wastes 65,024 addresses while simultaneously creating a risk: if additional subnets are needed later (e.g., for Azure Bastion, App Gateway, or additional PaaS integration), the large gap between 10.0.1.0/24 and 10.0.2.0/24 is fine, but there is no documented subnet plan for expansion. More importantly, App Service VNet integration requires a minimum /26 subnet (not /24), but a /24 is significantly oversized for a single App Service Plan.",
+      "failure_scenario": "Future requirements add Azure Bastion (requires dedicated /26+), an App Gateway for WAF (requires /24+), or a second private endpoint subnet. Without a documented address plan, new subnets conflict with existing allocations. Alternatively, in an enterprise landing zone, the VNet address space may be pre-allocated by the networking team — the plan assumes 10.0.0.0/16 is available.",
+      "artifact_section": "Phase 2: IaC Foundation",
+      "suggested_mitigation": "Document a subnet address plan as part of Phase 2. Use appropriately sized subnets: /26 for App Service integration (64 IPs, minimum required), /27 for private endpoints (32 IPs, more than enough). Add a note that the VNet address space must be validated against the enterprise IP Address Management (IPAM) plan during governance discovery."
+    },
+    {
+      "status": "resolved",
+      "resolution": "Phase 2 step 9 now specifies Azure Deployment Stacks as the deployment mechanism with deny-settings, resource tracking, and clean rollback on partial failure.",
+      "severity": "should_fix",
+      "category": "missing_failure_mode",
+      "title": "No rollback strategy for partial deployment failures",
+      "description": "The plan deploys infrastructure across Phases 2-4 (networking → database → compute) but does not describe what happens if Phase 3 succeeds (Cosmos DB deployed) and Phase 4 fails (App Service deployment error). There is no rollback procedure, no state management for partial failures, and no guidance on whether to tear down and retry or fix-forward.",
+      "failure_scenario": "Phase 3 deploys Cosmos DB with private endpoint. Phase 4 fails because the App Service SKU is blocked by Azure Policy. Cosmos DB is running and billing. The developer must manually decide whether to delete the Cosmos DB (losing the private endpoint and DNS setup), fix the SKU and redeploy, or troubleshoot policy. No guidance exists in the plan.",
+      "artifact_section": "## Phased Implementation Plan",
+      "suggested_mitigation": "Add a rollback strategy section to the plan: (1) All IaC phases should be re-runnable (idempotent) so fix-forward is the default strategy. (2) Document that each phase's Bicep what-if must pass before deployment. (3) Add a 'cleanup' script or deploy.ps1 flag to tear down a resource group entirely if needed. (4) Note that Cosmos DB with purge protection and Key Vault with soft delete require special handling on teardown."
+    },
+    {
+      "status": "resolved",
+      "resolution": "Phase 6 step 2 now specifies auto-generated 4-digit numeric codes with uniqueness validation against active hackathons. Reject and regenerate on collision.",
+      "severity": "should_fix",
+      "category": "architectural_weakness",
+      "title": "4-digit event code has high collision probability and is brute-forceable",
+      "description": "The plan uses a 4-digit event code for hacker self-service onboarding, stored as SHA-256 hash. A 4-digit code has only 10,000 possible values (0000-9999). With 2-3 parallel events, a brute-force attack needs at most 10,000 attempts to guess any active event code. SHA-256 hashing does not help because the attacker can precompute all 10,000 hashes. The /api/join endpoint accepts event codes from any authenticated user — there is no rate limiting described.",
+      "failure_scenario": "An authenticated user (any GitHub account) calls POST /api/join with all 10,000 possible codes sequentially. Within seconds, they discover all active event codes and join every active hackathon. The SHA-256 hash provides zero protection because the keyspace is trivially enumerable.",
+      "artifact_section": "Phase 6: Core API — Hackathon & Team Management",
+      "suggested_mitigation": "Option A: Use a 6-8 character alphanumeric code (36^6 = 2.1B possibilities, or 36^8 = 2.8T). Option B: Add rate limiting on /api/join (5 attempts per 15 minutes per user). Option C: Add an account lockout after N failed attempts. Ideally combine A + B. The SHA-256 storage is good practice regardless but is not a substitute for keyspace size."
+    },
+    {
+      "status": "resolved",
+      "resolution": "Phase 3 step 5 now has configurable DNS zone: optional existingPrivateDnsZoneId parameter. If provided, links to existing zone; if omitted, creates new zone in project RG. AVM table includes Private DNS Zone module.",
+      "severity": "should_fix",
+      "category": "hidden_dependency",
+      "title": "Private DNS Zone link to VNet not explicitly planned",
+      "description": "The plan creates a Private Endpoint for Cosmos DB with DNS zone 'privatelink.documents.azure.com' but does not explicitly list the Private DNS Zone resource itself or the VNet link resource. Per the azure-bicep-patterns skill, the standard pattern requires THREE resources: (1) Private Endpoint, (2) DNS Zone Group on the PE, and (3) the Private DNS Zone linked to the VNet. In an enterprise landing zone, the Private DNS Zone may already exist in a central hub — the plan does not account for this.",
+      "failure_scenario": "The Bicep template creates the Private Endpoint but the Private DNS Zone does not exist. The DNS Zone Group creation fails because there is no zone to register in. Alternatively, the template creates a new privatelink.documents.azure.com zone but the enterprise already has one in the hub VNet — now there are two competing zones and DNS resolution breaks.",
+      "artifact_section": "Phase 3: Database IaC & Schema",
+      "suggested_mitigation": "Add explicit steps in Phase 3: (1) Check if a central Private DNS Zone exists (governance/networking team dependency). (2) If yes, use a VNet link to the existing zone. (3) If no, create the zone with a VNet link. Make this a parameter in the Bicep module: existingPrivateDnsZoneId (optional, if provided skip zone creation)."
+    },
+    {
+      "status": "resolved",
+      "resolution": "Phase 3 step 3 specifies Periodic backup (free, default). Acceptable for hackathon-scoped event data with relaxed RTO/RPO.",
+      "severity": "suggestion",
+      "category": "waf_blind_spot",
+      "title": "No backup or disaster recovery plan for Cosmos DB data",
+      "description": "The plan does not mention Cosmos DB backup configuration. Cosmos DB Serverless supports continuous backup (7 or 30 day retention) but this must be explicitly configured. The default periodic backup policy may not meet RTO/RPO expectations. For a hackathon platform where event data is actively used during live events, data loss during an event would be catastrophic.",
+      "failure_scenario": "A bug in the application logic corrupts the scores container during a live event. The admin wants to restore to a point 30 minutes ago. Without continuous backup configured, the default periodic backup has a 4-hour interval — the last good backup may be hours old.",
+      "artifact_section": "## Tech Stack Recommendation",
+      "suggested_mitigation": "Add Cosmos DB continuous backup (7-day retention minimum) to Phase 3 Bicep configuration. Document the restore procedure in an operational runbook. This is a single Bicep property: backupPolicy.type = 'Continuous'."
+    },
+    {
+      "status": "resolved",
+      "resolution": "Phase 1 step 1 now specifies Turborepo with turbo.json pipeline config. Folder structure includes turbo.json.",
+      "severity": "suggestion",
+      "category": "scope_risk",
+      "title": "Monorepo tooling (workspaces, build orchestration) not specified",
+      "description": "Phase 1 creates a monorepo with apps/web/ and packages/shared/ but does not specify the workspace management tool (npm workspaces, pnpm, turborepo, nx). For a monorepo with shared packages, the build toolchain choice affects dependency hoisting, script execution order, and CI caching. The existing root package.json uses npm directly.",
+      "failure_scenario": "Developer creates the monorepo structure, then discovers that npm workspaces require explicit workspace configuration in root package.json. The shared types package needs to be built before the web app. Without a build orchestrator like turborepo, CI runs are slow because there is no caching. The existing package.json scripts (npm run validate, etc.) may conflict with workspace commands.",
+      "artifact_section": "Phase 1: Monorepo Scaffold & Dev Environment",
+      "suggested_mitigation": "Specify npm workspaces (simplest, no extra dependency) or turborepo (better DX, build caching) in Phase 1. Document the root package.json workspaces configuration and build order."
+    },
+    {
+      "status": "resolved",
+      "resolution": "Trade-offs section now includes a disclaimer marking all cost estimates as parametric approximations, to be verified against Azure Pricing Calculator before budget commitment.",
+      "severity": "suggestion",
+      "category": "waf_blind_spot",
+      "title": "No cost estimate provided for the proposed architecture",
+      "description": "The plan recommends specific SKUs (B1/S1 App Service, Serverless Cosmos DB, Standard Key Vault) but provides no monthly cost estimate. The repo has an Azure Pricing MCP server with bulk estimate capabilities. The constraints state 'assume enterprise landing zone' but no budget is established to validate that Serverless Cosmos + B1 App Service is actually cost-appropriate.",
+      "failure_scenario": "The estimated monthly cost exceeds expectations. The Cosmos DB Serverless 1,000 RU/s burst limit is hit during a live event, degrading performance. The plan assumed 'dramatically cheaper' but actual costs with VNet, Private DNS, Key Vault, and Log Analytics are higher than a simple App Service + Cosmos DB estimate suggests.",
+      "artifact_section": "### Trade-offs Summary",
+      "suggested_mitigation": "Use the Azure Pricing MCP (azure_bulk_estimate) to produce a cost estimate covering all resources in dev and prod configurations. Document the estimate in the plan or as a separate cost-estimate artifact."
+    },
+    {
+      "status": "resolved",
+      "resolution": "Phase 1 step 10 adds a Cosmos DB emulator smoke test as a Phase 1 exit gate: verify SDK v4 connectivity, CRUD on all 10 containers, and change feed.",
+      "severity": "suggestion",
+      "category": "untested_assumption",
+      "title": "Cosmos DB emulator Linux support is limited",
+      "description": "Phase 1 specifies using the Cosmos DB emulator for local development in a Linux devcontainer. The Cosmos DB Linux emulator was in preview and has known limitations: it only supports the NoSQL API (which is what the plan uses, so this is ok), but it requires Docker-in-Docker within the devcontainer, and may have compatibility issues with the latest @azure/cosmos SDK versions.",
+      "failure_scenario": "Developer tries to run the Cosmos DB emulator inside the Ubuntu 24.04 devcontainer. Docker-in-Docker is not configured. The emulator container cannot start. The developer falls back to using a deployed Cosmos DB account for development, violating the 'local-first' requirement, or loses significant time troubleshooting Docker-in-Docker setup.",
+      "artifact_section": "Phase 1: Monorepo Scaffold & Dev Environment",
+      "suggested_mitigation": "Verify the Cosmos DB Linux emulator works in the existing devcontainer configuration. The devcontainer already uses Docker-outside-Docker (docker-outside-of-docker feature). Document the exact emulator image and startup command. Add a fallback note for developers who cannot run the emulator."
+    }
+  ]
+}

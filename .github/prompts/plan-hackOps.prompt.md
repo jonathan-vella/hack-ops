@@ -21,7 +21,7 @@
 
 HackOps manages the complete lifecycle of a MicroHack event:
 
-- Team registration and self-service hacker onboarding via a 4-digit event code
+- Team registration and self-service hacker onboarding via an auto-generated 4-digit event code
 - Configurable, Markdown-driven scoring rubric that drives all scoring UI, validation, and grading
 - Hacker score submission (form-based and JSON file upload), held in a staging/approval queue
 - Admin and coach submission review, approval, rejection, and score override
@@ -42,7 +42,7 @@ HackOps manages the complete lifecycle of a MicroHack event:
 ### Key Invariants
 
 - Scores are immutable until approved (staging pattern)
-- One active rubric at a time (atomic swap on activation)
+- One active rubric at a time (atomic swap via pointer document + versioned rubric docs)
 - Score entry and grading are fully rubric-driven — nothing hardcoded
 - Hackers are team-scoped; cross-team submission attempts return 403
 - Event codes stored as SHA-256 hash only
@@ -129,6 +129,7 @@ _Alternatives considered_: **Provisioned throughput** — predictable cost but o
 | NSG              | `br/public:avm/res/network/network-security-group` | `0.5.0`     |
 | Log Analytics    | `br/public:avm/res/operational-insights/workspace` | `0.9.0`     |
 | App Insights     | `br/public:avm/res/insights/component`             | `0.4.0`     |
+| Private DNS Zone | `br/public:avm/res/network/private-dns-zone`       | `0.7.0`     |
 
 ### CI/CD
 
@@ -190,6 +191,8 @@ kv-{take(projectName, 7)}-{take(env, 3)}-{suffix}  →  kv-hackops-dev-x7k2m9 (2
 | Single App Service                  | All eggs in one basket. Mitigated by deployment slots for zero-downtime deploy. |
 | shadcn/ui vs. Fluent UI             | Less "Azure-branded" but faster to build, lighter bundle, more flexible.        |
 
+> **Cost estimates in this plan are parametric approximations.** Verify all prices against the Azure Pricing Calculator or Azure Pricing MCP tools before committing to a budget. SKU pricing varies by region and is subject to change.
+
 ---
 
 ## Phased Implementation Plan
@@ -202,7 +205,7 @@ kv-{take(projectName, 7)}-{take(env, 3)}-{suffix}  →  kv-hackops-dev-x7k2m9 (2
 
 **Steps**:
 
-1. Create monorepo root at project level with `apps/web/` for the Next.js app and `packages/shared/` for shared TypeScript types
+1. Create monorepo root at project level using **Turborepo** with `apps/web/` for the Next.js app and `packages/shared/` for shared TypeScript types. Install `turbo` as a dev dependency and configure `turbo.json` with pipelines for `build`, `lint`, `type-check`, and `test`
 2. Initialize Next.js 15 (App Router) in `apps/web/` with TypeScript, Tailwind CSS 4, ESLint
 3. Install and configure shadcn/ui (init + first components: `Button`, `Card`, `Table`, `Badge`, `Dialog`)
 4. Install `@azure/cosmos`, `@azure/identity`, `zod`, and dev dependencies
@@ -211,10 +214,12 @@ kv-{take(projectName, 7)}-{take(env, 3)}-{suffix}  →  kv-hackops-dev-x7k2m9 (2
 7. Add Azurite configuration for any blob storage needs (JSON file uploads)
 8. Create a seed script (`scripts/seed-cosmos.ts`) that creates all 10 containers with partition keys and inserts sample data
 9. Update `.devcontainer/devcontainer.json` to include Cosmos DB emulator and Azurite containers
+10. **Cosmos DB emulator smoke test**: verify `@azure/cosmos` SDK v4 connects to the emulator, CRUD operations succeed on all 10 containers, and change feed subscription works. This gates Phase 1 exit — if the emulator doesn't work with the chosen SDK, surface the issue before writing any data layer code
 
 **Folder structure**:
 
 ```
+turbo.json                      # Turborepo pipeline config
 apps/
   web/                        # Next.js 15 app
     src/
@@ -262,6 +267,28 @@ scripts/
 
 ---
 
+### Phase 1.5: Governance Discovery
+
+**Goal**: Discover Azure Policy constraints in the target subscription before writing any IaC. This is a hard gate — policy-violating Bicep will fail at deployment.
+
+**Exit criteria**: `agent-output/hackops/04-governance-constraints.json` populated with all discovered policies; constraints mapped to resource types planned in Phases 2-4.
+
+**Steps**:
+
+1. Run governance discovery REST API against the target subscription and all inherited management group policies
+2. Classify discovered policies by effect (`Deny`, `Audit`, `Modify`, `DeployIfNotExists`) and map to planned resources (VNet, Cosmos DB, App Service, Key Vault)
+3. Document all constraints in `agent-output/hackops/04-governance-constraints.json` (machine-readable) and `agent-output/hackops/04-governance-constraints.md` (human-readable)
+4. Identify any `Deny` policies that would block planned SKUs (Serverless Cosmos DB, B1/S1 App Service) or configurations (public access settings, TLS versions)
+5. Determine required tags beyond the 4-tag baseline (`Environment`, `Project`, `Owner`, `CostCenter`) — enterprise policies often enforce additional tags
+6. Document allowed regions and verify `swedencentral` is permitted for all planned resource types
+7. If Azure connectivity is unavailable, create a placeholder constraints file documenting that governance discovery is pending and must complete before any `az deployment` command
+
+**Output**: `agent-output/hackops/04-governance-constraints.json` — consumed by all subsequent IaC phases as the single source of truth for policy compliance.
+
+**Hard gate**: No Bicep deployment (`az deployment group create` or `what-if`) may proceed until this phase completes. Local `bicep build` and `bicep lint` are permitted.
+
+---
+
 ### Phase 2: IaC Foundation
 
 **Goal**: Bicep templates that deploy networking, monitoring, and Key Vault — the foundational layer all other resources depend on.
@@ -273,20 +300,22 @@ scripts/
 1. Create `infra/bicep/hackops/main.bicep` with parameters for `environment`, `projectName`, `location`, `owner`
 2. Define `var uniqueSuffix = take(uniqueString(resourceGroup().id), 6)` — single source for the 6-character suffix passed to all modules
 3. Create `infra/bicep/hackops/main.bicepparam` for dev environment
-4. Create module `modules/networking.bicep` — VNet (`10.0.0.0/16`), two subnets: `snet-app` (`10.0.1.0/24`, App Service delegation), `snet-pe` (`10.0.2.0/24`, private endpoints), NSGs for each
+4. Create module `modules/networking.bicep` — VNet (`10.0.0.0/24`), three subnets: `snet-app` (`10.0.0.0/26`, 64 IPs, App Service delegation), `snet-pe` (`10.0.0.64/27`, 32 IPs, private endpoints), `snet-spare` (`10.0.0.96/27`, 32 IPs, reserved for future services), NSGs for each. A `/24` avoids over-claiming enterprise address space while leaving room to grow
 5. Create module `modules/monitoring.bicep` — Log Analytics workspace + Application Insights (using AVM modules)
 6. Create module `modules/key-vault.bicep` — Key Vault with RBAC authorization, purge protection, private endpoint on `snet-pe`
 7. Wire all modules in `main.bicep` with `uniqueSuffix`, tags, and diagnostic settings
 8. Create `infra/bicep/hackops/deploy.ps1` deployment script
+9. Configure **Azure Deployment Stacks** (`az stack group create`) as the deployment mechanism. Deployment stacks protect deployed resources with deny-settings, track all resources as a unit, and allow clean rollback on partial failure. Failed deployments detach resources without deleting them — redeploy to reconcile
 
 **AVM modules used**: `network/virtual-network`, `network/network-security-group`, `operational-insights/workspace`, `insights/component`, `key-vault/vault`
 
-**Policy considerations**:
+**Policy considerations** (sourced from Phase 1.5 governance discovery):
 
-- VNet: Ensure address space doesn't conflict with enterprise VNet ranges (governance discovery will reveal)
+- VNet: Ensure address space doesn't conflict with enterprise VNet ranges (check `04-governance-constraints.json` for allowed ranges)
 - Key Vault: `publicNetworkAccess: 'Disabled'` in prod; use Private Endpoint + VNet service endpoint for pipeline access
 - NSG: Default deny-all inbound on `snet-pe`; App Service integration subnet requires specific delegation rules
-- All resources: Include minimum 4 baseline tags + any policy-discovered additional tags
+- All resources: Include baseline tags + ALL policy-discovered additional tags from `04-governance-constraints.json`
+- SKUs: Verify planned SKUs are in the allowed list per governance constraints
 
 ---
 
@@ -300,16 +329,18 @@ scripts/
 
 1. Create module `modules/cosmos-db.bicep` using AVM module `br/public:avm/res/document-db/database-account:0.10.0`
 2. Configure: NoSQL API, Serverless capacity, `swedencentral`, system-assigned managed identity
-3. Define all 10 containers with partition keys (see table in Database section above)
-4. Create Private Endpoint for Cosmos DB on `snet-pe` with DNS zone `privatelink.documents.azure.com`
-5. Add Cosmos DB connection string as Key Vault secret (for fallback; prefer managed identity)
-6. Add role assignment: App Service managed identity → Cosmos DB `Cosmos DB Built-in Data Contributor` role
+3. Configure **backup policy**: Periodic (free, default — 2 copies every 4 hours, 8-hour retention). Sufficient for hackathon-scoped event data where RTO/RPO targets are relaxed
+4. Define all 10 containers with partition keys (see table in Database section above)
+5. Create Private Endpoint for Cosmos DB on `snet-pe`. **Private DNS Zone is configurable**: accept an optional `existingPrivateDnsZoneId` parameter — if provided, link the PE to the existing zone; if omitted, create `privatelink.documents.azure.com` in the project resource group. This supports both self-contained deployments and enterprise hub-spoke DNS architectures
+6. Add Cosmos DB connection string as Key Vault secret (for fallback; prefer managed identity)
+7. Add **Cosmos DB SQL role assignment** (data-plane RBAC, NOT an ARM role assignment): App Service managed identity → Built-in Data Contributor (role definition ID `00000000-0000-0000-0000-000000000002`). This uses the `Microsoft.DocumentDB/databaseAccounts/sqlRoleAssignments` resource type, which is required for data-plane operations (read/write documents). The control-plane role `Cosmos DB Account Reader` is insufficient
 
-**Policy considerations**:
+**Policy considerations** (sourced from Phase 1.5 governance discovery):
 
-- `publicNetworkAccess: 'Disabled'` — mandatory by policy assumption
+- `publicNetworkAccess: 'Disabled'` — mandatory by policy assumption; verify in `04-governance-constraints.json`
 - Private Endpoint group ID: `Sql` (Core/NoSQL API)
-- Serverless SKU may need policy exemption if "allowed SKUs" policy is narrowly scoped — flag during governance discovery
+- Serverless SKU may need policy exemption if "allowed SKUs" policy is narrowly scoped — check governance constraints
+- Verify `swedencentral` supports Cosmos DB Serverless (it does as of 2025, but confirm against governance allowed-regions list)
 
 ---
 
@@ -327,13 +358,14 @@ scripts/
 4. Configure App Settings via Key Vault references: `@Microsoft.KeyVault(SecretUri=...)`
 5. Configure Easy Auth (GitHub OAuth provider): client ID + client secret stored in Key Vault
 6. Set `APPLICATIONINSIGHTS_CONNECTION_STRING` from App Insights output
-7. Add role assignments: App Service identity → Key Vault Secrets User, → Cosmos DB Data Contributor
+7. Add role assignments: App Service identity → Key Vault Secrets User (ARM RBAC), → Cosmos DB Built-in Data Contributor (SQL role assignment — see Phase 3 step 7)
 8. Configure deployment slots: `staging` slot for zero-downtime deployments
 9. Set `WEBSITE_VNET_ROUTE_ALL=1` to force all outbound traffic through VNet
 
 **Gotchas**:
 
 - Easy Auth GitHub provider requires a GitHub OAuth App (created manually in GitHub Settings → Developer Settings → OAuth Apps); callback URL: `https://app-hackops-{env}-{suffix}.azurewebsites.net/.auth/login/github/callback`
+- **Verify GitHub OAuth is permitted**: Enterprise subscriptions may enforce Entra ID-only authentication via conditional access or App Service auth policies. Test Easy Auth GitHub login immediately after first deployment — if blocked, the auth strategy must pivot to Entra ID with external identities
 - `WEBSITE_DNS_SERVER=168.63.129.16` needed for private DNS resolution within VNet
 - App Service VNet integration subnet must have delegation `Microsoft.Web/serverFarms` — already handled in Phase 2 networking module
 
@@ -341,18 +373,21 @@ scripts/
 
 ### Phase 5: Authentication & Authorization Middleware
 
-**Goal**: GitHub OAuth login working end-to-end. Role-based middleware enforcing Admin/Coach/Hacker/Anonymous access on all routes.
+**Goal**: GitHub OAuth login working end-to-end. Role-based middleware enforcing Admin/Coach/Hacker/Anonymous access on all routes. CORS, rate limiting, and Zod validation middleware protecting all API endpoints.
 
-**Exit criteria**: Login redirects to GitHub; session contains user profile; API routes return 401/403 correctly by role.
+**Exit criteria**: Login redirects to GitHub; session contains user profile; API routes return 401/403 correctly by role; CORS blocks non-whitelisted origins; rate limiter returns 429 on abuse.
 
 **Steps**:
 
 1. Create `src/lib/auth.ts` — parse Easy Auth headers (`X-MS-CLIENT-PRINCIPAL`), decode base64 JWT, extract GitHub identity (userId, login, email, avatar)
 2. Create `src/lib/roles.ts` — role resolution: look up user in `roles` container by GitHub userId + hackathonId; return `Admin | Coach | Hacker | Anonymous`
 3. Create `src/middleware.ts` — Next.js middleware that intercepts all `/api/*` routes (except `/api/health`): validate auth headers, resolve role, attach to request context
-4. Create role guard helper: `requireRole('Admin', 'Coach')` — returns 403 if insufficient permissions
-5. Create `src/lib/audit.ts` — audit logger that writes `reviewedBy`, `reviewedAt`, `reviewReason` to submissions on any reviewer action
-6. Implement primary admin protection — lookup in `config` container; reject demotion attempts
+4. **Configure CORS** — whitelist the App Service origin (`https://app-hackops-{env}-{suffix}.azurewebsites.net`) and `localhost:3000` for dev. Block all other origins. Set in `next.config.ts` headers or via middleware
+5. **Add rate limiting** — in-memory rate limiter (e.g., `Map<IP, {count, resetAt}>`) at 100 requests/min/IP for API routes. Returns `429 Too Many Requests` with `Retry-After` header. For production scale, consider Azure API Management or App Service IP restrictions
+6. **Centralized Zod validation middleware** — create `src/lib/validation/middleware.ts` that wraps route handlers with automatic request body parsing via Zod schemas. Invalid payloads return 400 with structured error response. Parse at boundaries, not in business logic
+7. Create role guard helper: `requireRole('Admin', 'Coach')` — returns 403 if insufficient permissions
+8. Create `src/lib/audit.ts` — audit logger that writes `reviewedBy`, `reviewedAt`, `reviewReason` to submissions on any reviewer action
+9. Implement primary admin protection — lookup in `config` container; reject demotion attempts
 
 **Local dev**: Easy Auth doesn't work locally. Create a dev auth bypass in `src/lib/auth.ts` that reads `DEV_USER_ROLE` and `DEV_USER_ID` from environment variables when `NODE_ENV=development`.
 
@@ -367,7 +402,7 @@ scripts/
 **Steps**:
 
 1. **Hackathon CRUD** — `POST/GET/PATCH /api/hackathons` — create, list, update lifecycle state (`draft → active → archived`)
-2. **Event code** — on hackathon creation, generate 4-digit code, store SHA-256 hash only in `hackathons` container. Return plaintext to admin once.
+2. **Event code** — on hackathon creation, **auto-generate** a 4-digit numeric code (`0000`–`9999`). Validate uniqueness against all active hackathons before persisting — reject and regenerate on collision. Store SHA-256 hash only in `hackathons` container. Return plaintext to admin once.
 3. **Hacker onboarding** — `POST /api/join` — accept event code + GitHub identity, verify hash match, create hacker record in `hackers` container
 4. **Team assignment** — `POST /api/hackathons/{id}/assign-teams` — Fisher-Yates shuffle all unassigned hackers, distribute into teams of `teamSize` (configurable). Store in `teams` container.
 5. **Manual reassignment** — `PATCH /api/teams/{id}/reassign` — admin-only, move hacker between teams
@@ -394,7 +429,7 @@ scripts/
 
 **Steps**:
 
-1. **Rubric CRUD** — `POST/GET/PATCH /api/rubrics` — create rubric with Markdown-driven criteria (categories, max points, descriptions). Only one can be `active` at a time (atomic swap pattern: deactivate current → activate new in single transaction).
+1. **Rubric CRUD** — `POST/GET/PATCH /api/rubrics` — create rubric with Markdown-driven criteria (categories, max points, descriptions). Only one can be `active` at a time. Uses a **pointer + versioned docs** pattern: rubric versions are stored as separate documents (`rubric-v1`, `rubric-v2`, etc.) and a small pointer document indicates the active version. Atomic swap = update the pointer document only. Consumers always read the pointer first, then fetch the referenced version — no partial reads during updates.
 2. **Submission endpoint** — `POST /api/submissions` — accept form data OR JSON file upload. Validate against active rubric schema (Zod). Hackers can only submit for their own team (403 otherwise). Submission enters `pending` state.
 3. **Review queue** — `GET /api/submissions?status=pending` (Admin, Coach). List pending submissions with team info, challenge info, submitted scores.
 4. **Approve/Reject** — `PATCH /api/submissions/:id` — set status to `approved` or `rejected`. On approval: copy validated scores to `scores` container (immutable). Write audit fields (`reviewedBy`, `reviewedAt`, `reviewReason`).
@@ -470,22 +505,20 @@ scripts/
 
 ---
 
-### Phase 12: Governance Discovery & Hardening
+### Phase 12: Production Hardening & Compliance Validation
 
-**Goal**: Discover actual Azure Policy constraints, harden all resources, validate compliance.
+**Goal**: Final compliance sweep before production deployment. Governance discovery was completed in Phase 1.5 — this phase validates all templates against the discovered constraints and hardens configuration.
 
-**Exit criteria**: `04-governance-constraints.md` populated; all Bicep templates cross-referenced against discovered policies; what-if passes clean.
+**Exit criteria**: All Bicep templates cross-referenced against `04-governance-constraints.json`; `az deployment group what-if` passes clean; security baseline verified.
 
 **Steps**:
 
-1. Run governance discovery REST API against target subscription
-2. Document all discovered policies in `agent-output/hackops/04-governance-constraints.md` and `.json`
-3. Cross-reference Bicep templates against policies — adjust tags, SKUs, network settings
-4. Add any policy-required additional tags beyond the 4 baseline
-5. Validate: `az deployment group what-if` with all constraints applied
-6. Generate `agent-output/hackops/` artifacts per the 7-step workflow convention
-
-**This phase is a hard gate** — per repo governance rules, if policies cannot be fully discovered, do not proceed to production deployment.
+1. Re-run governance discovery to catch any policy changes since Phase 1.5
+2. Cross-reference ALL Bicep templates against `04-governance-constraints.json` — verify tags, SKUs, network settings, TLS versions, and public access flags comply with every `Deny` policy
+3. Validate: `az deployment group what-if` with all constraints applied — zero policy violations
+4. Verify security baseline: TLS 1.2 enforced, HTTPS-only, managed identity everywhere, no connection string auth in production, `publicNetworkAccess: 'Disabled'` on all data-plane resources
+5. Generate `agent-output/hackops/` artifacts per the 7-step workflow convention
+6. Final deployment stack reconciliation — ensure all resources are tracked and deny-settings are applied
 
 ---
 
