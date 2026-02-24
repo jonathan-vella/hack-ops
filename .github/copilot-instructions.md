@@ -7,7 +7,34 @@
 **Read `AGENTS.md` first** — it is the lightweight table of contents for the entire project.
 It covers the 7-step workflow, agent roster, skill/instruction locations, and key conventions.
 
-## Quick Start
+## HackOps Project
+
+HackOps is the active project being built in this repo — an Azure hackathon
+management platform (Next.js 15 + Cosmos DB + App Service).
+
+| Resource                                          | Purpose                                       |
+| ------------------------------------------------- | --------------------------------------------- |
+| `docs/hackops-user-guide.md`                      | Step-by-step runbook — start here             |
+| `.github/prompts/plan-hackOpsExecution.prompt.md` | Execution blueprint (6 phases, ~44 artifacts) |
+| `docs/exec-plans/active/hackops-execution.md`     | Session tracker — living progress checklist   |
+| `.github/prompts/session-resume.prompt.md`        | Run `/session-resume` at each session start   |
+| `.github/prompts/plan-hackOps.prompt.md`          | Original technical plan (feature specs)       |
+
+### Session Continuity
+
+Work spans many sessions. To resume:
+
+1. Run `/session-resume` in Copilot Chat
+2. The agent reads the session tracker, loads context, and continues
+
+### Execution Order
+
+B0 Bootstrap issues → A Product docs → C Toolchain → B Backlog →
+D Infrastructure → E App build → F Supporting artifacts
+
+See `docs/hackops-user-guide.md` for the full walkthrough.
+
+## Quick Start (Infrastructure)
 
 1. Enable subagents: `"github.copilot.chat": { "customAgentInSubagent": { "enabled": true } }`
 2. Open Chat (`Ctrl+Shift+I`) → Select **InfraOps Conductor** → Describe your project
