@@ -279,7 +279,7 @@ Fallback: [Azure Pricing Calculator](https://azure.microsoft.com/pricing/calcula
 
 ## Challenger Review (Advisory)
 
-After generating the assessment and cost estimate, invoke `10-Challenger` via `#runSubagent`:
+After generating the assessment and cost estimate, invoke `infra-challenger-subagent` via `#runSubagent`:
 
 1. Provide: `artifact_path` = `agent-output/{project}/02-architecture-assessment.md`,
    `project_name` = `{project}`, `artifact_type` = `architecture`

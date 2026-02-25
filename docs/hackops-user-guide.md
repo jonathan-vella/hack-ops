@@ -17,24 +17,24 @@ the [execution blueprint] and the [session tracker].
 
 ### Prerequisites
 
-| Requirement | How to verify |
-| ----------- | ------------- |
-| VS Code with GitHub Copilot Chat | Copilot icon visible in sidebar |
-| Dev container running | Terminal shows Ubuntu prompt, `node --version` returns v22+ |
-| Git configured | `git config user.name` returns your name |
-| GitHub CLI authenticated | `gh auth status` shows logged in |
-| Azure CLI installed | `az version` returns output (login not needed until Phase D) |
-| Repo cloned and on `main` | `git branch --show-current` returns `main` |
+| Requirement                      | How to verify                                                |
+| -------------------------------- | ------------------------------------------------------------ |
+| VS Code with GitHub Copilot Chat | Copilot icon visible in sidebar                              |
+| Dev container running            | Terminal shows Ubuntu prompt, `node --version` returns v22+  |
+| Git configured                   | `git config user.name` returns your name                     |
+| GitHub CLI authenticated         | `gh auth status` shows logged in                             |
+| Azure CLI installed              | `az version` returns output (login not needed until Phase D) |
+| Repo cloned and on `main`        | `git branch --show-current` returns `main`                   |
 
 ### Key Files You Should Know About
 
-| File | What it is | When to read it |
-| ---- | ---------- | --------------- |
-| [plan-hackOps.prompt.md] | The 539-line technical plan — the original vision | When you need detail on a specific feature or phase |
+| File                              | What it is                                                | When to read it                                        |
+| --------------------------------- | --------------------------------------------------------- | ------------------------------------------------------ |
+| [plan-hackOps.prompt.md]          | The 539-line technical plan — the original vision         | When you need detail on a specific feature or phase    |
 | [plan-hackOpsExecution.prompt.md] | The execution blueprint — what to build and in what order | When you need specs for what you're currently building |
-| [hackops-execution.md] | Session tracker — living checklist of progress | Every session start and end |
-| [session-resume.prompt.md] | Auto-resume prompt — loads state and continues | Every session start |
-| [challenge-findings.json] | Adversarial review findings (all 14 resolved) | If you want to understand why a decision was made |
+| [hackops-execution.md]            | Session tracker — living checklist of progress            | Every session start and end                            |
+| [session-resume.prompt.md]        | Auto-resume prompt — loads state and continues            | Every session start                                    |
+| [challenge-findings.json]         | Adversarial review findings (all 14 resolved)             | If you want to understand why a decision was made      |
 
 [plan-hackOps.prompt.md]: ../.github/prompts/plan-hackOps.prompt.md
 [plan-hackOpsExecution.prompt.md]: ../.github/prompts/plan-hackOpsExecution.prompt.md
@@ -367,13 +367,13 @@ to create resources in `rg-hackops-dev`.
 
 #### 4e. Run the Azure-connected prompts
 
-4. `/infra-04-governance` → governance discovery +
+1. `/infra-04-governance` → governance discovery +
    implementation plan
-5. `/infra-05-bicep-generate` → Bicep templates in
+2. `/infra-05-bicep-generate` → Bicep templates in
    `infra/bicep/hackops/`
-6. Validate: `bicep build infra/bicep/hackops/main.bicep`
-7. `/infra-06-deploy` → what-if analysis, then deployment
-8. `/infra-07-as-built` → post-deployment documentation
+3. Validate: `bicep build infra/bicep/hackops/main.bicep`
+4. `/infra-06-deploy` → what-if analysis, then deployment
+5. `/infra-07-as-built` → post-deployment documentation
 
 **Verify**: Resources visible in Azure Portal under
 `rg-hackops-dev`.
@@ -399,18 +399,18 @@ Run each prompt, then verify the exit criteria before moving to
 the next. The App Conductor (agent 16) orchestrates this if you
 prefer to use it directly.
 
-| Order | Run this prompt | Then verify | Gate |
-| ----- | --------------- | ----------- | ---- |
-| 1 | `/app-01-scaffold` | `npm run build` succeeds | Approval |
-| 2 | `/app-02-auth` | Role guard unit tests pass | Approval |
-| 3 | `/app-03-api-hackathons` | `tsc --noEmit` + endpoint tests | Validate |
-| 4 | `/app-04-api-scoring` | `tsc --noEmit` + endpoint tests | Validate |
-| 5 | `/app-05-api-challenges` | `tsc --noEmit` + endpoint tests | Validate |
-| 6 | `/app-06-api-admin` | `tsc --noEmit` + all API tests pass | Validate |
-| 7 | `/app-07-leaderboard` | `npm run build` + no type errors | Validate |
-| 8 | `/app-08-dashboard` | `npm run build` + no type errors | Validate |
-| 9 | `/app-09-tests` | Coverage >80%, all tests pass | Validate |
-| 10 | `/app-10-ci-cd` | Workflows pass dry-run | Approval |
+| Order | Run this prompt          | Then verify                         | Gate     |
+| ----- | ------------------------ | ----------------------------------- | -------- |
+| 1     | `/app-01-scaffold`       | `npm run build` succeeds            | Approval |
+| 2     | `/app-02-auth`           | Role guard unit tests pass          | Approval |
+| 3     | `/app-03-api-hackathons` | `tsc --noEmit` + endpoint tests     | Validate |
+| 4     | `/app-04-api-scoring`    | `tsc --noEmit` + endpoint tests     | Validate |
+| 5     | `/app-05-api-challenges` | `tsc --noEmit` + endpoint tests     | Validate |
+| 6     | `/app-06-api-admin`      | `tsc --noEmit` + all API tests pass | Validate |
+| 7     | `/app-07-leaderboard`    | `npm run build` + no type errors    | Validate |
+| 8     | `/app-08-dashboard`      | `npm run build` + no type errors    | Validate |
+| 9     | `/app-09-tests`          | Coverage >80%, all tests pass       | Validate |
+| 10    | `/app-10-ci-cd`          | Workflows pass dry-run              | Approval |
 
 > **Approval gates** mean you review and confirm before the
 > next step starts. **Validate gates** mean the automated
@@ -440,16 +440,16 @@ Create a PR and merge after CI passes.
 These can be done at any point. Pick them up between other
 phases or when you need a break from the main build.
 
-| Task | What to do |
-| ---- | ---------- |
-| Seed data | "Create `scripts/seed-cosmos.ts` and test fixtures as specified in blueprint Phase F section F1" |
-| OpenAPI spec | "Generate `docs/openapi.yaml` from `docs/api-contract.md`" |
-| Testing strategy | "Create `docs/testing-strategy.md` as specified in blueprint Phase F section F3" |
-| Security checklist | "Create `docs/security-checklist.md` as specified in blueprint Phase F section F4" |
-| Local dev guide | "Create `docs/local-dev-guide.md` as specified in blueprint Phase F section F5" |
-| Update AGENTS.md | "Update `AGENTS.md` to include agents 11-16 and 3 subagents" |
-| Update docs README | "Update `docs/README.md` to link all new documentation" |
-| Update quality score | "Update `QUALITY_SCORE.md` to track app-dev progress" |
+| Task                 | What to do                                                                                       |
+| -------------------- | ------------------------------------------------------------------------------------------------ |
+| Seed data            | "Create `scripts/seed-cosmos.ts` and test fixtures as specified in blueprint Phase F section F1" |
+| OpenAPI spec         | "Generate `docs/openapi.yaml` from `docs/api-contract.md`"                                       |
+| Testing strategy     | "Create `docs/testing-strategy.md` as specified in blueprint Phase F section F3"                 |
+| Security checklist   | "Create `docs/security-checklist.md` as specified in blueprint Phase F section F4"               |
+| Local dev guide      | "Create `docs/local-dev-guide.md` as specified in blueprint Phase F section F5"                  |
+| Update AGENTS.md     | "Update `AGENTS.md` to include agents 11-16 and 3 subagents"                                     |
+| Update docs README   | "Update `docs/README.md` to link all new documentation"                                          |
+| Update quality score | "Update `QUALITY_SCORE.md` to track app-dev progress"                                            |
 
 ---
 
@@ -457,20 +457,20 @@ phases or when you need a break from the main build.
 
 ### Session Commands
 
-| When | Do this |
-| ---- | ------- |
-| Starting a new session | Type `/session-resume` in Copilot Chat |
-| Resuming manually | Read [hackops-execution.md] and follow the next unchecked item |
-| Ending a session | Ensure the agent updated the session tracker, then commit |
+| When                   | Do this                                                        |
+| ---------------------- | -------------------------------------------------------------- |
+| Starting a new session | Type `/session-resume` in Copilot Chat                         |
+| Resuming manually      | Read [hackops-execution.md] and follow the next unchecked item |
+| Ending a session       | Ensure the agent updated the session tracker, then commit      |
 
 ### Branch Cheat Sheet
 
-| Phase | Branch | Merge gate |
-| ----- | ------ | ---------- |
-| A (docs) | `feature/product-docs` | `npm run lint:md` |
-| C (toolchain) | `feature/app-dev-toolchain` | `npm run validate` |
-| B + D + E (prompts + build) | `feature/prompts` | `npm run lint:md` + CI |
-| F (supporting) | direct PRs to `main` | Standard review |
+| Phase                       | Branch                      | Merge gate             |
+| --------------------------- | --------------------------- | ---------------------- |
+| A (docs)                    | `feature/product-docs`      | `npm run lint:md`      |
+| C (toolchain)               | `feature/app-dev-toolchain` | `npm run validate`     |
+| B + D + E (prompts + build) | `feature/prompts`           | `npm run lint:md` + CI |
+| F (supporting)              | direct PRs to `main`        | Standard review        |
 
 ### Validation Commands
 
@@ -490,15 +490,15 @@ bicep build infra/bicep/hackops/main.bicep  # Bicep syntax
 
 ### What to Do When Things Go Wrong
 
-| Problem | Solution |
-| ------- | -------- |
-| Session tracker is out of sync | Read git log for recent changes, manually update checkboxes |
-| Prompt produces wrong output | Re-read the blueprint section for that step, adjust the prompt, and re-run |
-| Validation fails after a step | Fix the errors before moving to the next step — gates exist for a reason |
-| Azure deployment fails | Check `az account show`, verify resource group exists, review what-if output |
-| Agent generates incorrect patterns | Check if the relevant skill needs updating via `microsoft-skill-creator` |
-| Context window exhausted mid-step | Commit what you have, end the session, start a new one with `/session-resume` |
-| Lost track of progress | Read [hackops-execution.md] — the session log shows full history |
+| Problem                            | Solution                                                                      |
+| ---------------------------------- | ----------------------------------------------------------------------------- |
+| Session tracker is out of sync     | Read git log for recent changes, manually update checkboxes                   |
+| Prompt produces wrong output       | Re-read the blueprint section for that step, adjust the prompt, and re-run    |
+| Validation fails after a step      | Fix the errors before moving to the next step — gates exist for a reason      |
+| Azure deployment fails             | Check `az account show`, verify resource group exists, review what-if output  |
+| Agent generates incorrect patterns | Check if the relevant skill needs updating via `microsoft-skill-creator`      |
+| Context window exhausted mid-step  | Commit what you have, end the session, start a new one with `/session-resume` |
+| Lost track of progress             | Read [hackops-execution.md] — the session log shows full history              |
 
 ---
 

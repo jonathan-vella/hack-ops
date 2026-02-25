@@ -1,6 +1,7 @@
 ---
 description: Resume a HackOps execution session. Loads progress state, identifies next step, and continues work from where the last session left off.
 agent: "agent"
+model: Claude Opus 4.6
 tools:
   - search/changes
   - search/codebase

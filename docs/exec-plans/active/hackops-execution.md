@@ -17,9 +17,9 @@
 <!-- Update this at the START of each session -->
 
 **Phase**: A — Product Documentation
-**Step**: A1 — Run `doc-prd-generator.prompt.md` → produce `docs/prd.md`
+**Step**: A2 — Run `doc-api-contract-generator.prompt.md` → produce `packages/shared/types/api-contract.ts` + `docs/api-contract.md`
 **Branch**: `feature/product-docs`
-**Goal**: Generate the PRD from the technical plan
+**Goal**: Generate the API contract types and reference doc
 
 ---
 
@@ -40,7 +40,7 @@
 - [x] A0: Create `doc-prd-generator.prompt.md`
 - [x] A0: Create `doc-api-contract-generator.prompt.md`
 - [x] A0: Create `doc-data-model-generator.prompt.md`
-- [ ] A1: Run PRD generator → `docs/prd.md`
+- [x] A1: Run PRD generator → `docs/prd.md`
 - [ ] A2: Run API contract generator →
       `packages/shared/types/api-contract.ts` + `docs/api-contract.md`
 - [ ] A3: Run data model generator → `docs/data-model.md`
@@ -130,20 +130,28 @@
   - Gate: `npm run build` succeeds
 - [ ] Run app-02-auth → auth middleware + role guards
   - Gate: role guard unit tests pass
+  - Gate: `app-security-challenger-subagent` (focus: `auth`) — no critical/high findings
 - [ ] Run app-03-api-hackathons → hackathon/team/join routes
   - Gate: `tsc --noEmit` + endpoint tests pass
+  - Gate: `app-logic-challenger-subagent` (focus: `api-contract`) — contract conformance
 - [ ] Run app-04-api-scoring → rubric/submission/review routes
   - Gate: `tsc --noEmit` + endpoint tests pass
+  - Gate: `app-logic-challenger-subagent` (focus: `business-rules`) — scoring correctness
 - [ ] Run app-05-api-challenges → challenge/progression routes
   - Gate: `tsc --noEmit` + endpoint tests pass
+  - Gate: `app-logic-challenger-subagent` (focus: `business-rules`) — gating correctness
 - [ ] Run app-06-api-admin → admin/audit/config routes
   - Gate: all API tests pass, app-review-subagent APPROVED
+  - Gate: `app-security-challenger-subagent` (focus: `full`) — full security review of all API routes
+  - Gate: `app-logic-challenger-subagent` (focus: `full`) — full business logic review
 - [ ] Run app-07-leaderboard → SSR leaderboard page
   - Gate: `npm run build` succeeds, no type errors
+  - Gate: `app-security-challenger-subagent` (focus: `data-handling`) — data exposure check
 - [ ] Run app-08-dashboard → admin/hacker/coach dashboards
   - Gate: `npm run build` succeeds, app-review APPROVED
 - [ ] Run app-09-tests → full test suite
   - Gate: coverage >80%, all tests pass
+  - Gate: `app-logic-challenger-subagent` (focus: `test-coverage`) — test gap analysis
 - [ ] Run app-10-ci-cd → CI/CD workflows
   - Gate: workflows pass dry-run validation
 
@@ -176,6 +184,9 @@
 | 2   | 2026-02-25 | B0         | Created 12 GitHub  | A1: Run PRD        | None     |
 |     |            |            | issues (#1-#12),   | generator prompt   |          |
 |     |            |            | epic label         |                    |          |
+| 3   | 2026-02-25 | A / A1     | Generated PRD with | A2: Run API        | None     |
+|     |            |            | 64 user stories,   | contract generator |          |
+|     |            |            | 8 domains, NFRs    |                    |          |
 
 ---
 
