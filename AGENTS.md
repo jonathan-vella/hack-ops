@@ -31,9 +31,28 @@ All outputs → `agent-output/{project}/`.
 | 07-Deploy        | Azure deployment with what-if analysis              |
 | 08-As-Built      | Post-deployment documentation suite                 |
 | 09-Diagnose      | Resource health assessment and troubleshooting      |
-| 10-Challenger    | Adversarial review of plans and architecture        |
 
 Agent definitions: `.github/agents/*.agent.md`
+
+### Adversarial Subagents
+
+| Subagent                         | Parent Agents                           | Purpose                                               |
+| -------------------------------- | --------------------------------------- | ----------------------------------------------------- |
+| infra-challenger-subagent        | Requirements, Architect, Bicep Plan     | Challenges infra plans for governance/WAF/feasibility |
+| app-security-challenger-subagent | API Builder, Test Writer, App Conductor | Challenges app code for auth bypass, IDOR, injection  |
+| app-logic-challenger-subagent    | Test Writer, App Conductor              | Challenges business rules, contract drift, edge cases |
+
+### Other Subagents
+
+| Subagent                      | Parent Agent | Purpose                         |
+| ----------------------------- | ------------ | ------------------------------- |
+| cost-estimate-subagent        | Architect    | Pricing MCP queries             |
+| governance-discovery-subagent | Bicep Plan   | Azure Policy REST API discovery |
+| bicep-lint-subagent           | Bicep Code   | `bicep build` + `bicep lint`    |
+| bicep-review-subagent         | Bicep Code   | AVM/security/naming code review |
+| bicep-whatif-subagent         | Deploy       | `az deployment group what-if`   |
+
+Subagent definitions: `.github/agents/_subagents/`
 
 ## Where to Find Things
 

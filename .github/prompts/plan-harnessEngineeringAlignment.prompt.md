@@ -99,7 +99,7 @@ Specific per-agent changes:
 - **01-Conductor**: Add exec-plan creation/tracking at workflow start. Reference `QUALITY_SCORE.md` in pre-flight checks.
 - **02-Requirements through 08-As-Built**: Add golden-principles skill reference. Update instruction references to consolidated names.
 - **09-Diagnose**: Add reference to store diagnostic findings as exec-plan artifacts when they reveal systemic issues.
-- **10-Challenger**: Add golden-principles as a review lens (check if proposals violate core principles).
+- **infra-challenger-subagent**: Add golden-principles as a review lens (check if proposals violate core principles).
 
 ## Step 7 — Entropy/Garbage Collection (Dual-Mode)
 

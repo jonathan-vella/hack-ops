@@ -122,7 +122,7 @@ export namespace HackathonsAPI {
 Ensure:
 
 - All types are `export`ed
-- Event codes are `string` only (never expose the hash mechanism in types)
+- Event codes are `string` only (stored as plaintext; no hashing involved)
 - Submission states reflect the staging/approval invariant: `'pending' | 'approved' | 'rejected'`
 - Score types enforce rubric-driven structure (no free-form numeric fields)
 

@@ -246,7 +246,7 @@ Security measures (multi-select with business descriptions), Authentication meth
    - Set status badge to `In Progress`, step badge to `Step 1 of 7`
    - This is **MANDATORY** for every new project — do NOT skip
 4. Run `npm run lint:artifact-templates` — if errors appear for your artifact, fix them before continuing
-5. **Invoke Challenger** — delegate to `10-Challenger` via `#runSubagent`:
+5. **Invoke Challenger** — delegate to `infra-challenger-subagent` via `#runSubagent`:
    - Provide: `artifact_path` = `agent-output/{project}/01-requirements.md`,
      `project_name` = `{project}`, `artifact_type` = `requirements`
    - Review the returned findings JSON

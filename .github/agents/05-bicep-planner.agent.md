@@ -316,7 +316,7 @@ Include:
 
 ### Phase 4.5: Challenger Review (Advisory)
 
-After generating the implementation plan, invoke `10-Challenger` via `#runSubagent`:
+After generating the implementation plan, invoke `infra-challenger-subagent` via `#runSubagent`:
 
 1. Provide: `artifact_path` = `agent-output/{project}/04-implementation-plan.md`,
    `project_name` = `{project}`, `artifact_type` = `implementation-plan`

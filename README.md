@@ -34,30 +34,30 @@ Azure App Service + Cosmos DB NoSQL with GitHub OAuth authentication.
 
 ## What It Does
 
-| Feature | Description |
-|---------|-------------|
-| **Team & Hacker Management** | Self-service onboarding via 4-digit event code; Fisher-Yates team shuffle; manual reassignment |
-| **Rubric-Driven Scoring** | Markdown-defined rubric drives all forms, validation, and grade computation — nothing hardcoded |
-| **Submission Workflow** | Form or JSON file upload → staging queue → coach/admin approve/reject → immutable score record |
-| **Live Leaderboard** | Auto-refresh every 30s; expandable rows; grade badges (A/B/C/D); award badges; SSR for fast first paint |
-| **Challenge Gating** | Challenge N+1 unlocks only after Challenge N is approved |
-| **Role Management** | Admin, Coach, Hacker, Anonymous — invite by GitHub username; primary admin protected from demotion |
-| **Audit Trail** | Every reviewer action logged with `reviewedBy`, `reviewedAt`, `reviewReason` |
+| Feature                      | Description                                                                                             |
+| ---------------------------- | ------------------------------------------------------------------------------------------------------- |
+| **Team & Hacker Management** | Self-service onboarding via 4-digit event code; Fisher-Yates team shuffle; manual reassignment          |
+| **Rubric-Driven Scoring**    | Markdown-defined rubric drives all forms, validation, and grade computation — nothing hardcoded         |
+| **Submission Workflow**      | Form or JSON file upload → staging queue → coach/admin approve/reject → immutable score record          |
+| **Live Leaderboard**         | Auto-refresh every 30s; expandable rows; grade badges (A/B/C/D); award badges; SSR for fast first paint |
+| **Challenge Gating**         | Challenge N+1 unlocks only after Challenge N is approved                                                |
+| **Role Management**          | Admin, Coach, Hacker, Anonymous — invite by GitHub username; primary admin protected from demotion      |
+| **Audit Trail**              | Every reviewer action logged with `reviewedBy`, `reviewedAt`, `reviewReason`                            |
 
 ---
 
 ## Tech Stack
 
-| Layer | Technology |
-|-------|-----------|
-| **Frontend** | Next.js 15 (App Router), Tailwind CSS 4, shadcn/ui |
-| **Backend** | Next.js Route Handlers, TypeScript, Zod |
-| **Database** | Cosmos DB NoSQL (Serverless), 10 containers |
-| **Auth** | Azure App Service Easy Auth — GitHub OAuth only |
-| **Compute** | Azure App Service (Linux, Node 22 LTS) |
-| **IaC** | Bicep + Azure Verified Modules (AVM), GitHub Actions |
-| **Observability** | Application Insights, Log Analytics |
-| **Secrets** | Azure Key Vault — zero hardcoded values |
+| Layer             | Technology                                           |
+| ----------------- | ---------------------------------------------------- |
+| **Frontend**      | Next.js 15 (App Router), Tailwind CSS 4, shadcn/ui   |
+| **Backend**       | Next.js Route Handlers, TypeScript, Zod              |
+| **Database**      | Cosmos DB NoSQL (Serverless), 10 containers          |
+| **Auth**          | Azure App Service Easy Auth — GitHub OAuth only      |
+| **Compute**       | Azure App Service (Linux, Node 22 LTS)               |
+| **IaC**           | Bicep + Azure Verified Modules (AVM), GitHub Actions |
+| **Observability** | Application Insights, Log Analytics                  |
+| **Secrets**       | Azure Key Vault — zero hardcoded values              |
 
 All database traffic flows over a **Private Endpoint** — Cosmos DB is never exposed to the
 public internet.
@@ -132,12 +132,12 @@ governance discovery requirements.
 
 ## Roles
 
-| Role | Capabilities |
-|------|-------------|
-| **Admin** | Full control — create/launch/archive hackathons, manage roles, override scores, view audit log |
-| **Coach** | Review and approve/reject submissions, view all teams |
-| **Hacker** | Submit scores for own team, view leaderboard |
-| **Anonymous** | Blocked entirely — login required |
+| Role          | Capabilities                                                                                   |
+| ------------- | ---------------------------------------------------------------------------------------------- |
+| **Admin**     | Full control — create/launch/archive hackathons, manage roles, override scores, view audit log |
+| **Coach**     | Review and approve/reject submissions, view all teams                                          |
+| **Hacker**    | Submit evidence for own team, view leaderboard                                                 |
+| **Anonymous** | Blocked entirely — login required                                                              |
 
 ---
 

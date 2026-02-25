@@ -67,8 +67,8 @@ For each container, write a TypeScript interface that:
    - `challenges`: include `order: number` for sequential gating
    - `progression`: include `unlockedChallenges: string[]` mirroring the
      gating invariant
-   - `hackers`: event code field must be `eventCodeHash: string`
-     (never store raw event code)
+   - `hackers`: event code field is `eventCode: string`
+     (stored as plaintext; security via rate limiting, not hashing)
 
 ### Step 3 — Write sample documents
 
@@ -162,5 +162,5 @@ Each container definition section must include:
 - [ ] All 10 containers have a sample document
 - [ ] `submissions` interface includes `state`, `reviewedBy`, `reviewedAt`, `reviewReason`
 - [ ] `rubrics` documents the pointer/versioned pattern
-- [ ] `hackers` uses `eventCodeHash` (not raw event code)
+- [ ] `hackers` uses `eventCode` (plaintext; join endpoint rate-limited)
 - [ ] `npm run lint:md` passes
