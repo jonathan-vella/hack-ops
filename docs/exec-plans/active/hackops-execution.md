@@ -19,11 +19,11 @@
 
 | Step                      | Issue | Status          |
 | ------------------------- | ----- | --------------- |
-| Epic: Phase A             | #1    | Open (3/7 done) |
+| Epic: Phase A             | #1    | Open (4/7 done) |
 | Epic: Phase C             | #2    | Open            |
 | A1: PRD                   | #3    | Closed          |
 | A2: API contract          | #4    | Closed          |
-| A3: Data model            | #5    | Open            |
+| A3: Data model            | #5    | Closed          |
 | A4: UI pages              | #6    | Open            |
 | A5: Env config            | #7    | Open            |
 | C1: App-dev agents        | #8    | Open            |
@@ -39,9 +39,9 @@
 <!-- Update this at the START of each session -->
 
 **Phase**: A — Product Documentation
-**Step**: A3 — Run `doc-data-model-generator.prompt.md` → produce `docs/data-model.md`
+**Step**: A4 — Create `docs/ui-pages.md`
 **Branch**: `feature/product-docs`
-**Goal**: Generate the Cosmos DB data model reference
+**Goal**: Create UI page inventory with routes, roles, components, and data deps
 
 ---
 
@@ -65,7 +65,7 @@
 - [x] A1: Run PRD generator → `docs/prd.md`
 - [x] A2: Run API contract generator →
       `packages/shared/types/api-contract.ts` + `docs/api-contract.md`
-- [ ] A3: Run data model generator → `docs/data-model.md`
+- [x] A3: Run data model generator → `docs/data-model.md`
 - [ ] A4: Create `docs/ui-pages.md`
 - [ ] A5: Create `docs/environment-config.md`
 - [ ] Merge `feature/product-docs` → main
@@ -223,6 +223,10 @@
 |     |            |            | contract: 26          | generator          |          |
 |     |            |            | endpoints, TS         |                    |          |
 |     |            |            | types + MD ref        |                    |          |
+| 5   | 2026-02-25 | A / A3     | Generated data model: | A4: UI pages       | None     |
+|     |            |            | 10 containers, TS     | inventory          |          |
+|     |            |            | interfaces, samples,  |                    |          |
+|     |            |            | query patterns        |                    |          |
 
 ---
 
