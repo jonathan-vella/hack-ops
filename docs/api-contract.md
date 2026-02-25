@@ -94,10 +94,10 @@ continuation tokens:
 
 #### GET /api/health
 
-| Field | Value                      |
-| ----- | -------------------------- |
-| Auth  | None (unauthenticated)     |
-| Role  | —                          |
+| Field | Value                  |
+| ----- | ---------------------- |
+| Auth  | None (unauthenticated) |
+| Role  | —                      |
 
 **Response 200:** `ApiResponse<HealthAPI.HealthCheckResponse>`
 
@@ -111,10 +111,10 @@ continuation tokens:
 
 #### POST /api/hackathons
 
-| Field      | Value                                 |
-| ---------- | ------------------------------------- |
-| Auth       | Required (GitHub OAuth via Easy Auth) |
-| Role       | Admin                                 |
+| Field | Value                                 |
+| ----- | ------------------------------------- |
+| Auth  | Required (GitHub OAuth via Easy Auth) |
+| Role  | Admin                                 |
 
 **Request body:** `HackathonsAPI.CreateRequest`
 
@@ -133,10 +133,10 @@ continuation tokens:
 
 #### GET /api/hackathons
 
-| Field      | Value                                 |
-| ---------- | ------------------------------------- |
-| Auth       | Required (GitHub OAuth via Easy Auth) |
-| Role       | Admin, Coach                          |
+| Field | Value                                 |
+| ----- | ------------------------------------- |
+| Auth  | Required (GitHub OAuth via Easy Auth) |
+| Role  | Admin, Coach                          |
 
 **Query parameters:** `HackathonsAPI.ListRequest`
 (`status?`, `continuationToken?`, `pageSize?`)
@@ -147,10 +147,10 @@ continuation tokens:
 
 #### PATCH /api/hackathons/:id
 
-| Field      | Value                                 |
-| ---------- | ------------------------------------- |
-| Auth       | Required (GitHub OAuth via Easy Auth) |
-| Role       | Admin                                 |
+| Field | Value                                 |
+| ----- | ------------------------------------- |
+| Auth  | Required (GitHub OAuth via Easy Auth) |
+| Role  | Admin                                 |
 
 **Request body:** `HackathonsAPI.UpdateRequest`
 
@@ -166,10 +166,10 @@ continuation tokens:
 
 #### POST /api/hackathons/:id/assign-teams
 
-| Field      | Value                                 |
-| ---------- | ------------------------------------- |
-| Auth       | Required (GitHub OAuth via Easy Auth) |
-| Role       | Admin                                 |
+| Field | Value                                 |
+| ----- | ------------------------------------- |
+| Auth  | Required (GitHub OAuth via Easy Auth) |
+| Role  | Admin                                 |
 
 **Request body:** `HackathonsAPI.AssignTeamsRequest`
 (`teamSize?` — overrides hackathon default)
@@ -223,10 +223,10 @@ Teams are balanced so no team has fewer than
 
 #### GET /api/teams
 
-| Field      | Value                                 |
-| ---------- | ------------------------------------- |
-| Auth       | Required (GitHub OAuth via Easy Auth) |
-| Role       | Admin, Coach                          |
+| Field | Value                                 |
+| ----- | ------------------------------------- |
+| Auth  | Required (GitHub OAuth via Easy Auth) |
+| Role  | Admin, Coach                          |
 
 **Query parameters:** `TeamsAPI.ListRequest`
 (`hackathonId` required, `continuationToken?`, `pageSize?`)
@@ -237,10 +237,10 @@ Teams are balanced so no team has fewer than
 
 #### PATCH /api/teams/:id/reassign
 
-| Field      | Value                                 |
-| ---------- | ------------------------------------- |
-| Auth       | Required (GitHub OAuth via Easy Auth) |
-| Role       | Admin                                 |
+| Field | Value                                 |
+| ----- | ------------------------------------- |
+| Auth  | Required (GitHub OAuth via Easy Auth) |
+| Role  | Admin                                 |
 
 **Request body:** `TeamsAPI.ReassignRequest`
 
@@ -262,18 +262,28 @@ Teams are balanced so no team has fewer than
 
 #### POST /api/rubrics
 
-| Field      | Value                                 |
-| ---------- | ------------------------------------- |
-| Auth       | Required (GitHub OAuth via Easy Auth) |
-| Role       | Admin                                 |
+| Field | Value                                 |
+| ----- | ------------------------------------- |
+| Auth  | Required (GitHub OAuth via Easy Auth) |
+| Role  | Admin                                 |
 
 **Request body:** `RubricsAPI.CreateRequest`
 
 ```json
 {
   "categories": [
-    { "id": "quality", "name": "Code Quality", "description": "Clean, readable code", "maxScore": 10 },
-    { "id": "creativity", "name": "Creativity", "description": "Novel approach", "maxScore": 20 }
+    {
+      "id": "quality",
+      "name": "Code Quality",
+      "description": "Clean, readable code",
+      "maxScore": 10
+    },
+    {
+      "id": "creativity",
+      "name": "Creativity",
+      "description": "Novel approach",
+      "maxScore": 20
+    }
   ]
 }
 ```
@@ -287,10 +297,10 @@ versioned docs pattern — activate via PATCH.
 
 #### GET /api/rubrics
 
-| Field      | Value                                 |
-| ---------- | ------------------------------------- |
-| Auth       | Required (GitHub OAuth via Easy Auth) |
-| Role       | Admin, Coach, Hacker                  |
+| Field | Value                                 |
+| ----- | ------------------------------------- |
+| Auth  | Required (GitHub OAuth via Easy Auth) |
+| Role  | Admin, Coach, Hacker                  |
 
 **Query parameters:** `RubricsAPI.ListRequest`
 (`activeOnly?`, `continuationToken?`, `pageSize?`)
@@ -301,10 +311,10 @@ versioned docs pattern — activate via PATCH.
 
 #### GET /api/rubrics/:id
 
-| Field      | Value                                 |
-| ---------- | ------------------------------------- |
-| Auth       | Required (GitHub OAuth via Easy Auth) |
-| Role       | Admin, Coach, Hacker                  |
+| Field | Value                                 |
+| ----- | ------------------------------------- |
+| Auth  | Required (GitHub OAuth via Easy Auth) |
+| Role  | Admin, Coach, Hacker                  |
 
 **Response 200:** `ApiResponse<RubricsAPI.RubricRecord>`
 
@@ -312,10 +322,10 @@ versioned docs pattern — activate via PATCH.
 
 #### PATCH /api/rubrics/:id
 
-| Field      | Value                                 |
-| ---------- | ------------------------------------- |
-| Auth       | Required (GitHub OAuth via Easy Auth) |
-| Role       | Admin                                 |
+| Field | Value                                 |
+| ----- | ------------------------------------- |
+| Auth  | Required (GitHub OAuth via Easy Auth) |
+| Role  | Admin                                 |
 
 **Request body:** `RubricsAPI.UpdateRequest`
 
@@ -368,10 +378,10 @@ Submission is created in `pending` state with `scores: null`.
 
 #### GET /api/submissions
 
-| Field      | Value                                 |
-| ---------- | ------------------------------------- |
-| Auth       | Required (GitHub OAuth via Easy Auth) |
-| Role       | Admin, Coach (all); Hacker (own team) |
+| Field | Value                                 |
+| ----- | ------------------------------------- |
+| Auth  | Required (GitHub OAuth via Easy Auth) |
+| Role  | Admin, Coach (all); Hacker (own team) |
 
 **Query parameters:** `SubmissionsAPI.ListRequest`
 (`hackathonId` required, `status?`, `teamId?`,
@@ -388,10 +398,10 @@ only their own team's submissions.
 
 #### PATCH /api/submissions/:id
 
-| Field      | Value                                 |
-| ---------- | ------------------------------------- |
-| Auth       | Required (GitHub OAuth via Easy Auth) |
-| Role       | Admin, Coach                          |
+| Field | Value                                 |
+| ----- | ------------------------------------- |
+| Auth  | Required (GitHub OAuth via Easy Auth) |
+| Role  | Admin, Coach                          |
 
 **Request body:** `SubmissionsAPI.ReviewRequest`
 
@@ -430,10 +440,10 @@ required.
 
 #### PATCH /api/scores/:id/override
 
-| Field      | Value                                 |
-| ---------- | ------------------------------------- |
-| Auth       | Required (GitHub OAuth via Easy Auth) |
-| Role       | Admin                                 |
+| Field | Value                                 |
+| ----- | ------------------------------------- |
+| Auth  | Required (GitHub OAuth via Easy Auth) |
+| Role  | Admin                                 |
 
 **Request body:** `ScoresAPI.OverrideRequest`
 
@@ -464,10 +474,10 @@ logged.
 
 #### GET /api/leaderboard/:hackathonId
 
-| Field      | Value                                 |
-| ---------- | ------------------------------------- |
-| Auth       | Required (GitHub OAuth via Easy Auth) |
-| Role       | Admin, Coach, Hacker                  |
+| Field | Value                                 |
+| ----- | ------------------------------------- |
+| Auth  | Required (GitHub OAuth via Easy Auth) |
+| Role  | Admin, Coach, Hacker                  |
 
 **Response 200:** `ApiResponse<LeaderboardAPI.LeaderboardResponse>`
 
@@ -491,10 +501,10 @@ Client-side auto-refresh polls every 30 seconds.
 
 #### POST /api/challenges
 
-| Field      | Value                                 |
-| ---------- | ------------------------------------- |
-| Auth       | Required (GitHub OAuth via Easy Auth) |
-| Role       | Admin                                 |
+| Field | Value                                 |
+| ----- | ------------------------------------- |
+| Auth  | Required (GitHub OAuth via Easy Auth) |
+| Role  | Admin                                 |
 
 **Request body:** `ChallengesAPI.CreateRequest`
 
@@ -514,10 +524,10 @@ Client-side auto-refresh polls every 30 seconds.
 
 #### GET /api/challenges
 
-| Field      | Value                                 |
-| ---------- | ------------------------------------- |
-| Auth       | Required (GitHub OAuth via Easy Auth) |
-| Role       | Admin, Coach, Hacker                  |
+| Field | Value                                 |
+| ----- | ------------------------------------- |
+| Auth  | Required (GitHub OAuth via Easy Auth) |
+| Role  | Admin, Coach, Hacker                  |
 
 **Query parameters:** `ChallengesAPI.ListRequest`
 (`hackathonId` required, `continuationToken?`, `pageSize?`)
@@ -531,10 +541,10 @@ Client-side auto-refresh polls every 30 seconds.
 
 #### GET /api/progression
 
-| Field      | Value                                 |
-| ---------- | ------------------------------------- |
-| Auth       | Required (GitHub OAuth via Easy Auth) |
-| Role       | Admin, Coach, Hacker                  |
+| Field | Value                                 |
+| ----- | ------------------------------------- |
+| Auth  | Required (GitHub OAuth via Easy Auth) |
+| Role  | Admin, Coach, Hacker                  |
 
 **Query parameters:** `ProgressionAPI.GetRequest`
 (`hackathonId` required, `teamId` required)
@@ -551,10 +561,10 @@ N+1 unlocks when Challenge N's submission is approved.
 
 #### POST /api/roles/invite
 
-| Field      | Value                                 |
-| ---------- | ------------------------------------- |
-| Auth       | Required (GitHub OAuth via Easy Auth) |
-| Role       | Admin                                 |
+| Field | Value                                 |
+| ----- | ------------------------------------- |
+| Auth  | Required (GitHub OAuth via Easy Auth) |
+| Role  | Admin                                 |
 
 **Request body:** `RolesAPI.InviteRequest`
 
@@ -577,10 +587,10 @@ N+1 unlocks when Challenge N's submission is approved.
 
 #### DELETE /api/roles/:id
 
-| Field      | Value                                 |
-| ---------- | ------------------------------------- |
-| Auth       | Required (GitHub OAuth via Easy Auth) |
-| Role       | Admin                                 |
+| Field | Value                                 |
+| ----- | ------------------------------------- |
+| Auth  | Required (GitHub OAuth via Easy Auth) |
+| Role  | Admin                                 |
 
 **Response 204:** No content
 
@@ -594,10 +604,10 @@ N+1 unlocks when Challenge N's submission is approved.
 
 #### GET /api/roles
 
-| Field      | Value                                 |
-| ---------- | ------------------------------------- |
-| Auth       | Required (GitHub OAuth via Easy Auth) |
-| Role       | Admin                                 |
+| Field | Value                                 |
+| ----- | ------------------------------------- |
+| Auth  | Required (GitHub OAuth via Easy Auth) |
+| Role  | Admin                                 |
 
 **Query parameters:** `RolesAPI.ListRequest`
 (`hackathonId` required, `continuationToken?`, `pageSize?`)
@@ -610,10 +620,10 @@ N+1 unlocks when Challenge N's submission is approved.
 
 #### GET /api/audit/:hackathonId
 
-| Field      | Value                                 |
-| ---------- | ------------------------------------- |
-| Auth       | Required (GitHub OAuth via Easy Auth) |
-| Role       | Admin                                 |
+| Field | Value                                 |
+| ----- | ------------------------------------- |
+| Auth  | Required (GitHub OAuth via Easy Auth) |
+| Role  | Admin                                 |
 
 **Query parameters:** `AuditAPI.ListRequest`
 (`hackathonId` in path, `action?`, `continuationToken?`,
@@ -630,10 +640,10 @@ Paginated, filterable log of all reviewer actions.
 
 #### GET /api/config
 
-| Field      | Value                                 |
-| ---------- | ------------------------------------- |
-| Auth       | Required (GitHub OAuth via Easy Auth) |
-| Role       | Admin                                 |
+| Field | Value                                 |
+| ----- | ------------------------------------- |
+| Auth  | Required (GitHub OAuth via Easy Auth) |
+| Role  | Admin                                 |
 
 **Response 200:** `ApiResponse<ConfigAPI.ConfigRecord[]>`
 
@@ -644,10 +654,10 @@ refresh interval, max team size, etc.).
 
 #### PATCH /api/config/:key
 
-| Field      | Value                                 |
-| ---------- | ------------------------------------- |
-| Auth       | Required (GitHub OAuth via Easy Auth) |
-| Role       | Admin                                 |
+| Field | Value                                 |
+| ----- | ------------------------------------- |
+| Auth  | Required (GitHub OAuth via Easy Auth) |
+| Role  | Admin                                 |
 
 **Request body:** `ConfigAPI.UpdateRequest`
 
@@ -666,48 +676,48 @@ refresh interval, max team size, etc.).
 
 ## Error Code Catalogue
 
-| Code  | Meaning                    | Common Causes                                              |
-| ----- | -------------------------- | ---------------------------------------------------------- |
-| `400` | Bad Request                | Zod validation failure, missing required field,            |
-|       |                            | score exceeds rubric max                                   |
-| `401` | Unauthorized               | Missing/invalid Easy Auth header, invalid event code       |
-| `403` | Forbidden                  | Insufficient role, cross-team access, primary admin        |
-|       |                            | demotion attempt, locked challenge submission              |
-| `404` | Not Found                  | Resource ID does not exist                                 |
-| `409` | Conflict                   | Duplicate submission, invalid state transition,            |
-|       |                            | already reviewed, user already has role                    |
-| `429` | Too Many Requests          | Rate limit exceeded (5/min/IP on join, 100/min/IP general) |
-| `500` | Internal Server Error      | Unexpected server error, Cosmos DB connectivity failure    |
+| Code  | Meaning               | Common Causes                                              |
+| ----- | --------------------- | ---------------------------------------------------------- |
+| `400` | Bad Request           | Zod validation failure, missing required field,            |
+|       |                       | score exceeds rubric max                                   |
+| `401` | Unauthorized          | Missing/invalid Easy Auth header, invalid event code       |
+| `403` | Forbidden             | Insufficient role, cross-team access, primary admin        |
+|       |                       | demotion attempt, locked challenge submission              |
+| `404` | Not Found             | Resource ID does not exist                                 |
+| `409` | Conflict              | Duplicate submission, invalid state transition,            |
+|       |                       | already reviewed, user already has role                    |
+| `429` | Too Many Requests     | Rate limit exceeded (5/min/IP on join, 100/min/IP general) |
+| `500` | Internal Server Error | Unexpected server error, Cosmos DB connectivity failure    |
 
 ---
 
 ## Endpoint Summary
 
-| #  | Method   | Path                              | Role(s)        | Phase |
-| -- | -------- | --------------------------------- | -------------- | ----- |
-| 1  | `GET`    | `/api/health`                     | —              | —     |
-| 2  | `POST`   | `/api/hackathons`                 | Admin          | 6     |
-| 3  | `GET`    | `/api/hackathons`                 | Admin, Coach   | 6     |
-| 4  | `PATCH`  | `/api/hackathons/:id`             | Admin          | 6     |
-| 5  | `POST`   | `/api/hackathons/:id/assign-teams`| Admin          | 6     |
-| 6  | `POST`   | `/api/join`                       | Any authed     | 6     |
-| 7  | `GET`    | `/api/teams`                      | Admin, Coach   | 6     |
-| 8  | `PATCH`  | `/api/teams/:id/reassign`         | Admin          | 6     |
-| 9  | `POST`   | `/api/rubrics`                    | Admin          | 7     |
-| 10 | `GET`    | `/api/rubrics`                    | All roles      | 7     |
-| 11 | `GET`    | `/api/rubrics/:id`                | All roles      | 7     |
-| 12 | `PATCH`  | `/api/rubrics/:id`                | Admin          | 7     |
-| 13 | `POST`   | `/api/submissions`                | Hacker         | 7     |
-| 14 | `GET`    | `/api/submissions`                | All roles      | 7     |
-| 15 | `PATCH`  | `/api/submissions/:id`            | Admin, Coach   | 7     |
-| 16 | `PATCH`  | `/api/scores/:id/override`        | Admin          | 7     |
-| 17 | `GET`    | `/api/leaderboard/:hackathonId`   | All roles      | 8     |
-| 18 | `POST`   | `/api/challenges`                 | Admin          | 9     |
-| 19 | `GET`    | `/api/challenges`                 | All roles      | 9     |
-| 20 | `GET`    | `/api/progression`                | All roles      | 9     |
-| 21 | `POST`   | `/api/roles/invite`               | Admin          | 10    |
-| 22 | `GET`    | `/api/roles`                      | Admin          | 10    |
-| 23 | `DELETE` | `/api/roles/:id`                  | Admin          | 10    |
-| 24 | `GET`    | `/api/audit/:hackathonId`         | Admin          | 10    |
-| 25 | `GET`    | `/api/config`                     | Admin          | 10    |
-| 26 | `PATCH`  | `/api/config/:key`                | Admin          | 10    |
+| #   | Method   | Path                               | Role(s)      | Phase |
+| --- | -------- | ---------------------------------- | ------------ | ----- |
+| 1   | `GET`    | `/api/health`                      | —            | —     |
+| 2   | `POST`   | `/api/hackathons`                  | Admin        | 6     |
+| 3   | `GET`    | `/api/hackathons`                  | Admin, Coach | 6     |
+| 4   | `PATCH`  | `/api/hackathons/:id`              | Admin        | 6     |
+| 5   | `POST`   | `/api/hackathons/:id/assign-teams` | Admin        | 6     |
+| 6   | `POST`   | `/api/join`                        | Any authed   | 6     |
+| 7   | `GET`    | `/api/teams`                       | Admin, Coach | 6     |
+| 8   | `PATCH`  | `/api/teams/:id/reassign`          | Admin        | 6     |
+| 9   | `POST`   | `/api/rubrics`                     | Admin        | 7     |
+| 10  | `GET`    | `/api/rubrics`                     | All roles    | 7     |
+| 11  | `GET`    | `/api/rubrics/:id`                 | All roles    | 7     |
+| 12  | `PATCH`  | `/api/rubrics/:id`                 | Admin        | 7     |
+| 13  | `POST`   | `/api/submissions`                 | Hacker       | 7     |
+| 14  | `GET`    | `/api/submissions`                 | All roles    | 7     |
+| 15  | `PATCH`  | `/api/submissions/:id`             | Admin, Coach | 7     |
+| 16  | `PATCH`  | `/api/scores/:id/override`         | Admin        | 7     |
+| 17  | `GET`    | `/api/leaderboard/:hackathonId`    | All roles    | 8     |
+| 18  | `POST`   | `/api/challenges`                  | Admin        | 9     |
+| 19  | `GET`    | `/api/challenges`                  | All roles    | 9     |
+| 20  | `GET`    | `/api/progression`                 | All roles    | 9     |
+| 21  | `POST`   | `/api/roles/invite`                | Admin        | 10    |
+| 22  | `GET`    | `/api/roles`                       | Admin        | 10    |
+| 23  | `DELETE` | `/api/roles/:id`                   | Admin        | 10    |
+| 24  | `GET`    | `/api/audit/:hackathonId`          | Admin        | 10    |
+| 25  | `GET`    | `/api/config`                      | Admin        | 10    |
+| 26  | `PATCH`  | `/api/config/:key`                 | Admin        | 10    |

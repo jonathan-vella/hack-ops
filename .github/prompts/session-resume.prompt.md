@@ -85,7 +85,24 @@ After completing each item:
 2. If the item produces a file, verify it exists
 3. If a validation command is specified, run it
 
-### Step 5 — Update session state (MANDATORY before ending)
+### Step 5 — Sync GitHub issues (MANDATORY after each step)
+
+After completing each step, sync the corresponding GitHub
+issue using the issue-to-step mapping table in the session
+tracker:
+
+1. Read the "Issue-to-Step Mapping" table in the tracker
+2. For each completed step that has a mapped issue:
+   - Close the issue with `gh issue close <N> --comment "..."`
+   - Include a brief completion note (commit SHA, PR, or output file)
+3. Update the parent epic's task list checkboxes with
+   `gh issue edit <N> --body "..."`
+4. Update the mapping table status in the tracker
+
+This syncs the session tracker (file) with GitHub Issues
+(project management). Both must stay aligned.
+
+### Step 6 — Update session state (MANDATORY before ending)
 
 Before the session ends, update the session tracker:
 
@@ -93,7 +110,8 @@ Before the session ends, update the session tracker:
 2. Update the "Current Session Target" section with next step
 3. Append a row to the "Session Log" table
 4. Record any decisions made in the "Decisions Made" table
-5. Note any blockers discovered
+5. Update the "Issue-to-Step Mapping" status column
+6. Note any blockers discovered
 
 ## Output Expectations
 
@@ -109,5 +127,6 @@ Before the session ends, update the session tracker:
 - [ ] Only phase-relevant context was loaded
 - [ ] Correct branch is checked out
 - [ ] All completed items are checked off in the tracker
+- [ ] GitHub issues synced (closed/updated per mapping table)
 - [ ] Session log has a new entry for this session
 - [ ] No work was done outside the current phase's scope

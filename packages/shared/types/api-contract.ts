@@ -125,8 +125,7 @@ export namespace HackathonsAPI {
   export const PATHS = {
     base: "/api/hackathons",
     byId: (id: string) => `/api/hackathons/${id}` as const,
-    assignTeams: (id: string) =>
-      `/api/hackathons/${id}/assign-teams` as const,
+    assignTeams: (id: string) => `/api/hackathons/${id}/assign-teams` as const,
   } as const;
 }
 
@@ -435,8 +434,7 @@ export namespace AuditAPI {
   }
 
   export const PATHS = {
-    byHackathon: (hackathonId: string) =>
-      `/api/audit/${hackathonId}` as const,
+    byHackathon: (hackathonId: string) => `/api/audit/${hackathonId}` as const,
   } as const;
 }
 
