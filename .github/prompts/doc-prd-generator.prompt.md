@@ -92,7 +92,8 @@ Target ~60-80 stories total across all domains. Each story must:
 Derive NFRs from the plan's constraints and scale data (`~75 max concurrent users`):
 
 - **Performance**: Leaderboard SSR response < 2 s at 75 concurrent users
-- **Security**: All endpoints authenticated except `/api/health`; event codes stored as plaintext, join endpoint rate-limited (5/min/IP)
+- **Security**: All endpoints authenticated except `/api/health`; event codes stored as
+  plaintext, join endpoint rate-limited (5/min/IP)
 - **Accessibility**: WCAG 2.1 AA for all public-facing pages
 - **Compliance**: Azure Policy guardrails respected; no public endpoints for database
 - **Observability**: All reviewer actions audited with `reviewedBy`, `reviewedAt`, `reviewReason`
