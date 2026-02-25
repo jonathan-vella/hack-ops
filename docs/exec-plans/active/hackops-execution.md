@@ -16,10 +16,13 @@
 
 <!-- Update this at the START of each session -->
 
-**Phase**: Not started
-**Step**: —
-**Branch**: —
-**Goal**: —
+**Phase**: A — Product Documentation
+**Step**: A1 — Run `doc-prd-generator.prompt.md` → produce `docs/prd.md`
+**Branch**: `feature/product-docs`
+**Goal**: Create the three A0 doc-generator prompts for PRD, API contract, and data model
+
+> **B0 blocker**: No GitHub auth token in devcontainer. Issue creation skipped;
+> resume B0 when `GH_TOKEN` is set.
 
 ---
 
@@ -39,9 +42,9 @@
 **Branch**: `feature/product-docs`
 **Merge gate**: `npm run lint:md` passes
 
-- [ ] A0: Create `doc-prd-generator.prompt.md`
-- [ ] A0: Create `doc-api-contract-generator.prompt.md`
-- [ ] A0: Create `doc-data-model-generator.prompt.md`
+- [x] A0: Create `doc-prd-generator.prompt.md`
+- [x] A0: Create `doc-api-contract-generator.prompt.md`
+- [x] A0: Create `doc-data-model-generator.prompt.md`
 - [ ] A1: Run PRD generator → `docs/prd.md`
 - [ ] A2: Run API contract generator →
   `packages/shared/types/api-contract.ts` + `docs/api-contract.md`
@@ -173,6 +176,8 @@
 |     |            |            | challenged, and    | issues, then start |          |
 |     |            |            | resolved 14        | Phase A            |          |
 |     |            |            | findings           |                    |          |
+| 1   | 2026-02-25 | A / A0     | Created 3 A0       | A1: Run PRD        | B0 needs |
+|     |            |            | doc-gen prompts on | generator prompt   | GH_TOKEN |
 
 ---
 
