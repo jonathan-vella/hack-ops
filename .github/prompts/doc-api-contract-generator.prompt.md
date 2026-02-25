@@ -1,14 +1,14 @@
 ---
-description: 'Generate the HackOps API contract — TypeScript types and Markdown reference — from the technical plan. Output: packages/shared/types/api-contract.ts + docs/api-contract.md'
+description: "Generate the HackOps API contract — TypeScript types and Markdown reference — from the technical plan. Output: packages/shared/types/api-contract.ts + docs/api-contract.md"
 agent: agent
 tools:
   [
-    'read/readFile',
-    'edit/editFiles',
-    'edit/createFile',
-    'search/textSearch',
-    'search/fileSearch',
-    'execute/runInTerminal',
+    "read/readFile",
+    "edit/editFiles",
+    "edit/createFile",
+    "search/textSearch",
+    "search/fileSearch",
+    "execute/runInTerminal",
   ]
 ---
 
@@ -46,6 +46,7 @@ Type errors at compile time catch contract drift (Golden Principle 10).
 
 Read `.github/prompts/plan-hackOps.prompt.md` in full. Extract every endpoint
 mentioned across Phases 5-10 with:
+
 - HTTP method and path
 - Required role (Admin / Coach / Hacker / none)
 - Request body shape
@@ -54,21 +55,21 @@ mentioned across Phases 5-10 with:
 
 Group endpoints into these API groups:
 
-| Group        | Prefix               | Phase |
-| ------------ | -------------------- | ----- |
-| Health       | `/api/health`        | —     |
-| Hackathons   | `/api/hackathons`    | 6     |
-| Teams        | `/api/teams`         | 6     |
-| Hackers      | `/api/hackers`       | 6     |
-| Submissions  | `/api/submissions`   | 7     |
-| Scores       | `/api/scores`        | 7     |
-| Rubrics      | `/api/rubrics`       | 7     |
-| Leaderboard  | `/api/leaderboard`   | 8     |
-| Challenges   | `/api/challenges`    | 9     |
-| Progression  | `/api/progression`   | 9     |
-| Roles        | `/api/roles`         | 10    |
-| Audit        | `/api/audit`         | 10    |
-| Config       | `/api/config`        | 10    |
+| Group       | Prefix             | Phase |
+| ----------- | ------------------ | ----- |
+| Health      | `/api/health`      | —     |
+| Hackathons  | `/api/hackathons`  | 6     |
+| Teams       | `/api/teams`       | 6     |
+| Hackers     | `/api/hackers`     | 6     |
+| Submissions | `/api/submissions` | 7     |
+| Scores      | `/api/scores`      | 7     |
+| Rubrics     | `/api/rubrics`     | 7     |
+| Leaderboard | `/api/leaderboard` | 8     |
+| Challenges  | `/api/challenges`  | 9     |
+| Progression | `/api/progression` | 9     |
+| Roles       | `/api/roles`       | 10    |
+| Audit       | `/api/audit`       | 10    |
+| Config      | `/api/config`      | 10    |
 
 ### Step 2 — Define shared types
 
@@ -79,7 +80,7 @@ Before endpoint-specific types, define the shared building blocks:
 type ApiResponse<T> = { data: T; ok: true } | { error: string; ok: false };
 
 // Role enum matching Easy Auth claims
-type UserRole = 'admin' | 'coach' | 'hacker';
+type UserRole = "admin" | "coach" | "hacker";
 
 // Pagination
 type PageRequest = { continuationToken?: string; pageSize?: number };
@@ -92,6 +93,7 @@ the plan's invariants and phase descriptions.
 ### Step 3 — Write TypeScript contract
 
 For each API group, write a TypeScript namespace containing:
+
 - Request type(s)
 - Response type(s)
 - Path constants
@@ -100,13 +102,25 @@ Example structure:
 
 ```typescript
 export namespace HackathonsAPI {
-  export interface CreateRequest { name: string; eventCode: string; }
-  export interface HackathonSummary { id: string; name: string; status: HackathonStatus; teamCount: number; }
-  export const PATHS = { base: '/api/hackathons', byId: (id: string) => `/api/hackathons/${id}` } as const;
+  export interface CreateRequest {
+    name: string;
+    eventCode: string;
+  }
+  export interface HackathonSummary {
+    id: string;
+    name: string;
+    status: HackathonStatus;
+    teamCount: number;
+  }
+  export const PATHS = {
+    base: "/api/hackathons",
+    byId: (id: string) => `/api/hackathons/${id}`,
+  } as const;
 }
 ```
 
 Ensure:
+
 - All types are `export`ed
 - Event codes are `string` only (never expose the hash mechanism in types)
 - Submission states reflect the staging/approval invariant: `'pending' | 'approved' | 'rejected'`
@@ -142,17 +156,18 @@ For each endpoint, write a reference block in `docs/api-contract.md`:
 ```markdown
 ### POST /api/submissions
 
-| Field        | Value                                      |
-| ------------ | ------------------------------------------ |
-| Auth         | Required (GitHub OAuth via Easy Auth)      |
-| Role         | Hacker                                     |
-| Rate limit   | 10 req/min per team                        |
+| Field      | Value                                 |
+| ---------- | ------------------------------------- |
+| Auth       | Required (GitHub OAuth via Easy Auth) |
+| Role       | Hacker                                |
+| Rate limit | 10 req/min per team                   |
 
 **Request body**: `SubmissionsAPI.CreateRequest`
 
 **Response 201**: `ApiResponse<SubmissionsAPI.SubmissionRecord>`
 
 **Error responses**:
+
 - `400` — Invalid rubric field or missing required answer
 - `403` — Cross-team submission attempt
 - `409` — Duplicate submission for same challenge
@@ -161,6 +176,7 @@ For each endpoint, write a reference block in `docs/api-contract.md`:
 ### Step 6 — Create docs/api-contract.md
 
 Write the complete reference to `docs/api-contract.md` with:
+
 - Intro section explaining the TypeScript-first contract approach
 - Easy Auth header parsing section (how role is determined from headers)
 - All endpoint reference blocks grouped by API group

@@ -19,10 +19,7 @@
 **Phase**: A — Product Documentation
 **Step**: A1 — Run `doc-prd-generator.prompt.md` → produce `docs/prd.md`
 **Branch**: `feature/product-docs`
-**Goal**: Create the three A0 doc-generator prompts for PRD, API contract, and data model
-
-> **B0 blocker**: No GitHub auth token in devcontainer. Issue creation skipped;
-> resume B0 when `GH_TOKEN` is set.
+**Goal**: Generate the PRD from the technical plan
 
 ---
 
@@ -30,12 +27,10 @@
 
 ### Phase B0 — Bootstrap Issues
 
-- [ ] Create `[Epic] Phase A: Product Documentation` issue
-- [ ] Create `[Epic] Phase C: App-Dev Toolchain` issue
-- [ ] Create individual Phase A tracking issues (PRD, API contract,
-  data model, UI pages, env config)
-- [ ] Create individual Phase C tracking issues (agents, skills,
-  instructions, registration, subagents)
+- [x] Create `[Epic] Phase A: Product Documentation` issue (#1)
+- [x] Create `[Epic] Phase C: App-Dev Toolchain` issue (#2)
+- [x] Create individual Phase A tracking issues (#3-#7)
+- [x] Create individual Phase C tracking issues (#8-#12)
 
 ### Phase A — Product Documentation
 
@@ -47,7 +42,7 @@
 - [x] A0: Create `doc-data-model-generator.prompt.md`
 - [ ] A1: Run PRD generator → `docs/prd.md`
 - [ ] A2: Run API contract generator →
-  `packages/shared/types/api-contract.ts` + `docs/api-contract.md`
+      `packages/shared/types/api-contract.ts` + `docs/api-contract.md`
 - [ ] A3: Run data model generator → `docs/data-model.md`
 - [ ] A4: Create `docs/ui-pages.md`
 - [ ] A5: Create `docs/environment-config.md`
@@ -98,7 +93,7 @@
 - [ ] B3: Create `generate-backlog.prompt.md`
 - [ ] B4: Create `backlog-triage.prompt.md`
 - [ ] B5: Document Projects board setup in
-  `docs/exec-plans/backlog-setup.md`
+      `docs/exec-plans/backlog-setup.md`
 - [ ] Run backlog generation prompt → verify issues created
 
 ### Phase D — Infrastructure Execution
@@ -176,8 +171,11 @@
 |     |            |            | challenged, and    | issues, then start |          |
 |     |            |            | resolved 14        | Phase A            |          |
 |     |            |            | findings           |                    |          |
-| 1   | 2026-02-25 | A / A0     | Created 3 A0       | A1: Run PRD        | B0 needs |
-|     |            |            | doc-gen prompts on | generator prompt   | GH_TOKEN |
+| 1   | 2026-02-25 | A / A0     | Created 3 A0       | B0: Bootstrap      | B0 needs |
+|     |            |            | doc-gen prompts    | issues             | GH_TOKEN |
+| 2   | 2026-02-25 | B0         | Created 12 GitHub  | A1: Run PRD        | None     |
+|     |            |            | issues (#1-#12),   | generator prompt   |          |
+|     |            |            | epic label         |                    |          |
 
 ---
 
@@ -196,17 +194,17 @@ have enough context for the current step.
 
 ### Read when working on specific phases
 
-| Phase   | Additional context files                          |
-| ------- | ------------------------------------------------- |
-| A (docs) | `plan-hackOps.prompt.md` (Phases 5-10)           |
-| B (backlog) | `docs/prd.md`, `docs/api-contract.md`         |
-| C (toolchain) | `agent-definitions.instructions.md`,         |
-|         | `agent-skills.instructions.md`,                  |
-|         | `microsoft-skill-creator` skill                  |
-| D (infra) | `azure-defaults` skill, existing agent defs     |
-| E (app) | All Phase A docs, `hackops-domain` skill,         |
-|         | `api-contract.ts` types                           |
-| F (supporting) | `AGENTS.md`, `docs/README.md`              |
+| Phase          | Additional context files                    |
+| -------------- | ------------------------------------------- |
+| A (docs)       | `plan-hackOps.prompt.md` (Phases 5-10)      |
+| B (backlog)    | `docs/prd.md`, `docs/api-contract.md`       |
+| C (toolchain)  | `agent-definitions.instructions.md`,        |
+|                | `agent-skills.instructions.md`,             |
+|                | `microsoft-skill-creator` skill             |
+| D (infra)      | `azure-defaults` skill, existing agent defs |
+| E (app)        | All Phase A docs, `hackops-domain` skill,   |
+|                | `api-contract.ts` types                     |
+| F (supporting) | `AGENTS.md`, `docs/README.md`               |
 
 ---
 

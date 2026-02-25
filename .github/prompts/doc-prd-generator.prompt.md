@@ -1,13 +1,13 @@
 ---
-description: 'Generate the HackOps Product Requirements Document (PRD) from the technical plan. Output: docs/prd.md'
+description: "Generate the HackOps Product Requirements Document (PRD) from the technical plan. Output: docs/prd.md"
 agent: agent
 tools:
   [
-    'read/readFile',
-    'edit/editFiles',
-    'edit/createFile',
-    'search/textSearch',
-    'search/fileSearch',
+    "read/readFile",
+    "edit/editFiles",
+    "edit/createFile",
+    "search/textSearch",
+    "search/fileSearch",
   ]
 ---
 
@@ -44,12 +44,12 @@ Read `.github/prompts/plan-hackOps.prompt.md` fully. Extract:
 
 From the plan's `Roles` statement, define four personas:
 
-| Persona   | Role        | Goals                                 | Pain points                          |
-| --------- | ----------- | ------------------------------------- | ----------------------------------- |
-| Admin     | Full control | Manage events, teams, roles, config  | Manual reassignments are error-prone |
-| Coach     | Validate/score | Review and grade submissions        | No audit trail on overrides         |
-| Hacker    | Team-scoped submission | Submit work, track progress  | Unclear challenge gating rules      |
-| Anonymous | Blocked     | —                                     | Cannot access the platform          |
+| Persona   | Role                   | Goals                               | Pain points                          |
+| --------- | ---------------------- | ----------------------------------- | ------------------------------------ |
+| Admin     | Full control           | Manage events, teams, roles, config | Manual reassignments are error-prone |
+| Coach     | Validate/score         | Review and grade submissions        | No audit trail on overrides          |
+| Hacker    | Team-scoped submission | Submit work, track progress         | Unclear challenge gating rules       |
+| Anonymous | Blocked                | —                                   | Cannot access the platform           |
 
 Expand each persona with specific goals and pain points derived from the plan.
 
@@ -57,16 +57,16 @@ Expand each persona with specific goals and pain points derived from the plan.
 
 Map each Phase 5-10 to a feature domain:
 
-| Domain                   | Plan Phase | Description                                |
-| ------------------------ | ---------- | ------------------------------------------ |
-| Authentication & Roles   | Phase 5    | GitHub OAuth, role guards, Easy Auth       |
-| Hackathon Lifecycle      | Phase 6    | Create, launch, archive events             |
-| Team Management          | Phase 6    | Shuffle, register, reassign teams          |
-| Hacker Onboarding        | Phase 6    | Event code join, profile creation          |
-| Scoring Engine           | Phase 7    | Rubric-driven submission + review queue    |
-| Leaderboard              | Phase 8    | SSR live leaderboard, grade/award badges   |
-| Challenge Progression    | Phase 9    | Sequential gating, unlock on approval      |
-| Admin Operations         | Phase 10   | Audit trail, config, role management       |
+| Domain                 | Plan Phase | Description                              |
+| ---------------------- | ---------- | ---------------------------------------- |
+| Authentication & Roles | Phase 5    | GitHub OAuth, role guards, Easy Auth     |
+| Hackathon Lifecycle    | Phase 6    | Create, launch, archive events           |
+| Team Management        | Phase 6    | Shuffle, register, reassign teams        |
+| Hacker Onboarding      | Phase 6    | Event code join, profile creation        |
+| Scoring Engine         | Phase 7    | Rubric-driven submission + review queue  |
+| Leaderboard            | Phase 8    | SSR live leaderboard, grade/award badges |
+| Challenge Progression  | Phase 9    | Sequential gating, unlock on approval    |
+| Admin Operations       | Phase 10   | Audit trail, config, role management     |
 
 ### Step 4 — Write user stories
 
@@ -76,10 +76,12 @@ For each domain, generate user stories using this format:
 **US-{NNN}**: As a {role}, I want {action}, so that {outcome}.
 
 **Acceptance criteria**:
+
 - Given {context}, when {trigger}, then {expected result}.
 ```
 
 Target ~60-80 stories total across all domains. Each story must:
+
 - Map to exactly one feature domain
 - Reference the invariant it enforces (if applicable)
 - Include at least two Given/When/Then acceptance criteria
@@ -115,21 +117,37 @@ Write the complete PRD to `docs/prd.md` with these top-level sections:
 
 ```markdown
 # HackOps — Product Requirements Document
+
 ## Product Vision
+
 ## Success Metrics
+
 ## User Personas
+
 ## Feature Domains
+
 ## User Stories
+
 ### Authentication & Roles
+
 ### Hackathon Lifecycle
+
 ### Team Management
+
 ### Hacker Onboarding
+
 ### Scoring Engine
+
 ### Leaderboard
+
 ### Challenge Progression
+
 ### Admin Operations
+
 ## Non-Functional Requirements
+
 ## Out of Scope
+
 ## Glossary
 ```
 

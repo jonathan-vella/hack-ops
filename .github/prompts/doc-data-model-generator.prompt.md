@@ -1,13 +1,13 @@
 ---
-description: 'Generate the HackOps Cosmos DB data model reference with TypeScript interfaces and sample documents. Output: docs/data-model.md'
+description: "Generate the HackOps Cosmos DB data model reference with TypeScript interfaces and sample documents. Output: docs/data-model.md"
 agent: agent
 tools:
   [
-    'read/readFile',
-    'edit/editFiles',
-    'edit/createFile',
-    'search/textSearch',
-    'search/fileSearch',
+    "read/readFile",
+    "edit/editFiles",
+    "edit/createFile",
+    "search/textSearch",
+    "search/fileSearch",
   ]
 ---
 
@@ -55,6 +55,7 @@ Also extract field-level details from Phases 6-10 task descriptions.
 ### Step 2 — Design TypeScript interfaces
 
 For each container, write a TypeScript interface that:
+
 1. Includes `id: string` and the partition key field
 2. Includes a `_type` discriminant field (e.g., `_type: 'hackathon'`)
 3. Uses strict union types for status/state fields
@@ -73,6 +74,7 @@ For each container, write a TypeScript interface that:
 
 For each container, provide one realistic sample document as a JSON code block.
 The sample must:
+
 - Use plausible example data (avoid `"string"` or `"value"` placeholders)
 - Show all required fields
 - Demonstrate nullable/optional fields with `null` or omitted values
@@ -80,6 +82,7 @@ The sample must:
 ### Step 4 — Document indexing recommendations
 
 For each container, note indexing policy recommendations:
+
 - Default (`/*`) is acceptable for most containers
 - Call out any field that should be excluded for cost savings
   (large Markdown fields in `rubrics`, JSON blobs in `submissions`)
@@ -90,12 +93,12 @@ For each container, note indexing policy recommendations:
 
 Document the key multi-container patterns the app uses:
 
-| Pattern                         | Containers involved          | Description                                            |
-| ------------------------------- | ---------------------------- | ------------------------------------------------------ |
-| Leaderboard assembly            | `scores`, `teams`, `hackers` | Join approved scores with team and member display names |
-| Submission review queue         | `submissions`, `rubrics`     | Load pending submissions with active rubric for grading |
-| Challenge progression check     | `progression`, `challenges`  | Determine next unlockable challenge for a team          |
-| Rubric atomic swap              | `rubrics`                    | Update pointer document then insert new versioned rubric |
+| Pattern                     | Containers involved          | Description                                              |
+| --------------------------- | ---------------------------- | -------------------------------------------------------- |
+| Leaderboard assembly        | `scores`, `teams`, `hackers` | Join approved scores with team and member display names  |
+| Submission review queue     | `submissions`, `rubrics`     | Load pending submissions with active rubric for grading  |
+| Challenge progression check | `progression`, `challenges`  | Determine next unlockable challenge for a team           |
+| Rubric atomic swap          | `rubrics`                    | Update pointer document then insert new versioned rubric |
 
 ### Step 6 — Write docs/data-model.md
 
@@ -103,25 +106,42 @@ Write the complete data model to `docs/data-model.md` with these sections:
 
 ```markdown
 # HackOps — Cosmos DB Data Model
+
 ## Overview
+
 ## Container Summary Table
+
 ## Container Definitions
+
 ### hackathons
+
 ### teams
+
 ### hackers
+
 ### scores
+
 ### submissions
+
 ### rubrics
+
 ### config
+
 ### roles
+
 ### challenges
+
 ### progression
+
 ## Cross-Container Query Patterns
+
 ## Indexing Recommendations
+
 ## Key Invariants Encoded in the Schema
 ```
 
 Each container definition section must include:
+
 1. TypeScript interface (fenced code block, `typescript` syntax)
 2. Partition key rationale (one paragraph)
 3. Sample document (fenced code block, `json` syntax)

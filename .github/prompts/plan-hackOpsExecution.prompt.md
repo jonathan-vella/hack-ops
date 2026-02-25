@@ -200,7 +200,7 @@ Create in `.github/agents/`:
 | `app-review-subagent.agent.md` | API Builder, Frontend Builder | Code review against api-routes, typescript, and react-components instructions, returns APPROVED/NEEDS_REVISION | GPT-5.3-Codex |
 | `app-test-subagent.agent.md`   | Test Writer                   | Runs `npm test`, returns PASS/FAIL with coverage report                                                        | GPT-5.3-Codex |
 
-Each agent follows the existing frontmatter schema, references skills via `Read .github/skills/{name}/SKILL.md FIRST`, and lists appropriate tools.
+Each agent follows the existing frontmatter schema, references skills via **Read** `.github/skills/{name}/SKILL.md` FIRST, and lists appropriate tools.
 
 **Skill references for new agents** (include in agent body alongside azure-defaults):
 
