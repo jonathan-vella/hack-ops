@@ -2,19 +2,20 @@
 description: Resume a HackOps execution session. Loads progress state, identifies next step, and continues work from where the last session left off.
 agent: "agent"
 tools:
-  - changes
-  - codebase
-  - editFiles
-  - fetch
-  - findTestFiles
-  - githubRepo
-  - problems
-  - readFile
-  - runCommands
-  - search
-  - terminalLastCommand
-  - terminalSelection
-  - usages
+  - search/changes
+  - search/codebase
+  - edit/editFiles
+  - web/fetch
+  - web/githubRepo
+  - read/problems
+  - read/readFile
+  - execute/getTerminalOutput
+  - execute/runInTerminal
+  - read/terminalLastCommand
+  - read/terminalSelection
+  - azure-mcp/search
+  - search/usages
+  - todo
 ---
 
 # Resume HackOps Execution Session
