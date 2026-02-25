@@ -327,7 +327,7 @@ Create in `.github/prompts/`:
 | --------------------------------- | ------------------- | ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `app-01-scaffold.prompt.md`       | 11-App Scaffolder   | Phase 1       | Turborepo setup, Next.js 15 init, `packages/shared/types/` for all 10 container interfaces, Cosmos DB emulator config, `.env.example`, seed script                       |
 | `app-02-auth.prompt.md`           | 12-API Builder      | Phase 5       | Auth middleware (Easy Auth header parsing), role resolution, role guards, dev auth bypass, CORS config, rate limiter, audit logger                                       |
-| `app-03-api-hackathons.prompt.md` | 12-API Builder      | Phase 6       | Hackathon CRUD, event code generation (SHA-256), hacker onboarding (join), team assignment (Fisher-Yates), manual reassignment                                           |
+| `app-03-api-hackathons.prompt.md` | 12-API Builder      | Phase 6       | Hackathon CRUD, event code generation (plaintext + rate limiting), hacker onboarding (join), team assignment (Fisher-Yates), manual reassignment                         |
 | `app-04-api-scoring.prompt.md`    | 12-API Builder      | Phase 7       | Rubric CRUD (pointer + versioned pattern), submission endpoint (form + JSON upload), review queue, approve/reject, score override                                        |
 | `app-05-api-challenges.prompt.md` | 12-API Builder      | Phase 9       | Challenge CRUD, progression tracking, gate middleware, auto-unlock trigger                                                                                               |
 | `app-06-api-admin.prompt.md`      | 12-API Builder      | Phase 10      | Role management (invite/remove), audit trail query, config management endpoints                                                                                          |
@@ -356,7 +356,7 @@ Create in `.github/prompts/`:
 ### F4. Security checklist
 
 - **Create**: `docs/security-checklist.md`
-- **Content**: Consolidate security invariants scattered across phases: TLS 1.2, HTTPS-only, managed identity, no public endpoints, SHA-256 event codes, input validation, CORS, rate limiting, audit trail, primary admin protection
+- **Content**: Consolidate security invariants scattered across phases: TLS 1.2, HTTPS-only, managed identity, no public endpoints, event code rate limiting (5/min/IP), input validation, CORS, rate limiting, audit trail, primary admin protection
 
 ### F5. Local development runbook
 

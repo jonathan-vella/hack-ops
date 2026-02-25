@@ -92,7 +92,7 @@ massive scale.
 - **Role**: Team-scoped participant
 - **Goals**:
   - Join a hackathon quickly with an event code
-  - Submit scores for their team's current challenge
+  - Submit evidence for their team's current challenge
   - Track their team's progress and leaderboard position
   - Understand which challenges are unlocked
 - **Pain points**:
@@ -265,13 +265,15 @@ as a unique 4-digit number, so that hackers can join easily.
 **Acceptance criteria**:
 
 - Given I create a hackathon, when the event code is generated,
-  then it is a 4-digit numeric code (`0000`–`9999`) unique
+  then it is a 4-digit numeric code (`1000`–`9999`) unique
   among all active hackathons.
 - Given a collision with an existing active hackathon code,
   when generation detects it, then a new code is generated and
   uniqueness is re-verified.
 
-> Enforces invariant: Event codes stored as SHA-256 hash only.
+> Enforces invariant: Event codes are convenience shortcodes
+> stored as plaintext; security relies on GitHub OAuth + rate
+> limiting (5 attempts/min/IP on `/api/join`).
 
 ---
 
@@ -353,10 +355,11 @@ that I can adjust for different event formats.
 **Acceptance criteria**:
 
 - Given I set `teamSize` to 3, when team assignment runs, then
-  teams are created with 3 members each (remainder hackers form
-  a smaller final team).
+  teams are created with approximately 3 members each, balanced
+  so no team has fewer than `ceil(teamSize / 2)` members.
 - Given 11 hackers and `teamSize` of 5, when assignment runs,
-  then 2 teams of 5 and 1 team of 1 are created.
+  then 3 teams are created (4 + 4 + 3) rather than 2 teams of
+  5 and a runt team of 1.
 
 ---
 
@@ -424,11 +427,17 @@ help.
 - Given I enter a valid event code for an active hackathon,
   when I call `POST /api/join`, then my hacker profile is
   created in the `hackers` container.
-- Given I enter an invalid event code, when the hash comparison
+- Given I enter an invalid event code, when the comparison
   fails, then a `401 Unauthorized` response is returned without
   revealing whether the hackathon exists.
+- Given the join endpoint is rate-limited to 5 attempts per
+  minute per IP, when an attacker brute-forces codes, then
+  they are throttled before exhausting the keyspace.
 
-> Enforces invariant: Event codes stored as SHA-256 hash only.
+> Event codes are convenience shortcodes, not secrets. Security
+> relies on GitHub OAuth authentication + rate limiting, not
+> code obscurity. Codes are stored as plaintext and compared
+> directly.
 
 ---
 
@@ -539,45 +548,53 @@ atomically.
 
 ---
 
-**US-029**: As a Hacker, I want to submit scores for my team's
-current challenge, so that my team's work is recorded.
+**US-029**: As a Hacker, I want to submit evidence for my
+team's current challenge, so that my team's work enters the
+review queue.
 
 **Acceptance criteria**:
 
 - Given challenge `C1` is unlocked for my team, when I call
-  `POST /api/submissions` with valid scores, then a submission
-  is created in `pending` state.
+  `POST /api/submissions` with a description and optional
+  attachments, then a submission is created in `pending` state
+  with no scores (scores are entered by the Coach during
+  review).
 - Given I attempt to submit for a team that is not mine, when
   the team-scoping check runs, then a `403 Forbidden` response
   is returned.
 
 > Enforces invariant: Hackers are team-scoped; cross-team
-> submission attempts return 403.
+> submission attempts return 403. Hackers submit evidence;
+> Coaches enter numeric scores during review.
 
 ---
 
-**US-030**: As a Hacker, I want to submit scores via a dynamic
-form driven by the active rubric, so that I fill in exactly the
-right fields.
+**US-030**: As a Coach, I want to enter scores via a dynamic
+form driven by the active rubric during review, so that scoring
+is structured and consistent.
 
 **Acceptance criteria**:
 
+- Given a `pending` submission, when the Coach opens the review
+  form, then the `<RubricForm>` component renders with rubric
+  categories and max point constraints.
 - Given the active rubric has 3 categories with max points of
-  10, 20, and 30, when the `<RubricForm>` component renders,
-  then it shows 3 input fields with those constraints.
-- Given the rubric changes, when I reload the form, then the
-  new rubric structure is reflected without code changes.
+  10, 20, and 30, then the form shows 3 input fields with those
+  constraints.
+- Given the rubric changes, when a Coach opens a new review,
+  then the new rubric structure is reflected without code
+  changes.
 
 ---
 
-**US-031**: As a Hacker, I want to upload scores via JSON file,
-so that I can batch-submit programmatically.
+**US-031**: As a Coach, I want to upload scores via JSON file,
+so that I can batch-score multiple submissions programmatically.
 
 **Acceptance criteria**:
 
 - Given I upload a valid JSON file matching the active rubric
-  schema, when Zod validation runs, then the submission is
-  accepted.
+  schema, when Zod validation runs, then the scores are applied
+  to the specified submission.
 - Given I upload a JSON file that does not match the rubric
   schema, when validation runs, then a `400 Bad Request` is
   returned with details about which fields are invalid.
@@ -589,9 +606,14 @@ review queue, so that I can approve or reject them.
 
 **Acceptance criteria**:
 
-- Given 5 submissions are in `pending` state, when I call
-  `GET /api/submissions?status=pending`, then all 5 are
-  returned with team info, challenge info, and submitted scores.
+- Given 5 submissions are in `pending` state for hackathon
+  `H1`, when I call
+  `GET /api/submissions?status=pending&hackathonId=H1`, then
+  all 5 are returned with team info, challenge info, and
+  submitted evidence.
+- Given I am a Coach for `H1` but not `H2`, when I query
+  submissions without a hackathonId filter, then only `H1`
+  submissions are returned (hackathon-scoped queue).
 - Given I am a Hacker, when I call the same endpoint, then I
   can only see my own team's submissions.
 
@@ -603,11 +625,12 @@ the scores are recorded on the leaderboard.
 **Acceptance criteria**:
 
 - Given a `pending` submission, when I call `PATCH
-/api/submissions/:id` with status `approved`, then scores are
-  copied to the `scores` container as immutable records.
+/api/submissions/:id` with status `approved` and rubric scores
+  per category, then the Coach-entered scores are copied to the
+  `scores` container as immutable records.
 - Given the approval completes, when I check the audit fields,
-  then `reviewedBy`, `reviewedAt`, and `reviewReason` are
-  populated.
+  then `reviewedBy`, `reviewedAt`, `reviewReason`, and the
+  per-category scores are populated.
 
 > Enforces invariant: Scores are immutable until approved
 > (staging pattern). All reviewer actions are audited.
@@ -649,11 +672,10 @@ scores cannot enter the system.
 **Acceptance criteria**:
 
 - Given the active rubric has a max score of 10 for category
-  `Quality`, when a submission includes 15 for `Quality`, then
-  it is rejected with a `400 Bad Request`.
-- Given all submitted values are within rubric bounds, when
-  validation passes, then the submission enters the review
-  queue.
+  `Quality`, when a Coach enters 15 for `Quality` during
+  review, then the score is rejected with a `400 Bad Request`.
+- Given all Coach-entered values are within rubric bounds, when
+  validation passes, then the scores are recorded.
 
 ---
 
@@ -693,6 +715,9 @@ leaderboard for a hackathon, so that I can see team rankings.
 - Given hackathon `H1` has 4 teams with approved scores, when
   I navigate to `/leaderboard/H1`, then teams are displayed
   ranked by total approved scores (highest first).
+- Given two teams have the same total score, when the
+  leaderboard renders, then the team whose last approval
+  timestamp is earlier ranks higher (earliest completion wins).
 - Given the page is server-side rendered, when I load it, then
   the initial HTML contains the full leaderboard (no hydration
   flash).
@@ -1082,8 +1107,9 @@ that I can monitor all hackathon activity at a glance.
 
 - All API endpoints authenticated except `/api/health`
 - GitHub OAuth via Azure App Service Easy Auth
-- Event codes stored as SHA-256 hash only — plaintext returned
-  to Admin once at creation and never persisted
+- Event codes are convenience shortcodes (not secrets);
+  stored as plaintext, protected by rate limiting
+  (5 attempts/min/IP on `/api/join`)
 - Role-based access control on every route
 - Primary admin protection — cannot be demoted
 - CORS restricted to App Service origin and `localhost:3000`
@@ -1156,18 +1182,18 @@ The following items are explicitly **not** included in HackOps:
 
 ## Glossary
 
-| Term                     | Definition                                                                                                    |
-| ------------------------ | ------------------------------------------------------------------------------------------------------------- |
-| **MicroHack**            | A structured hackathon event with defined challenges, team-based scoring, and gated progression               |
-| **Event code**           | A 4-digit numeric code auto-generated per hackathon; used by hackers to self-register; stored as SHA-256 hash |
-| **Rubric**               | A configurable, Markdown-driven scoring template defining categories, max points, and grade thresholds        |
-| **Pointer document**     | A small Cosmos DB document that references the active rubric version; enables atomic swap                     |
-| **Staging pattern**      | Submissions enter a `pending` state and must be explicitly approved before scores appear on the leaderboard   |
-| **Fisher-Yates shuffle** | An unbiased algorithm for randomly assigning hackers to teams with equal probability                          |
-| **Easy Auth**            | Azure App Service built-in authentication; handles GitHub OAuth without custom middleware                     |
-| **Grade badge**          | A visual indicator (A/B/C/D) on the leaderboard based on rubric-defined score thresholds                      |
-| **Award badge**          | A special recognition badge for achievements like "Highest Score" or "Fastest Completion"                     |
-| **Challenge gating**     | The rule that Challenge N+1 is locked until Challenge N's submission is approved                              |
-| **Private Endpoint**     | An Azure networking feature that gives a resource a private IP within a VNet, disabling public access         |
-| **Deployment Stack**     | An Azure resource that tracks all resources deployed by a template as a unit, with deny-settings and rollback |
-| **AVM**                  | Azure Verified Modules — Microsoft's official Bicep module library for Azure resources                        |
+| Term                     | Definition                                                                                                                                             |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **MicroHack**            | A structured hackathon event with defined challenges, team-based scoring, and gated progression                                                        |
+| **Event code**           | A 4-digit numeric code (`1000`–`9999`) auto-generated per hackathon; used by hackers to self-register; stored as plaintext, protected by rate limiting |
+| **Rubric**               | A configurable, Markdown-driven scoring template defining categories, max points, and grade thresholds                                                 |
+| **Pointer document**     | A small Cosmos DB document that references the active rubric version; enables atomic swap                                                              |
+| **Staging pattern**      | Submissions enter a `pending` state and must be explicitly approved before scores appear on the leaderboard                                            |
+| **Fisher-Yates shuffle** | An unbiased algorithm for randomly assigning hackers to teams with equal probability                                                                   |
+| **Easy Auth**            | Azure App Service built-in authentication; handles GitHub OAuth without custom middleware                                                              |
+| **Grade badge**          | A visual indicator (A/B/C/D) on the leaderboard based on rubric-defined score thresholds                                                               |
+| **Award badge**          | A special recognition badge for achievements like "Highest Score" or "Fastest Completion"                                                              |
+| **Challenge gating**     | The rule that Challenge N+1 is locked until Challenge N's submission is approved                                                                       |
+| **Private Endpoint**     | An Azure networking feature that gives a resource a private IP within a VNet, disabling public access                                                  |
+| **Deployment Stack**     | An Azure resource that tracks all resources deployed by a template as a unit, with deny-settings and rollback                                          |
+| **AVM**                  | Azure Verified Modules — Microsoft's official Bicep module library for Azure resources                                                                 |

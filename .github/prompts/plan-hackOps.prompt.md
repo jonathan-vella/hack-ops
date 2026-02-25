@@ -23,8 +23,8 @@ HackOps manages the complete lifecycle of a MicroHack event:
 
 - Team registration and self-service hacker onboarding via an auto-generated 4-digit event code
 - Configurable, Markdown-driven scoring rubric that drives all scoring UI, validation, and grading
-- Hacker score submission (form-based and JSON file upload), held in a staging/approval queue
-- Admin and coach submission review, approval, rejection, and score override
+- Hacker evidence submission and Coach score entry (form-based and JSON file upload), held in a staging/approval queue
+- Admin and Coach submission review, approval, rejection, and score override
 - Live leaderboard (auto-refresh, expandable rows, grade badges, award badges) showing only approved scores
 - Hackathon lifecycle management (create, launch, archive), team assignment (Fisher-Yates shuffle), manual reassignment
 - Gated challenge progression (teams unlock challenges sequentially on approval)
@@ -45,7 +45,7 @@ HackOps manages the complete lifecycle of a MicroHack event:
 - One active rubric at a time (atomic swap via pointer document + versioned rubric docs)
 - Score entry and grading are fully rubric-driven — nothing hardcoded
 - Hackers are team-scoped; cross-team submission attempts return 403
-- Event codes stored as SHA-256 hash only
+- Event codes are convenience shortcodes stored as plaintext; join endpoint rate-limited (5/min/IP)
 - Challenge N+1 is gated until challenge N is approved
 - All reviewer actions are audited (reviewedBy, reviewedAt, reviewReason)
 - Primary admin cannot be demoted
@@ -402,8 +402,8 @@ scripts/
 **Steps**:
 
 1. **Hackathon CRUD** — `POST/GET/PATCH /api/hackathons` — create, list, update lifecycle state (`draft → active → archived`)
-2. **Event code** — on hackathon creation, **auto-generate** a 4-digit numeric code (`0000`–`9999`). Validate uniqueness against all active hackathons before persisting — reject and regenerate on collision. Store SHA-256 hash only in `hackathons` container. Return plaintext to admin once.
-3. **Hacker onboarding** — `POST /api/join` — accept event code + GitHub identity, verify hash match, create hacker record in `hackers` container
+2. **Event code** — on hackathon creation, **auto-generate** a 4-digit numeric code (`1000`–`9999`). Validate uniqueness against all active hackathons before persisting — reject and regenerate on collision. Store as plaintext in `hackathons` container.
+3. **Hacker onboarding** — `POST /api/join` — accept event code + GitHub identity, verify code match, rate-limit to 5 attempts/min/IP, create hacker record in `hackers` container
 4. **Team assignment** — `POST /api/hackathons/{id}/assign-teams` — Fisher-Yates shuffle all unassigned hackers, distribute into teams of `teamSize` (configurable). Store in `teams` container.
 5. **Manual reassignment** — `PATCH /api/teams/{id}/reassign` — admin-only, move hacker between teams
 6. **Zod schemas** for all request/response bodies in `src/lib/validation/`
@@ -423,7 +423,7 @@ scripts/
 
 ### Phase 7: Scoring Engine & Submission Workflow
 
-**Goal**: Markdown-driven rubric system. Hackers submit scores (form + JSON upload). Submissions enter staging queue. Coaches/Admins approve/reject with audit trail.
+**Goal**: Markdown-driven rubric system. Hackers submit evidence; Coaches enter scores (form + JSON upload). Submissions enter staging queue. Coaches/Admins approve/reject with audit trail.
 
 **Exit criteria**: Activate rubric → submit score → appears in queue → approve → score recorded → audit logged.
 
@@ -431,7 +431,7 @@ scripts/
 
 1. **Rubric CRUD** — `POST/GET/PATCH /api/rubrics` — create rubric with Markdown-driven criteria (categories, max points, descriptions). Only one can be `active` at a time. Uses a **pointer + versioned docs** pattern: rubric versions are stored as separate documents (`rubric-v1`, `rubric-v2`, etc.) and a small pointer document indicates the active version. Atomic swap = update the pointer document only. Consumers always read the pointer first, then fetch the referenced version — no partial reads during updates.
 2. **Submission endpoint** — `POST /api/submissions` — accept form data OR JSON file upload. Validate against active rubric schema (Zod). Hackers can only submit for their own team (403 otherwise). Submission enters `pending` state.
-3. **Review queue** — `GET /api/submissions?status=pending` (Admin, Coach). List pending submissions with team info, challenge info, submitted scores.
+3. **Review queue** — `GET /api/submissions?status=pending&hackathonId={id}` (Admin, Coach — hackathon-scoped). List pending submissions with team info, challenge info, and submitted evidence.
 4. **Approve/Reject** — `PATCH /api/submissions/:id` — set status to `approved` or `rejected`. On approval: copy validated scores to `scores` container (immutable). Write audit fields (`reviewedBy`, `reviewedAt`, `reviewReason`).
 5. **Score override** — `PATCH /api/scores/:id/override` (Admin only) — modify an approved score with mandatory reason. Audit logged.
 6. **Rubric-driven UI components** — `<RubricForm>` renders scoring form dynamically from active rubric JSON. No hardcoded score fields.
