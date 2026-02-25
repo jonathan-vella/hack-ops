@@ -20,18 +20,18 @@ never exposed to the public internet.
 
 ## Container Summary Table
 
-| Container      | Partition Key    | Doc Type         | Purpose                            |
-| -------------- | ---------------- | ---------------- | ---------------------------------- |
-| `hackathons`   | `/id`            | `hackathon`      | Event lifecycle                    |
-| `teams`        | `/hackathonId`   | `team`           | Team roster                        |
-| `hackers`      | `/hackathonId`   | `hacker`         | Hacker profiles                    |
-| `scores`       | `/teamId`        | `score`          | Approved (immutable) scores        |
-| `submissions`  | `/teamId`        | `submission`     | Staging queue (pending/approved)   |
-| `rubrics`      | `/id`            | `rubric`/pointer | Scoring rubrics (versioned)        |
-| `config`       | `/id`            | `config`         | App-wide settings                  |
-| `roles`        | `/hackathonId`   | `role`           | Role assignments per event         |
-| `challenges`   | `/hackathonId`   | `challenge`      | Challenge definitions              |
-| `progression`  | `/teamId`        | `progression`    | Sequential unlock state            |
+| Container     | Partition Key  | Doc Type         | Purpose                          |
+| ------------- | -------------- | ---------------- | -------------------------------- |
+| `hackathons`  | `/id`          | `hackathon`      | Event lifecycle                  |
+| `teams`       | `/hackathonId` | `team`           | Team roster                      |
+| `hackers`     | `/hackathonId` | `hacker`         | Hacker profiles                  |
+| `scores`      | `/teamId`      | `score`          | Approved (immutable) scores      |
+| `submissions` | `/teamId`      | `submission`     | Staging queue (pending/approved) |
+| `rubrics`     | `/id`          | `rubric`/pointer | Scoring rubrics (versioned)      |
+| `config`      | `/id`          | `config`         | App-wide settings                |
+| `roles`       | `/hackathonId` | `role`           | Role assignments per event       |
+| `challenges`  | `/hackathonId` | `challenge`      | Challenge definitions            |
+| `progression` | `/teamId`      | `progression`    | Sequential unlock state          |
 
 ---
 
@@ -559,61 +559,61 @@ partitions contain a single document (efficient point reads).
 
 ### Submission Review Queue
 
-| Containers | `submissions` + `rubrics`                                       |
-| ---------- | --------------------------------------------------------------- |
-| Flow       | 1. Read pointer doc (`active-rubric`) from `rubrics`.           |
-|            | 2. Fetch the referenced versioned rubric.                       |
-|            | 3. Query `submissions` where `state = 'pending'`, scoped       |
-|            |    to `hackathonId`.                                            |
-|            | 4. Present submissions with rubric categories for Coach grading.|
-| Notes      | Coaches only see submissions for their assigned hackathons.     |
+| Containers | `submissions` + `rubrics`                                        |
+| ---------- | ---------------------------------------------------------------- |
+| Flow       | 1. Read pointer doc (`active-rubric`) from `rubrics`.            |
+|            | 2. Fetch the referenced versioned rubric.                        |
+|            | 3. Query `submissions` where `state = 'pending'`, scoped         |
+|            | to `hackathonId`.                                                |
+|            | 4. Present submissions with rubric categories for Coach grading. |
+| Notes      | Coaches only see submissions for their assigned hackathons.      |
 
 ### Challenge Progression Check
 
-| Containers | `progression` + `challenges`                                  |
-| ---------- | ------------------------------------------------------------- |
-| Flow       | 1. Read team's `progression` document (point read by          |
-|            |    `teamId`).                                                 |
-|            | 2. Query `challenges` for the hackathon, ordered by `order`.  |
-|            | 3. Compare `currentChallenge` against challenge `order` to    |
-|            |    determine which challenges are locked/unlocked.            |
-| Notes      | On submission approval, if `challengeId` matches the current  |
-|            | challenge, auto-increment `currentChallenge` and append to    |
-|            | `unlockedChallenges`.                                         |
+| Containers | `progression` + `challenges`                                 |
+| ---------- | ------------------------------------------------------------ |
+| Flow       | 1. Read team's `progression` document (point read by         |
+|            | `teamId`).                                                   |
+|            | 2. Query `challenges` for the hackathon, ordered by `order`. |
+|            | 3. Compare `currentChallenge` against challenge `order` to   |
+|            | determine which challenges are locked/unlocked.              |
+| Notes      | On submission approval, if `challengeId` matches the current |
+|            | challenge, auto-increment `currentChallenge` and append to   |
+|            | `unlockedChallenges`.                                        |
 
 ### Rubric Atomic Swap
 
-| Containers | `rubrics` (single container, two doc types)                 |
-| ---------- | ----------------------------------------------------------- |
-| Flow       | 1. Insert new versioned rubric doc (`rubric-vN`).           |
-|            | 2. Update pointer doc (`active-rubric`) to reference `vN`.  |
-| Notes      | Two separate writes — not transactional. If step 2 fails,   |
-|            | the old rubric stays active (safe failure mode). Consumers   |
-|            | always read the pointer first.                              |
+| Containers | `rubrics` (single container, two doc types)                |
+| ---------- | ---------------------------------------------------------- |
+| Flow       | 1. Insert new versioned rubric doc (`rubric-vN`).          |
+|            | 2. Update pointer doc (`active-rubric`) to reference `vN`. |
+| Notes      | Two separate writes — not transactional. If step 2 fails,  |
+|            | the old rubric stays active (safe failure mode). Consumers |
+|            | always read the pointer first.                             |
 
 ---
 
 ## Indexing Recommendations
 
-| Container      | Policy                                                              |
-| -------------- | ------------------------------------------------------------------- |
-| `hackathons`   | Default (`/*`). Small volume — no optimisation needed.              |
-| `teams`        | Default. Exclude `/members/*` from range indexes if member arrays   |
-|                | grow large (currently ≤ 5 members, so default is fine).             |
-| `teams`        | Composite index: `(hackathonId ASC)` for list queries.              |
-| `hackers`      | Default. Composite index: `(hackathonId ASC, teamId ASC)` for      |
-|                | assignment queries.                                                 |
-| `scores`       | Composite index: `(hackathonId ASC, total DESC)` for leaderboard   |
-|                | sorted queries.                                                     |
-| `submissions`  | Default. Composite index: `(hackathonId ASC, state ASC)` for       |
-|                | review queue queries.                                               |
-| `rubrics`      | Default. Very few documents — no custom indexing needed.            |
-| `config`       | Default. Very few documents.                                        |
-| `roles`        | Default. Composite index: `(hackathonId ASC, githubUserId ASC)`    |
-|                | for role-lookup queries.                                            |
-| `challenges`   | Composite index: `(hackathonId ASC, order ASC)` for ordered        |
-|                | listing.                                                            |
-| `progression`  | Default. Single document per team — always point reads.             |
+| Container     | Policy                                                            |
+| ------------- | ----------------------------------------------------------------- |
+| `hackathons`  | Default (`/*`). Small volume — no optimisation needed.            |
+| `teams`       | Default. Exclude `/members/*` from range indexes if member arrays |
+|               | grow large (currently ≤ 5 members, so default is fine).           |
+| `teams`       | Composite index: `(hackathonId ASC)` for list queries.            |
+| `hackers`     | Default. Composite index: `(hackathonId ASC, teamId ASC)` for     |
+|               | assignment queries.                                               |
+| `scores`      | Composite index: `(hackathonId ASC, total DESC)` for leaderboard  |
+|               | sorted queries.                                                   |
+| `submissions` | Default. Composite index: `(hackathonId ASC, state ASC)` for      |
+|               | review queue queries.                                             |
+| `rubrics`     | Default. Very few documents — no custom indexing needed.          |
+| `config`      | Default. Very few documents.                                      |
+| `roles`       | Default. Composite index: `(hackathonId ASC, githubUserId ASC)`   |
+|               | for role-lookup queries.                                          |
+| `challenges`  | Composite index: `(hackathonId ASC, order ASC)` for ordered       |
+|               | listing.                                                          |
+| `progression` | Default. Single document per team — always point reads.           |
 
 **Exclusions for cost savings:**
 
@@ -626,15 +626,15 @@ partitions contain a single document (efficient point reads).
 
 ## Key Invariants Encoded in the Schema
 
-| Invariant                              | How the schema enforces it                                                                                                                     |
-| -------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Staging pattern**                    | `submissions.state` is `"pending" \| "approved" \| "rejected"`. Approved submissions produce a separate `scores` document — never modified in place. |
-| **Atomic rubric swap**                 | Pointer doc (`active-rubric`) + versioned rubrics. Writers update pointer only; readers follow the pointer to the active version.               |
-| **Rubric-driven scoring**             | `RubricCategory` defines max scores. `CategoryScore` references `categoryId`. No hardcoded score fields anywhere.                              |
-| **Team-scoped submissions**            | `submissions.teamId` + `submissions.submittedBy` validated at API boundary. Cross-team attempts rejected with 403.                             |
-| **Sequential challenge gating**        | `progression.currentChallenge` (1-based) compared against `challenges.order`. Submission for a locked challenge returns 403.                    |
-| **Event code as plaintext**            | `hackers.eventCode` stored as-is. Join endpoint is rate-limited (5/min/IP) — no SHA-256 hashing overhead.                                      |
-| **Primary admin protection**           | `roles.isPrimaryAdmin` boolean. Demotion guard in `config` container (`config-primary-admin`). API rejects removal of the primary admin.       |
-| **Immutable approved scores**          | `scores` documents are write-once on approval. Admin overrides are logged with `overriddenBy`, `overriddenAt`, `overrideReason`.                |
-| **Audit trail on reviewer actions**    | `submissions.reviewedBy`, `reviewedAt`, `reviewReason` populated on every review action. Audit entries also written to the audit log.           |
-| **Tiebreaker rule**                    | Leaderboard sorts by `total DESC`, then `approvedAt ASC` on the last challenge. Earliest completion wins ties.                                  |
+| Invariant                           | How the schema enforces it                                                                                                                           |
+| ----------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Staging pattern**                 | `submissions.state` is `"pending" \| "approved" \| "rejected"`. Approved submissions produce a separate `scores` document — never modified in place. |
+| **Atomic rubric swap**              | Pointer doc (`active-rubric`) + versioned rubrics. Writers update pointer only; readers follow the pointer to the active version.                    |
+| **Rubric-driven scoring**           | `RubricCategory` defines max scores. `CategoryScore` references `categoryId`. No hardcoded score fields anywhere.                                    |
+| **Team-scoped submissions**         | `submissions.teamId` + `submissions.submittedBy` validated at API boundary. Cross-team attempts rejected with 403.                                   |
+| **Sequential challenge gating**     | `progression.currentChallenge` (1-based) compared against `challenges.order`. Submission for a locked challenge returns 403.                         |
+| **Event code as plaintext**         | `hackers.eventCode` stored as-is. Join endpoint is rate-limited (5/min/IP) — no SHA-256 hashing overhead.                                            |
+| **Primary admin protection**        | `roles.isPrimaryAdmin` boolean. Demotion guard in `config` container (`config-primary-admin`). API rejects removal of the primary admin.             |
+| **Immutable approved scores**       | `scores` documents are write-once on approval. Admin overrides are logged with `overriddenBy`, `overriddenAt`, `overrideReason`.                     |
+| **Audit trail on reviewer actions** | `submissions.reviewedBy`, `reviewedAt`, `reviewReason` populated on every review action. Audit entries also written to the audit log.                |
+| **Tiebreaker rule**                 | Leaderboard sorts by `total DESC`, then `approvedAt ASC` on the last challenge. Earliest completion wins ties.                                       |
