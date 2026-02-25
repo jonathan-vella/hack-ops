@@ -12,14 +12,36 @@
 
 ---
 
+## Issue-to-Step Mapping
+
+<!-- When a step completes, close the corresponding issue with a comment. -->
+<!-- When an epic's subtasks all complete, close the epic. -->
+
+| Step                      | Issue | Status          |
+| ------------------------- | ----- | --------------- |
+| Epic: Phase A             | #1    | Open (3/7 done) |
+| Epic: Phase C             | #2    | Open            |
+| A1: PRD                   | #3    | Closed          |
+| A2: API contract          | #4    | Closed          |
+| A3: Data model            | #5    | Open            |
+| A4: UI pages              | #6    | Open            |
+| A5: Env config            | #7    | Open            |
+| C1: App-dev agents        | #8    | Open            |
+| C3: App-dev skills        | #9    | Open            |
+| C4: App-dev instructions  | #10   | Open            |
+| C4: Register instructions | #11   | Open            |
+| C1: App-dev subagents     | #12   | Open            |
+
+---
+
 ## Current Session Target
 
 <!-- Update this at the START of each session -->
 
 **Phase**: A — Product Documentation
-**Step**: A2 — Run `doc-api-contract-generator.prompt.md` → produce `packages/shared/types/api-contract.ts` + `docs/api-contract.md`
+**Step**: A3 — Run `doc-data-model-generator.prompt.md` → produce `docs/data-model.md`
 **Branch**: `feature/product-docs`
-**Goal**: Generate the API contract types and reference doc
+**Goal**: Generate the Cosmos DB data model reference
 
 ---
 
@@ -41,7 +63,7 @@
 - [x] A0: Create `doc-api-contract-generator.prompt.md`
 - [x] A0: Create `doc-data-model-generator.prompt.md`
 - [x] A1: Run PRD generator → `docs/prd.md`
-- [ ] A2: Run API contract generator →
+- [x] A2: Run API contract generator →
       `packages/shared/types/api-contract.ts` + `docs/api-contract.md`
 - [ ] A3: Run data model generator → `docs/data-model.md`
 - [ ] A4: Create `docs/ui-pages.md`
@@ -173,20 +195,34 @@
 
 <!-- Append one entry per session. Keep entries concise. -->
 
-| #   | Date       | Phase/Step | What was done      | What's next        | Blockers |
-| --- | ---------- | ---------- | ------------------ | ------------------ | -------- |
-| 0   | 2026-02-24 | Planning   | Created blueprint, | B0: Bootstrap      | None     |
-|     |            |            | challenged, and    | issues, then start |          |
-|     |            |            | resolved 14        | Phase A            |          |
-|     |            |            | findings           |                    |          |
-| 1   | 2026-02-25 | A / A0     | Created 3 A0       | B0: Bootstrap      | B0 needs |
-|     |            |            | doc-gen prompts    | issues             | GH_TOKEN |
-| 2   | 2026-02-25 | B0         | Created 12 GitHub  | A1: Run PRD        | None     |
-|     |            |            | issues (#1-#12),   | generator prompt   |          |
-|     |            |            | epic label         |                    |          |
-| 3   | 2026-02-25 | A / A1     | Generated PRD with | A2: Run API        | None     |
-|     |            |            | 64 user stories,   | contract generator |          |
-|     |            |            | 8 domains, NFRs    |                    |          |
+| #   | Date       | Phase/Step | What was done         | What's next        | Blockers |
+| --- | ---------- | ---------- | --------------------- | ------------------ | -------- |
+| 0   | 2026-02-24 | Planning   | Created blueprint,    | B0: Bootstrap      | None     |
+|     |            |            | challenged, and       | issues, then start |          |
+|     |            |            | resolved 14           | Phase A            |          |
+|     |            |            | findings              |                    |          |
+| 1   | 2026-02-25 | A / A0     | Created 3 A0          | B0: Bootstrap      | B0 needs |
+|     |            |            | doc-gen prompts       | issues             | GH_TOKEN |
+| 2   | 2026-02-25 | B0         | Created 12 GitHub     | A1: Run PRD        | None     |
+|     |            |            | issues (#1-#12),      | generator prompt   |          |
+|     |            |            | epic label            |                    |          |
+| 3   | 2026-02-25 | A / A1     | Generated PRD with    | Adversarial review | None     |
+|     |            |            | 64 user stories,      | of PRD + add       |          |
+|     |            |            | 8 domains, NFRs       | challenger agents  |          |
+| 3b  | 2026-02-25 | Cross      | Created 3 adversarial | Fix 6 PRD design   | None     |
+|     |            |            | subagents (infra,     | decisions from     |          |
+|     |            |            | app-security,         | adversarial review |          |
+|     |            |            | app-logic); moved     |                    |          |
+|     |            |            | 10-Challenger to      |                    |          |
+|     |            |            | subagent; merged      |                    |          |
+|     |            |            | PR #14                |                    |          |
+| 3c  | 2026-02-25 | A / A1     | Fixed 6 PRD design    | A2: Run API        | None     |
+|     |            |            | decisions; aligned    | contract generator |          |
+|     |            |            | 7 files (15 edits)    |                    |          |
+| 4   | 2026-02-25 | A / A2     | Generated API         | A3: Run data model | None     |
+|     |            |            | contract: 26          | generator          |          |
+|     |            |            | endpoints, TS         |                    |          |
+|     |            |            | types + MD ref        |                    |          |
 
 ---
 
@@ -223,6 +259,12 @@ have enough context for the current step.
 
 <!-- Record any runtime decisions that deviate from the blueprint -->
 
-| Date | Decision | Rationale |
-| ---- | -------- | --------- |
-| —    | —        | —         |
+| Date       | Decision                                                   | Rationale                                                     |
+| ---------- | ---------------------------------------------------------- | ------------------------------------------------------------- |
+| 2026-02-25 | Hackers submit evidence; Coaches enter rubric scores       | Scoring authority belongs with Coaches, not Hackers           |
+| 2026-02-25 | Event codes stored as plaintext + rate limiting (5/min/IP) | SHA-256 hashing adds complexity without real security gain    |
+| 2026-02-25 | Tiebreaker: earliest last-approval timestamp wins          | Rewards faster completion when total scores are equal         |
+| 2026-02-25 | Unlimited evidence resubmissions allowed                   | Scores only entered by Coach on review; no reason to limit    |
+| 2026-02-25 | Team balance: `ceil(teamSize/2)` minimum per team          | Prevents runt teams of 1; balanced distribution is fairer     |
+| 2026-02-25 | Coach review queue is hackathon-scoped                     | Coaches should only see submissions for their assigned events |
+| 2026-02-25 | Moved 10-Challenger to infra-challenger-subagent           | Adversarial review is invoked by parent agents, not directly  |
