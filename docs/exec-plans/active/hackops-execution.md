@@ -31,7 +31,7 @@
 | C4: App-dev instructions  | #10   | Closed                  |
 | C4: Register instructions | #11   | Closed                  |
 | C1: App-dev subagents     | #12   | Closed                  |
-| Epic: Phase B             | #21   | Open (1 item remaining) |
+| Epic: Phase B             | #21   | Closed                  |
 | B1: Label taxonomy        | #26   | Closed                  |
 | B2: Milestones            | #22   | Closed                  |
 | B3: generate-backlog      | #23   | Closed                  |
@@ -45,11 +45,11 @@
 <!-- Update this at the START of each session -->
 
 **Phase**: D — Infrastructure Execution
-**Step**: Run infra-01 (offline) → requirements doc
+**Step**: Run infra-challenge → review findings
 **Branch**: `feature/prompts`
-**Goal**: Run infra-01 through infra-03 offline, then verify
-Azure connectivity for infra-04 through infra-07. Also run
-`/generate-backlog` when ready (Phase B final item).
+**Goal**: Run infra-challenge adversarial review of steps 01-03,
+then verify Azure connectivity (`az account show`) for infra-04
+through infra-07.
 
 ---
 
@@ -128,9 +128,9 @@ Azure connectivity for infra-04 through infra-07. Also run
 - [x] Run `scripts/setup-labels.sh` (requires GH_TOKEN)
 - [x] Run `scripts/setup-milestones.sh` (requires GH_TOKEN)
 - [x] Create GitHub Projects board ("HackOps Backlog", [#6](https://github.com/jonathan-vella/hack-ops/projects))
-- [ ] Configure board custom fields (Phase, Domain, Complexity) and views
-- [ ] Run backlog generation prompt → verify issues created
-- [ ] Add generated issues to the GitHub Project
+- [x] Configure board custom fields (Phase, Domain, Complexity) and views
+- [x] Run backlog generation prompt → verify issues created
+- [x] Add generated issues to the GitHub Project
 
 ### Phase D — Infrastructure Execution
 
@@ -145,9 +145,9 @@ Azure connectivity for infra-04 through infra-07. Also run
 - [x] D1: Create `infra-06-deploy.prompt.md`
 - [x] D1: Create `infra-07-as-built.prompt.md`
 - [x] D1: Create `infra-challenge.prompt.md`
-- [ ] Run infra-01 (offline) → `01-requirements.md`
-- [ ] Run infra-02 (offline) → `02-architecture-assessment.md`
-- [ ] Run infra-03 (offline) → `03-des-*.md/.py/.png`
+- [x] Run infra-01 (offline) → `01-requirements.md`
+- [x] Run infra-02 (offline) → `02-architecture-assessment.md`
+- [x] Run infra-03 (offline) → `03-des-*.md/.py/.png`
 - [ ] Run infra-challenge → review findings
 - [ ] Verify Azure connectivity (`az account show`)
 - [ ] Run infra-04 → `04-*.md/.json`
@@ -299,6 +299,17 @@ Azure connectivity for infra-04 through infra-07. Also run
 |     |            |            | milestones); closed    | through infra-03   |          |
 |     |            |            | issues #22-#26 via     | (offline)          |          |
 |     |            |            | gh CLI                 |                    |          |
+| 13  | 2026-02-26 | B / final  | Confirmed backlog      | Run infra-          | None     |
+|     |            | + D /      | already generated      | challenge, then    |          |
+|     |            | D2-D4      | (105 issues on board); | verify Azure       |          |
+|     |            |            | added Domain +         | connectivity for   |          |
+|     |            |            | Complexity fields;     | infra-04 through   |          |
+|     |            |            | closed Epic #21;       | infra-07           |          |
+|     |            |            | generated infra-01     |                    |          |
+|     |            |            | (requirements), 02     |                    |          |
+|     |            |            | (architecture), 03     |                    |          |
+|     |            |            | (diagram + 3 ADRs);    |                    |          |
+|     |            |            | commit 8fa0c7b         |                    |          |
 
 ---
 
