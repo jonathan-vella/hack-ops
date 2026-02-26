@@ -6,17 +6,18 @@ Updated by the doc-gardening workflow and referenced by `QUALITY_SCORE.md`.
 
 ## Active Debt Items
 
-| ID  | Category      | Description                                                        | Severity | Owner | Target  |
-| --- | ------------- | ------------------------------------------------------------------ | -------- | ----- | ------- |
-| 5   | Agents        | 01-conductor.agent.md 'agents' frontmatter format warning          | Low      | —     | —       |
-| 7   | Documentation | AGENTS.md missing app-dev workflow table (only infra 7-step shown) | Low      | —     | Phase F |
-| 9   | Instructions  | 7 applyTo warnings (wildcards) — cosmetic, not blocking            | Low      | —     | —       |
-| 12  | Artifact      | Template drift: 01-req, 02-arch, 04-gov (14 warn)                  | Low      | —     | Phase E |
+| ID  | Category      | Description                                                         | Severity | Owner | Target   |
+| --- | ------------- | ------------------------------------------------------------------- | -------- | ----- | -------- |
+| 5   | Agents        | 01-conductor.agent.md 'agents' frontmatter format warning           | Low      | —     | —        |
+| 7   | Documentation | AGENTS.md missing app-dev workflow table (only infra 7-step shown)  | Low      | —     | Phase F  |
+| 9   | Instructions  | 5 applyTo warnings (wildcards) — cosmetic, not blocking             | Low      | —     | —        |
+| 13  | CI/CD         | Phase 11 workflows missing (`hackops-ci.yml`, `hackops-deploy.yml`) | Medium   | —     | Phase 11 |
 
 ## Resolved Items
 
 | ID  | Category      | Description                                          | Resolved   | Resolution                                |
 | --- | ------------- | ---------------------------------------------------- | ---------- | ----------------------------------------- |
+| 12  | Artifact      | Template drift: 01-req, 02-arch, 04-gov (14 warn)    | 2026-02-26 | Updated Step 1–7 artifacts; lint is clean |
 | 11  | CI/Validation | `npm run validate` script missing from package.json  | 2026-02-26 | Added `validate` alias → `validate:all`   |
 | 8   | Documentation | docs/README.md GitHub URLs point to old repo name    | 2026-02-26 | Fixed URLs to `hack-ops`                  |
 | 10  | Validation    | 06-deployment-summary template missing attribution   | 2026-02-26 | Added attribution header to template      |
