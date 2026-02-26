@@ -21,16 +21,16 @@ See the [conductor agent](../.github/agents/01-conductor.agent.md) for orchestra
 
 | Resource                              | Description                   |
 | ------------------------------------- | ----------------------------- |
-| [Quickstart](quickstart.md)           | Get running in 10 minutes     |
-| [Workflow](workflow.md)               | 7-step agent + skill workflow |
+| [Quickstart](hackops-user-guide.md)           | Get running in 10 minutes     |
+| [Workflow](hackops-user-guide.md)               | 7-step agent + skill workflow |
 | [Dev Containers](dev-containers.md)   | Docker setup and alternatives |
-| [Prompt Guide](prompt-guide/)         | Agent & skill prompt examples |
-| [Troubleshooting](troubleshooting.md) | Common issues and solutions   |
-| [Glossary](GLOSSARY.md)               | Terms and definitions         |
+| [Prompt Guide](hackops-user-guide.md)         | Agent & skill prompt examples |
+| [Troubleshooting](hackops-user-guide.md) | Common issues and solutions   |
+| [Glossary](hackops-user-guide.md#glossary)               | Terms and definitions         |
 
 ---
 
-## Agents (10 + 5 Subagents)
+## Agents (9 + 8 Subagents)
 
 Agents are interactive AI assistants for specific workflow phases. Invoke via `Ctrl+Shift+A`.
 See `AGENTS.md` at the repo root for the lightweight map.
@@ -51,15 +51,26 @@ See `AGENTS.md` at the repo root for the lightweight map.
 | `bicep-plan`   | 📐 Strategist | 4     | Implementation planning            |
 | `bicep-code`   | ⚒️ Forge      | 5     | Bicep template generation          |
 | `deploy`       | 🚀 Envoy      | 6     | Azure deployment                   |
+| `as-built`     | 📋 Archivist  | 7     | Post-deployment documentation      |
 | `diagnose`     | 🔍 Sentinel   | —     | Post-deployment diagnostics        |
+
+### Adversarial Subagents (Conductor-Invoked)
+
+| Subagent                           | Purpose                                               | Passes                                   |
+| ---------------------------------- | ----------------------------------------------------- | ---------------------------------------- |
+| `infra-challenger-subagent`        | Challenges infra plans for governance/WAF/feasibility | security, waf, governance                |
+| `app-security-challenger-subagent` | Challenges app code for auth bypass, IDOR, injection  | auth, api-routes, data-handling          |
+| `app-logic-challenger-subagent`    | Challenges business rules, contract drift, edge cases | api-contract, business-rules, data-model |
 
 ### Validation Subagents (Conductor-Invoked)
 
-| Subagent                | Purpose                               | Returns                        |
-| ----------------------- | ------------------------------------- | ------------------------------ |
-| `bicep-lint-subagent`   | Bicep syntax validation               | PASS/FAIL with diagnostics     |
-| `bicep-whatif-subagent` | Deployment preview (what-if analysis) | Change summary, violations     |
-| `bicep-review-subagent` | Code review against AVM standards     | APPROVED/NEEDS_REVISION/FAILED |
+| Subagent                        | Purpose                               | Returns                        |
+| ------------------------------- | ------------------------------------- | ------------------------------ |
+| `bicep-lint-subagent`           | Bicep syntax validation               | PASS/FAIL with diagnostics     |
+| `bicep-whatif-subagent`         | Deployment preview (what-if analysis) | Change summary, violations     |
+| `bicep-review-subagent`         | Code review against AVM standards     | APPROVED/NEEDS_REVISION/FAILED |
+| `cost-estimate-subagent`        | Pricing MCP queries                   | Cost estimates                 |
+| `governance-discovery-subagent` | Azure Policy REST API discovery       | Policy constraints             |
 
 ---
 
@@ -96,6 +107,21 @@ Skills are reusable capabilities that agents invoke or that activate automatical
 | `docs-writer`         | Repo-aware docs maintenance                | "audit docs", "fix counts", "freshness check" |
 | `make-skill-template` | Create new skills                          | "create skill", "scaffold skill"              |
 
+### Infrastructure Patterns (Category 4)
+
+| Skill                   | Purpose                                  | Triggers                                         |
+| ----------------------- | ---------------------------------------- | ------------------------------------------------ |
+| `azure-bicep-patterns`  | Common Bicep infrastructure patterns     | "bicep pattern", "hub-spoke", "private endpoint" |
+| `azure-troubleshooting` | Azure resource troubleshooting playbooks | "troubleshoot", "diagnose", "health check"       |
+
+### Microsoft Reference (Category 5)
+
+| Skill                      | Purpose                                     | Triggers                                       |
+| -------------------------- | ------------------------------------------- | ---------------------------------------------- |
+| `microsoft-code-reference` | Look up Microsoft API refs and code samples | "API reference", "SDK sample", "verify method" |
+| `microsoft-docs`           | Query official Microsoft documentation      | "Microsoft docs", "learn.microsoft.com"        |
+| `microsoft-skill-creator`  | Create skills for Microsoft technologies    | "create Microsoft skill", "investigate topic"  |
+
 ---
 
 ## 7-Step Workflow (with Conductor)
@@ -106,7 +132,7 @@ Requirements → Architecture → Design → Planning → Implementation → Dep
    Agent        Agent       Skills     Agent         Agent       Agent       Skills
 ```
 
-See [workflow.md](workflow.md) for detailed step-by-step guide.
+See [workflow](hackops-user-guide.md) for detailed step-by-step guide.
 
 ---
 
@@ -122,7 +148,7 @@ prompt examples in `docs/prompt-guide/`:
 | Skill Reference         | Independent skill invocation         |
 | Tips & Patterns         | Advanced prompting techniques        |
 
-See [prompt-guide/](prompt-guide/) for the full guide.
+See [prompt-guide](hackops-user-guide.md) for the full guide.
 
 ---
 
@@ -133,9 +159,9 @@ azure-agentic-infraops/
 ├── AGENTS.md             # Lightweight map (start here)
 ├── QUALITY_SCORE.md      # Project health grades
 ├── .github/
-│   ├── agents/           # 10 agent definitions + 5 subagents
+│   ├── agents/           # 9 agent definitions + 8 subagents
 │   ├── skills/           # 14 skill definitions (incl. golden-principles)
-│   └── instructions/     # ~20 file-type rules (consolidated)
+│   └── instructions/     # 21 file-type rules (consolidated)
 ├── agent-output/         # Generated artifacts
 ├── infra/bicep/          # Bicep templates
 ├── docs/
@@ -150,4 +176,4 @@ azure-agentic-infraops/
 
 - **Issues**: [GitHub Issues](https://github.com/jonathan-vella/azure-agentic-infraops/issues)
 - **Discussions**: [GitHub Discussions](https://github.com/jonathan-vella/azure-agentic-infraops/discussions)
-- **Troubleshooting**: [troubleshooting.md](troubleshooting.md)
+- **Troubleshooting**: [troubleshooting](hackops-user-guide.md)

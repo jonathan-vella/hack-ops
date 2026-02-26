@@ -5,16 +5,14 @@ model: ["Claude Opus 4.6"]
 argument-hint: Describe the Azure infrastructure project you want to build end-to-end
 user-invokable: true
 agents:
-  [
-    "02-Requirements",
-    "03-Architect",
-    "04-Design",
-    "05-Bicep Planner",
-    "06-Bicep Code Generator",
-    "07-Deploy",
-    "08-As-Built",
-    "09-Diagnose",
-  ]
+  - "02-Requirements"
+  - "03-Architect"
+  - "04-Design"
+  - "05-Bicep Planner"
+  - "06-Bicep Code Generator"
+  - "07-Deploy"
+  - "08-As-Built"
+  - "09-Diagnose"
 tools:
   [
     vscode/extensions,
@@ -288,23 +286,26 @@ Use `#runSubagent` for each workflow step:
 
 ### Subagent Integration
 
-Subagents are wired into their parent agents automatically:
+Subagents are wired into their parent agents automatically.
+Adversarial subagents run **3 focused review passes** per invocation (parent makes 1 call, subagent loops internally).
 
-| Subagent                           | Parent Agent  | When Used                                        |
-| ---------------------------------- | ------------- | ------------------------------------------------ |
-| `infra-challenger-subagent`        | Requirements  | Step 1 — adversarial review of requirements      |
-| `infra-challenger-subagent`        | Architect     | Step 2 — adversarial review of WAF assessment    |
-| `infra-challenger-subagent`        | Bicep Plan    | Step 4 — adversarial review of implementation    |
-| `app-security-challenger-subagent` | API Builder   | Phase E — auth/RBAC/injection/IDOR review        |
-| `app-security-challenger-subagent` | App Conductor | Phase E — full security review after E6          |
-| `app-logic-challenger-subagent`    | Test Writer   | Phase E — business rule/contract drift review    |
-| `app-logic-challenger-subagent`    | App Conductor | Phase E — full logic review after E6, E9         |
-| `cost-estimate-subagent`           | Architect     | Step 2 — pricing isolation + accuracy validation |
-| `cost-estimate-subagent`           | As-Built      | Step 7 — as-built pricing for deployed SKUs      |
-| `governance-discovery-subagent`    | Bicep Plan    | Step 4 — policy discovery gate                   |
-| `bicep-lint-subagent`              | Bicep Code    | Step 5 Phase 4 — syntax check                    |
-| `bicep-review-subagent`            | Bicep Code    | Step 5 Phase 4 — code review                     |
-| `bicep-whatif-subagent`            | Deploy        | Step 6 — deployment preview                      |
+| Subagent                           | Parent Agent  | Passes                                   | When Used                                        |
+| ---------------------------------- | ------------- | ---------------------------------------- | ------------------------------------------------ |
+| `infra-challenger-subagent`        | Requirements  | security, waf, governance                | Step 1 — 3-pass adversarial review               |
+| `infra-challenger-subagent`        | Architect     | security, waf, governance                | Step 2 — 3-pass adversarial review               |
+| `infra-challenger-subagent`        | Bicep Plan    | security, waf, governance                | Step 4 — 3-pass adversarial review               |
+| `app-security-challenger-subagent` | API Builder   | auth, api-routes, data-handling          | Phase E — 3-pass security review                 |
+| `app-security-challenger-subagent` | App Conductor | auth, api-routes, data-handling          | Phase E — full 3-pass security review after E6   |
+| `app-logic-challenger-subagent`    | Test Writer   | api-contract, business-rules, data-model | Phase E — 3-pass logic review                    |
+| `app-logic-challenger-subagent`    | App Conductor | api-contract, business-rules, data-model | Phase E — full 3-pass logic review after E6, E9  |
+| `cost-estimate-subagent`           | Architect     | —                                        | Step 2 — pricing isolation + accuracy validation |
+| `cost-estimate-subagent`           | As-Built      | —                                        | Step 7 — as-built pricing for deployed SKUs      |
+| `governance-discovery-subagent`    | Bicep Plan    | —                                        | Step 4 — policy discovery gate                   |
+| `bicep-lint-subagent`              | Bicep Code    | —                                        | Step 5 Phase 4 — syntax check                    |
+| `bicep-review-subagent`            | Bicep Code    | —                                        | Step 5 Phase 4 — code review                     |
+| `bicep-whatif-subagent`            | Deploy        | —                                        | Step 6 — deployment preview                      |
+
+Adversarial findings are written to `agent-output/{project}/challenges/` subdirectory.
 
 > [!NOTE]
 > **Pricing Accuracy Gate (Steps 2 & 7)**: No agent writes dollar figures from

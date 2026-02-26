@@ -142,9 +142,23 @@ async function checkProhibitedRefs() {
     const lines = content.split("\n");
     for (const { pattern, label } of prohibited) {
       pattern.lastIndex = 0;
+      let inProhibitedSection = false;
       for (let i = 0; i < lines.length; i++) {
-        // Skip lines that document prohibited refs (e.g. "❌ ... → Use ...")
-        if (/[❌→]/.test(lines[i]) || /^\s*[-*]\s*❌/.test(lines[i])) {
+        // Track "Prohibited References" heading sections
+        if (/^#+\s+Prohibited References/i.test(lines[i])) {
+          inProhibitedSection = true;
+          pattern.lastIndex = 0;
+          continue;
+        }
+        if (inProhibitedSection && /^#+\s/.test(lines[i])) {
+          inProhibitedSection = false;
+        }
+        // Skip lines that document prohibited refs
+        if (
+          inProhibitedSection ||
+          /[❌→]/.test(lines[i]) ||
+          /^\s*[-*]\s*❌/.test(lines[i])
+        ) {
           pattern.lastIndex = 0;
           continue;
         }
@@ -202,11 +216,19 @@ async function checkAgentTable() {
   );
 
   const agentDir = join(ROOT, ".github", "agents");
+  const agentFiles = await readdir(agentDir).catch(() => []);
+  const subFiles = await readdir(join(agentDir, "_subagents")).catch(() => []);
+  const allAgentFiles = [...agentFiles, ...subFiles];
   for (const name of agentNames) {
-    // Check both as direct .agent.md and in _subagents/
-    const directPath = join(agentDir, `${name}.agent.md`);
-    const subPath = join(agentDir, "_subagents", `${name}.agent.md`);
-    if (!(await exists(directPath)) && !(await exists(subPath))) {
+    // Match exact name or numbered-prefix (e.g. "deploy" matches "07-deploy.agent.md")
+    const found = allAgentFiles.some(
+      (f) =>
+        f === `${name}.agent.md` ||
+        f === `${name}-subagent.agent.md` ||
+        (/^\d+-/.test(f) && f.replace(/^\d+-/, "") === `${name}.agent.md`) ||
+        f.includes(name),
+    );
+    if (!found) {
       addFinding(
         "docs/README.md",
         0,
