@@ -19,6 +19,9 @@ management platform (Next.js 15 + Cosmos DB + App Service).
 | `docs/exec-plans/active/hackops-execution.md`     | Session tracker — living progress checklist   |
 | `.github/prompts/session-resume.prompt.md`        | Run `/session-resume` at each session start   |
 | `.github/prompts/plan-hackOps.prompt.md`          | Original technical plan (feature specs)       |
+| [GitHub Project #6][hackops-board]                | Backlog board — HackOps Backlog               |
+
+[hackops-board]: https://github.com/users/jonathan-vella/projects/6
 
 ### Session Continuity
 

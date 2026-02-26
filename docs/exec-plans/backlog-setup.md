@@ -23,14 +23,14 @@ workflow labels:
 
 **Labels created:**
 
-| Category | Labels                                                            |
-| -------- | ----------------------------------------------------------------- |
-| Domain   | `app`, `frontend`, `backend`, `api`, `database`, `auth`,         |
-|          | `testing`                                                         |
-| Phase    | `phase-1` through `phase-12` (includes `phase-1.5`)              |
-| Workflow | `epic`, `prd`, `blocked`                                         |
-| Existing | `bug`, `enhancement`, `infrastructure`, `bicep`,                 |
-|          | `copilot-agent`, `documentation`, `scenario` (preserved)         |
+| Category | Labels                                                   |
+| -------- | -------------------------------------------------------- |
+| Domain   | `app`, `frontend`, `backend`, `api`, `database`, `auth`, |
+|          | `testing`                                                |
+| Phase    | `phase-1` through `phase-12` (includes `phase-1.5`)      |
+| Workflow | `epic`, `prd`, `blocked`                                 |
+| Existing | `bug`, `enhancement`, `infrastructure`, `bicep`,         |
+|          | `copilot-agent`, `documentation`, `scenario` (preserved) |
 
 ---
 
@@ -72,11 +72,12 @@ commands. The board provides a Kanban view of the backlog.
 ```bash
 gh project create \
   --owner jonathan-vella \
-  --title "HackOps Development" \
+  --title "HackOps Backlog" \
   --body "Kanban board for HackOps hackathon management platform"
 ```
 
-Note the returned project number (e.g., `1`).
+The project was created as **number 6**:
+`https://github.com/users/jonathan-vella/projects/6`
 
 ### Configure columns (status field)
 
@@ -84,18 +85,18 @@ Projects V2 uses a built-in "Status" field with configurable
 options. The default options are "Todo", "In Progress", "Done".
 Update them to match the HackOps workflow:
 
-| Status      | Description                            |
-| ----------- | -------------------------------------- |
-| Backlog     | Not yet scheduled for work             |
-| Ready       | Dependencies met, can start            |
-| In Progress | Actively being worked on               |
-| Review      | PR open or awaiting approval           |
-| Done        | Merged and verified                    |
+| Status      | Description                  |
+| ----------- | ---------------------------- |
+| Backlog     | Not yet scheduled for work   |
+| Ready       | Dependencies met, can start  |
+| In Progress | Actively being worked on     |
+| Review      | PR open or awaiting approval |
+| Done        | Merged and verified          |
 
 To configure via `gh`:
 
 ```bash
-PROJECT_NUM=1  # Replace with actual project number
+PROJECT_NUM=6
 
 # Status field updates require GraphQL — use the web UI
 # or the gh project field-list / field-edit commands:
@@ -104,31 +105,31 @@ gh project field-list "$PROJECT_NUM" --owner jonathan-vella
 
 > **Note**: Custom status options are best configured via the
 > GitHub web UI at
-> `https://github.com/users/jonathan-vella/projects/$PROJECT_NUM/settings`.
+> `https://github.com/users/jonathan-vella/projects/6/settings`.
 
 ### Add custom fields
 
-| Field      | Type            | Options                              |
-| ---------- | --------------- | ------------------------------------ |
-| Phase      | Single select   | Phase 1 through Phase 12             |
-| Domain     | Single select   | Auth, Hackathon, Team, Scoring,      |
-|            |                 | Leaderboard, Challenge, Admin, Infra |
-| Complexity | Single select   | S, M, L, XL                          |
+| Field      | Type          | Options                              |
+| ---------- | ------------- | ------------------------------------ |
+| Phase      | Single select | Phase 1 through Phase 12             |
+| Domain     | Single select | Auth, Hackathon, Team, Scoring,      |
+|            |               | Leaderboard, Challenge, Admin, Infra |
+| Complexity | Single select | S, M, L, XL                          |
 
 ```bash
 # Custom fields are created via the web UI or GraphQL API.
 # The gh CLI supports field creation:
-gh project field-create "$PROJECT_NUM" \
+gh project field-create 6 \
   --owner jonathan-vella \
   --name "Phase" \
   --data-type "SINGLE_SELECT"
 
-gh project field-create "$PROJECT_NUM" \
+gh project field-create 6 \
   --owner jonathan-vella \
   --name "Domain" \
   --data-type "SINGLE_SELECT"
 
-gh project field-create "$PROJECT_NUM" \
+gh project field-create 6 \
   --owner jonathan-vella \
   --name "Complexity" \
   --data-type "SINGLE_SELECT"
@@ -142,7 +143,7 @@ Bulk-add all open issues to the project:
 gh issue list --repo jonathan-vella/hack-ops \
   --state open --limit 200 --json number \
   --jq '.[].number' | while read -r num; do
-    gh project item-add "$PROJECT_NUM" \
+    gh project item-add 6 \
       --owner jonathan-vella \
       --url "https://github.com/jonathan-vella/hack-ops/issues/$num"
 done
@@ -152,12 +153,12 @@ done
 
 Create filtered views for different perspectives:
 
-| View name     | Filter                                  |
-| ------------- | --------------------------------------- |
-| By Phase      | Group by Phase field                    |
-| By Domain     | Group by Domain field                   |
-| Current Sprint| Filter: Status != Done, Phase = current |
-| Blocked       | Filter: label:blocked                   |
+| View name      | Filter                                  |
+| -------------- | --------------------------------------- |
+| By Phase       | Group by Phase field                    |
+| By Domain      | Group by Domain field                   |
+| Current Sprint | Filter: Status != Done, Phase = current |
+| Blocked        | Filter: label:blocked                   |
 
 Views are configured in the project web UI under "Views".
 

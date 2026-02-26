@@ -315,13 +315,15 @@ labels and milestones.
 
 **Verify**: Issues visible in GitHub with milestones assigned.
 
-#### 3d. Document Projects board setup
+#### 3d. Set up the GitHub Projects board
 
 > "Read `.github/prompts/plan-hackOpsExecution.prompt.md`
 > Phase B section B5. Create `docs/exec-plans/backlog-setup.md`."
 
-Then follow the documented steps to set up the GitHub Projects
-board manually.
+Then follow the documented steps to create the project, configure
+custom fields/views, and add issues to the board.
+
+The project is [HackOps Backlog (#6)](https://github.com/jonathan-vella/hack-ops/projects).
 
 ---
 

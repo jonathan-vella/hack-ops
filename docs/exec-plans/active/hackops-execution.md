@@ -17,26 +17,26 @@
 <!-- When a step completes, close the corresponding issue with a comment. -->
 <!-- When an epic's subtasks all complete, close the epic. -->
 
-| Step                      | Issue | Status |
-| ------------------------- | ----- | ------ |
-| Epic: Phase A             | #1    | Closed |
-| Epic: Phase C             | #2    | Closed |
-| A1: PRD                   | #3    | Closed |
-| A2: API contract          | #4    | Closed |
-| A3: Data model            | #5    | Closed |
-| A4: UI pages              | #6    | Closed |
-| A5: Env config            | #7    | Closed |
-| C1: App-dev agents        | #8    | Closed |
-| C3: App-dev skills        | #9    | Closed |
-| C4: App-dev instructions  | #10   | Closed |
-| C4: Register instructions | #11   | Closed |
-| C1: App-dev subagents     | #12   | Closed |
-| Epic: Phase B             | #21   | Open   |
-| B1: Label taxonomy        | #26   | Done (file, needs GH sync) |
-| B2: Milestones            | #22   | Done (file, needs GH sync) |
-| B3: generate-backlog      | #23   | Done (file, needs GH sync) |
-| B4: backlog-triage        | #24   | Done (file, needs GH sync) |
-| B5: Projects board docs   | #25   | Done (file, needs GH sync) |
+| Step                      | Issue | Status                  |
+| ------------------------- | ----- | ----------------------- |
+| Epic: Phase A             | #1    | Closed                  |
+| Epic: Phase C             | #2    | Closed                  |
+| A1: PRD                   | #3    | Closed                  |
+| A2: API contract          | #4    | Closed                  |
+| A3: Data model            | #5    | Closed                  |
+| A4: UI pages              | #6    | Closed                  |
+| A5: Env config            | #7    | Closed                  |
+| C1: App-dev agents        | #8    | Closed                  |
+| C3: App-dev skills        | #9    | Closed                  |
+| C4: App-dev instructions  | #10   | Closed                  |
+| C4: Register instructions | #11   | Closed                  |
+| C1: App-dev subagents     | #12   | Closed                  |
+| Epic: Phase B             | #21   | Open (1 item remaining) |
+| B1: Label taxonomy        | #26   | Closed                  |
+| B2: Milestones            | #22   | Closed                  |
+| B3: generate-backlog      | #23   | Closed                  |
+| B4: backlog-triage        | #24   | Closed                  |
+| B5: Projects board docs   | #25   | Closed                  |
 
 ---
 
@@ -44,11 +44,12 @@
 
 <!-- Update this at the START of each session -->
 
-**Phase**: B — Backlog Scaffold
-**Step**: Run label/milestone scripts + backlog generation
+**Phase**: D — Infrastructure Execution
+**Step**: Run infra-01 (offline) → requirements doc
 **Branch**: `feature/prompts`
-**Goal**: Execute setup scripts (requires GH_TOKEN), then run
-generate-backlog prompt to create issues
+**Goal**: Run infra-01 through infra-03 offline, then verify
+Azure connectivity for infra-04 through infra-07. Also run
+`/generate-backlog` when ready (Phase B final item).
 
 ---
 
@@ -124,23 +125,26 @@ generate-backlog prompt to create issues
 - [x] B4: Create `backlog-triage.prompt.md` (#24)
 - [x] B5: Document Projects board setup in
       `docs/exec-plans/backlog-setup.md` (#25)
-- [ ] Run `scripts/setup-labels.sh` (requires GH_TOKEN)
-- [ ] Run `scripts/setup-milestones.sh` (requires GH_TOKEN)
+- [x] Run `scripts/setup-labels.sh` (requires GH_TOKEN)
+- [x] Run `scripts/setup-milestones.sh` (requires GH_TOKEN)
+- [x] Create GitHub Projects board ("HackOps Backlog", [#6](https://github.com/jonathan-vella/hack-ops/projects))
+- [ ] Configure board custom fields (Phase, Domain, Complexity) and views
 - [ ] Run backlog generation prompt → verify issues created
+- [ ] Add generated issues to the GitHub Project
 
 ### Phase D — Infrastructure Execution
 
 **Branch**: `feature/prompts` (continued)
 **Prerequisite**: `az login` completed for steps D4-D7
 
-- [ ] D1: Create `infra-01-requirements.prompt.md`
-- [ ] D1: Create `infra-02-architecture.prompt.md`
-- [ ] D1: Create `infra-03-design.prompt.md`
-- [ ] D1: Create `infra-04-governance.prompt.md`
-- [ ] D1: Create `infra-05-bicep-generate.prompt.md`
-- [ ] D1: Create `infra-06-deploy.prompt.md`
-- [ ] D1: Create `infra-07-as-built.prompt.md`
-- [ ] D1: Create `infra-challenge.prompt.md`
+- [x] D1: Create `infra-01-requirements.prompt.md`
+- [x] D1: Create `infra-02-architecture.prompt.md`
+- [x] D1: Create `infra-03-design.prompt.md`
+- [x] D1: Create `infra-04-governance.prompt.md`
+- [x] D1: Create `infra-05-bicep-generate.prompt.md`
+- [x] D1: Create `infra-06-deploy.prompt.md`
+- [x] D1: Create `infra-07-as-built.prompt.md`
+- [x] D1: Create `infra-challenge.prompt.md`
 - [ ] Run infra-01 (offline) → `01-requirements.md`
 - [ ] Run infra-02 (offline) → `02-architecture-assessment.md`
 - [ ] Run infra-03 (offline) → `03-des-*.md/.py/.png`
@@ -205,81 +209,96 @@ generate-backlog prompt to create issues
 
 <!-- Append one entry per session. Keep entries concise. -->
 
-| #   | Date       | Phase/Step | What was done         | What's next        | Blockers |
-| --- | ---------- | ---------- | --------------------- | ------------------ | -------- |
-| 0   | 2026-02-24 | Planning   | Created blueprint,    | B0: Bootstrap      | None     |
-|     |            |            | challenged, and       | issues, then start |          |
-|     |            |            | resolved 14           | Phase A            |          |
-|     |            |            | findings              |                    |          |
-| 1   | 2026-02-25 | A / A0     | Created 3 A0          | B0: Bootstrap      | B0 needs |
-|     |            |            | doc-gen prompts       | issues             | GH_TOKEN |
-| 2   | 2026-02-25 | B0         | Created 12 GitHub     | A1: Run PRD        | None     |
-|     |            |            | issues (#1-#12),      | generator prompt   |          |
-|     |            |            | epic label            |                    |          |
-| 3   | 2026-02-25 | A / A1     | Generated PRD with    | Adversarial review | None     |
-|     |            |            | 64 user stories,      | of PRD + add       |          |
-|     |            |            | 8 domains, NFRs       | challenger agents  |          |
-| 3b  | 2026-02-25 | Cross      | Created 3 adversarial | Fix 6 PRD design   | None     |
-|     |            |            | subagents (infra,     | decisions from     |          |
-|     |            |            | app-security,         | adversarial review |          |
-|     |            |            | app-logic); moved     |                    |          |
-|     |            |            | 10-Challenger to      |                    |          |
-|     |            |            | subagent; merged      |                    |          |
-|     |            |            | PR #14                |                    |          |
-| 3c  | 2026-02-25 | A / A1     | Fixed 6 PRD design    | A2: Run API        | None     |
-|     |            |            | decisions; aligned    | contract generator |          |
-|     |            |            | 7 files (15 edits)    |                    |          |
-| 4   | 2026-02-25 | A / A2     | Generated API         | A3: Run data model | None     |
-|     |            |            | contract: 26          | generator          |          |
-|     |            |            | endpoints, TS         |                    |          |
-|     |            |            | types + MD ref        |                    |          |
-| 5   | 2026-02-25 | A / A3     | Generated data model: | A4: UI pages       | None     |
-|     |            |            | 10 containers, TS     | inventory          |          |
-|     |            |            | interfaces, samples,  |                    |          |
-|     |            |            | query patterns        |                    |          |
-| 6   | 2026-02-26 | A / A4-A5  | Created ui-pages.md   | Merge branch,      | GH_TOKEN |
-|     |            |            | (10 pages, 11 shared  | close issues #6 #7 | not set  |
-|     |            |            | components) and       |                    |          |
-|     |            |            | environment-config.md |                    |          |
-|     |            |            | (Easy Auth contract,  |                    |          |
-|     |            |            | Key Vault refs,       |                    |          |
-|     |            |            | .env template)        |                    |          |
-| 7   | 2026-02-26 | A / merge  | Merged                | Phase C: C1 agent  | GH_TOKEN |
-|     |            | + C / C1   | feature/product-docs  | definitions        | not set  |
-|     |            |            | to main; created 6    |                    | (issues  |
-|     |            |            | top-level agents +    |                    | #1,#5,#6 |
-|     |            |            | 3 subagents; added    |                    | #7 need  |
-|     |            |            | App Conductor handoff |                    | closing) |
-|     |            |            | to 01-Conductor       |                    |          |
-| 8   | 2026-02-26 | C / C3-C6  | Created 5 skills      | Merge branch →     | GH_TOKEN |
-|     |            |            | (nextjs-patterns,     | main, then start   | not set  |
-|     |            |            | cosmos-db-sdk,        | Phase B            | (issues  |
-|     |            |            | shadcn-ui-patterns,   |                    | #8-#12   |
-|     |            |            | zod-validation,       |                    | need     |
-|     |            |            | hackops-domain);      |                    | closing) |
-|     |            |            | 5 instructions;       |                    |          |
-|     |            |            | 2 issue templates;    |                    |          |
-|     |            |            | business rules        |                    |          |
-|     |            |            | validator;            |                    |          |
-|     |            |            | validate:all passes   |                    |          |
-| 9   | 2026-02-26 | C / merge  | PR #20 created and    | Phase B: B1 label  | None     |
-|     |            | + B / init | merged to main;       | taxonomy, B2       |          |
-|     |            |            | closed issues #1, #2, | milestones, B3-B4  |          |
-|     |            |            | #6-#12 via MCP;       | prompt files       |          |
-|     |            |            | created branch        |                    |          |
-|     |            |            | feature/prompts;      |                    |          |
-|     |            |            | created Epic #21 +    |                    |          |
-|     |            |            | issues #22-#26 for    |                    |          |
-|     |            |            | Phase B               |                    |          |
-| 10  | 2026-02-26 | B / B1-B5  | Created label script  | Run setup scripts  | GH_TOKEN |
-|     |            |            | (setup-labels.sh),    | + backlog prompt   | not set  |
-|     |            |            | milestone script      | (needs GH auth),   | (issues  |
-|     |            |            | (setup-milestones.sh),| then Phase D       | #22-#26  |
-|     |            |            | generate-backlog      | prompts            | need     |
-|     |            |            | prompt, backlog-triage|                    | closing) |
-|     |            |            | prompt, and backlog   |                    |          |
-|     |            |            | setup docs; lint:md   |                    |          |
-|     |            |            | passes                |                    |          |
+| #   | Date       | Phase/Step | What was done          | What's next        | Blockers |
+| --- | ---------- | ---------- | ---------------------- | ------------------ | -------- |
+| 0   | 2026-02-24 | Planning   | Created blueprint,     | B0: Bootstrap      | None     |
+|     |            |            | challenged, and        | issues, then start |          |
+|     |            |            | resolved 14            | Phase A            |          |
+|     |            |            | findings               |                    |          |
+| 1   | 2026-02-25 | A / A0     | Created 3 A0           | B0: Bootstrap      | B0 needs |
+|     |            |            | doc-gen prompts        | issues             | GH_TOKEN |
+| 2   | 2026-02-25 | B0         | Created 12 GitHub      | A1: Run PRD        | None     |
+|     |            |            | issues (#1-#12),       | generator prompt   |          |
+|     |            |            | epic label             |                    |          |
+| 3   | 2026-02-25 | A / A1     | Generated PRD with     | Adversarial review | None     |
+|     |            |            | 64 user stories,       | of PRD + add       |          |
+|     |            |            | 8 domains, NFRs        | challenger agents  |          |
+| 3b  | 2026-02-25 | Cross      | Created 3 adversarial  | Fix 6 PRD design   | None     |
+|     |            |            | subagents (infra,      | decisions from     |          |
+|     |            |            | app-security,          | adversarial review |          |
+|     |            |            | app-logic); moved      |                    |          |
+|     |            |            | 10-Challenger to       |                    |          |
+|     |            |            | subagent; merged       |                    |          |
+|     |            |            | PR #14                 |                    |          |
+| 3c  | 2026-02-25 | A / A1     | Fixed 6 PRD design     | A2: Run API        | None     |
+|     |            |            | decisions; aligned     | contract generator |          |
+|     |            |            | 7 files (15 edits)     |                    |          |
+| 4   | 2026-02-25 | A / A2     | Generated API          | A3: Run data model | None     |
+|     |            |            | contract: 26           | generator          |          |
+|     |            |            | endpoints, TS          |                    |          |
+|     |            |            | types + MD ref         |                    |          |
+| 5   | 2026-02-25 | A / A3     | Generated data model:  | A4: UI pages       | None     |
+|     |            |            | 10 containers, TS      | inventory          |          |
+|     |            |            | interfaces, samples,   |                    |          |
+|     |            |            | query patterns         |                    |          |
+| 6   | 2026-02-26 | A / A4-A5  | Created ui-pages.md    | Merge branch,      | GH_TOKEN |
+|     |            |            | (10 pages, 11 shared   | close issues #6 #7 | not set  |
+|     |            |            | components) and        |                    |          |
+|     |            |            | environment-config.md  |                    |          |
+|     |            |            | (Easy Auth contract,   |                    |          |
+|     |            |            | Key Vault refs,        |                    |          |
+|     |            |            | .env template)         |                    |          |
+| 7   | 2026-02-26 | A / merge  | Merged                 | Phase C: C1 agent  | GH_TOKEN |
+|     |            | + C / C1   | feature/product-docs   | definitions        | not set  |
+|     |            |            | to main; created 6     |                    | (issues  |
+|     |            |            | top-level agents +     |                    | #1,#5,#6 |
+|     |            |            | 3 subagents; added     |                    | #7 need  |
+|     |            |            | App Conductor handoff  |                    | closing) |
+|     |            |            | to 01-Conductor        |                    |          |
+| 8   | 2026-02-26 | C / C3-C6  | Created 5 skills       | Merge branch →     | GH_TOKEN |
+|     |            |            | (nextjs-patterns,      | main, then start   | not set  |
+|     |            |            | cosmos-db-sdk,         | Phase B            | (issues  |
+|     |            |            | shadcn-ui-patterns,    |                    | #8-#12   |
+|     |            |            | zod-validation,        |                    | need     |
+|     |            |            | hackops-domain);       |                    | closing) |
+|     |            |            | 5 instructions;        |                    |          |
+|     |            |            | 2 issue templates;     |                    |          |
+|     |            |            | business rules         |                    |          |
+|     |            |            | validator;             |                    |          |
+|     |            |            | validate:all passes    |                    |          |
+| 9   | 2026-02-26 | C / merge  | PR #20 created and     | Phase B: B1 label  | None     |
+|     |            | + B / init | merged to main;        | taxonomy, B2       |          |
+|     |            |            | closed issues #1, #2,  | milestones, B3-B4  |          |
+|     |            |            | #6-#12 via MCP;        | prompt files       |          |
+|     |            |            | created branch         |                    |          |
+|     |            |            | feature/prompts;       |                    |          |
+|     |            |            | created Epic #21 +     |                    |          |
+|     |            |            | issues #22-#26 for     |                    |          |
+|     |            |            | Phase B                |                    |          |
+| 10  | 2026-02-26 | B / B1-B5  | Created label script   | Run setup scripts  | GH_TOKEN |
+|     |            |            | (setup-labels.sh),     | + backlog prompt   | not set  |
+|     |            |            | milestone script       | (needs GH auth),   | (issues  |
+|     |            |            | (setup-milestones.sh), | then Phase D       | #22-#26  |
+|     |            |            | generate-backlog       | prompts            | need     |
+|     |            |            | prompt, backlog-triage |                    | closing) |
+|     |            |            | prompt, and backlog    |                    |          |
+|     |            |            | setup docs; lint:md    |                    |          |
+|     |            |            | passes                 |                    |          |
+| 11  | 2026-02-26 | D / D1     | Created all 8 infra    | Run infra-01       | GH_TOKEN |
+|     |            |            | prompt files:          | (offline), then    | not set  |
+|     |            |            | infra-01 through       | infra-02, infra-03 | (Phase B |
+|     |            |            | infra-07 + infra-      | offline; verify    | scripts  |
+|     |            |            | challenge; lint:md     | Azure for D4-D7    | blocked) |
+|     |            |            | passes; Phase B        |                    |          |
+|     |            |            | scripts still blocked  |                    |          |
+|     |            |            | (no GH auth)           |                    |          |
+| 12  | 2026-02-26 | B / run    | GH auth restored; ran  | Run /generate-     | None     |
+|     |            |            | setup-labels.sh (23    | backlog to create  |          |
+|     |            |            | labels) and setup-     | ~80 issues; then   |          |
+|     |            |            | milestones.sh (13      | run infra-01       |          |
+|     |            |            | milestones); closed    | through infra-03   |          |
+|     |            |            | issues #22-#26 via     | (offline)          |          |
+|     |            |            | gh CLI                 |                    |          |
 
 ---
 

@@ -19,15 +19,16 @@ See the [conductor agent](../.github/agents/01-conductor.agent.md) for orchestra
 
 ## Quick Links
 
-| Resource                                    | Description                   |
-| ------------------------------------------- | ----------------------------- |
-| [HackOps User Guide](hackops-user-guide.md) | Step-by-step runbook          |
-| [PRD](prd.md)                               | Product Requirements Document |
-| [API Contract](api-contract.md)             | 26-endpoint REST API spec     |
-| [Data Model](data-model.md)                 | Cosmos DB containers & schema |
-| [UI Pages](ui-pages.md)                     | Page inventory & route map    |
-| [Environment Config](environment-config.md) | Env vars & Key Vault refs     |
-| [Dev Containers](dev-containers.md)         | Docker setup and alternatives |
+| Resource                                     | Description                   |
+| -------------------------------------------- | ----------------------------- |
+| [HackOps User Guide](hackops-user-guide.md)  | Step-by-step runbook          |
+| [PRD](prd.md)                                | Product Requirements Document |
+| [API Contract](api-contract.md)              | 26-endpoint REST API spec     |
+| [Data Model](data-model.md)                  | Cosmos DB containers & schema |
+| [UI Pages](ui-pages.md)                      | Page inventory & route map    |
+| [Environment Config](environment-config.md)  | Env vars & Key Vault refs     |
+| [Dev Containers](dev-containers.md)          | Docker setup and alternatives |
+| [Backlog Setup](exec-plans/backlog-setup.md) | GitHub Project board config   |
 
 ---
 
@@ -184,6 +185,5 @@ azure-agentic-infraops/
 
 ## Getting Help
 
-- **Issues**: [GitHub Issues](https://github.com/jonathan-vella/azure-agentic-infraops/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/jonathan-vella/azure-agentic-infraops/discussions)
+- **Issues**: [GitHub Issues](https://github.com/jonathan-vella/hack-ops/issues)
 - **Troubleshooting**: Check [GitHub Issues](https://github.com/jonathan-vella/hack-ops/issues)
