@@ -25,9 +25,9 @@
 
 | Date       | Domain        | Change                                                                                  |
 | ---------- | ------------- | --------------------------------------------------------------------------------------- |
-| 2026-02-26 | Agents        | Added 6 app-dev agents (11-16) + 3 subagents; grade B+→A-                          |
-| 2026-02-26 | Docs          | Updated README + AGENTS.md: counts 15+11, added app-dev agent tables                |
-| 2026-02-26 | Docs          | Resolved dead links (quickstart, workflow, glossary, troubleshooting, prompt-guide)  |
+| 2026-02-26 | Agents        | Added 6 app-dev agents (11-16) + 3 subagents; grade B+→A-                               |
+| 2026-02-26 | Docs          | Updated README + AGENTS.md: counts 15+11, added app-dev agent tables                    |
+| 2026-02-26 | Docs          | Resolved dead links (quickstart, workflow, glossary, troubleshooting, prompt-guide)     |
 | 2026-02-26 | Docs          | Fixed agent table: bicep-plan→bicep-planner, bicep-code→bicep-code-generator            |
 | 2026-02-26 | Instructions  | Added ❌ markers to prohibited-refs list (fixed 3 false-positives in freshness checker) |
 | 2026-02-26 | CI/Validation | Fixed check-docs-freshness.mjs agent table lookup to handle numbered-prefix filenames   |

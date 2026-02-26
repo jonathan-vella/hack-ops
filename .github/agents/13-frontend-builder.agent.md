@@ -76,11 +76,11 @@ handoffs:
 
 ### Server vs Client Components
 
-| Pattern            | Use when                               | Directive       |
-| ------------------ | -------------------------------------- | --------------- |
-| Server Component   | Data fetching, no interactivity needed | (default)       |
-| Client Component   | Event handlers, state, browser APIs    | `'use client'`  |
-| Server Action      | Form submissions, mutations            | `'use server'`  |
+| Pattern          | Use when                               | Directive      |
+| ---------------- | -------------------------------------- | -------------- |
+| Server Component | Data fetching, no interactivity needed | (default)      |
+| Client Component | Event handlers, state, browser APIs    | `'use client'` |
+| Server Action    | Form submissions, mutations            | `'use server'` |
 
 ### Page Structure
 
@@ -108,14 +108,14 @@ apps/web/src/app/
 
 Use these components consistently across HackOps:
 
-| Component | Usage                             |
-| --------- | --------------------------------- |
-| Table     | Leaderboard, team lists, audit    |
-| Form      | Submission forms, hackathon CRUD  |
-| Badge     | Grade labels, award indicators    |
-| Dialog    | Confirmations, detail views       |
-| Card      | Dashboard metrics, team cards     |
-| Tabs      | Admin views, multi-section pages  |
+| Component | Usage                            |
+| --------- | -------------------------------- |
+| Table     | Leaderboard, team lists, audit   |
+| Form      | Submission forms, hackathon CRUD |
+| Badge     | Grade labels, award indicators   |
+| Dialog    | Confirmations, detail views      |
+| Card      | Dashboard metrics, team cards    |
+| Tabs      | Admin views, multi-section pages |
 
 ## Exit Criteria
 

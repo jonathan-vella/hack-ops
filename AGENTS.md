@@ -41,7 +41,7 @@ All outputs → `agent-output/{project}/`.
 | 13-Frontend Builder | Pages, layouts, shadcn/ui components                 |
 | 14-Test Writer      | Unit tests (Vitest), integration tests, E2E stubs    |
 | 15-App Deployer     | CI/CD workflows, App Service deployment              |
-| 16-App Conductor    | Orchestrates app-dev workflow (agents 11-15)          |
+| 16-App Conductor    | Orchestrates app-dev workflow (agents 11-15)         |
 
 Agent definitions: `.github/agents/*.agent.md`
 
@@ -65,11 +65,11 @@ Agent definitions: `.github/agents/*.agent.md`
 
 ### App-Dev Subagents
 
-| Subagent                      | Parent Agent                  | Purpose                            |
-| ----------------------------- | ----------------------------- | ---------------------------------- |
-| app-lint-subagent             | API Builder, Frontend Builder | `tsc --noEmit` + ESLint validation |
-| app-review-subagent           | API Builder, Frontend Builder | Code review against instructions   |
-| app-test-subagent             | Test Writer                   | `npm test` + coverage reporting    |
+| Subagent            | Parent Agent                  | Purpose                            |
+| ------------------- | ----------------------------- | ---------------------------------- |
+| app-lint-subagent   | API Builder, Frontend Builder | `tsc --noEmit` + ESLint validation |
+| app-review-subagent | API Builder, Frontend Builder | Code review against instructions   |
+| app-test-subagent   | Test Writer                   | `npm test` + coverage reporting    |
 
 Subagent definitions: `.github/agents/_subagents/`
 

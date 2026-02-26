@@ -70,12 +70,12 @@ handoffs:
 
 ### Test Pyramid
 
-| Layer       | Framework     | Target                     | Coverage goal |
-| ----------- | ------------- | -------------------------- | ------------- |
-| Unit        | Vitest        | Services, utils, helpers   | >80%          |
-| Integration | Vitest        | API routes + Cosmos DB     | >70%          |
-| Component   | Vitest + RTL  | React components           | >60%          |
-| E2E         | Playwright    | Critical user flows (stub) | Stubs only    |
+| Layer       | Framework    | Target                     | Coverage goal |
+| ----------- | ------------ | -------------------------- | ------------- |
+| Unit        | Vitest       | Services, utils, helpers   | >80%          |
+| Integration | Vitest       | API routes + Cosmos DB     | >70%          |
+| Component   | Vitest + RTL | React components           | >60%          |
+| E2E         | Playwright   | Critical user flows (stub) | Stubs only    |
 
 ### Test File Conventions
 

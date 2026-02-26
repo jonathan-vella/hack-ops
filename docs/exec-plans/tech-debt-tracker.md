@@ -16,12 +16,12 @@ Updated by the doc-gardening workflow and referenced by `QUALITY_SCORE.md`.
 
 ## Resolved Items
 
-| ID  | Category      | Description                                                               | Resolved Date | Resolution                                                         |
-| --- | ------------- | ------------------------------------------------------------------------- | ------------- | ------------------------------------------------------------------ |
-| 6   | Documentation | Dead links in docs/README.md (quickstart, workflow, glossary, etc.)       | 2026-02-26    | Replaced with Phase A doc links; dead refs removed                 |
-| 3   | Documentation | docs.instructions.md prohibited-refs false-positives in freshness checker | 2026-02-26    | Added ❌ markers; checker now skips documentation-of-prohibitions  |
-| 1   | Documentation | docs/README.md agent/skill counts were stale                              | 2026-02-26    | Fixed counts: 15+11 agents, 14 skills, 21 instructions             |
-| 2   | Instructions  | Instruction consolidation just completed                                  | 2025-07-15    | Consolidated 28→20; verified no duplicates remain                  |
+| ID  | Category      | Description                                                               | Resolved Date | Resolution                                                        |
+| --- | ------------- | ------------------------------------------------------------------------- | ------------- | ----------------------------------------------------------------- |
+| 6   | Documentation | Dead links in docs/README.md (quickstart, workflow, glossary, etc.)       | 2026-02-26    | Replaced with Phase A doc links; dead refs removed                |
+| 3   | Documentation | docs.instructions.md prohibited-refs false-positives in freshness checker | 2026-02-26    | Added ❌ markers; checker now skips documentation-of-prohibitions |
+| 1   | Documentation | docs/README.md agent/skill counts were stale                              | 2026-02-26    | Fixed counts: 15+11 agents, 14 skills, 21 instructions            |
+| 2   | Instructions  | Instruction consolidation just completed                                  | 2025-07-15    | Consolidated 28→20; verified no duplicates remain                 |
 
 ## Categories
 

@@ -84,32 +84,32 @@ Orchestrates the **application build workflow** — separate from the infra Cond
 
 ## App-Dev Workflow
 
-| Step | Agent               | Output                                         | Gate     | Exit criteria                                           |
-| ---- | ------------------- | ---------------------------------------------- | -------- | ------------------------------------------------------- |
-| A1   | 11-App Scaffolder   | `apps/web/`, `packages/shared/`, `turbo.json`  | Approval | `npm run build` succeeds                                |
-| A2   | 12-API Builder      | Auth middleware, role guards                    | Approval | Role guard unit tests pass                              |
-| A3   | 12-API Builder      | Hackathon, team, join API routes                | Validate | `tsc --noEmit` + endpoint tests pass                    |
-| A4   | 12-API Builder      | Scoring, rubric, submission routes              | Validate | `tsc --noEmit` + endpoint tests pass                    |
-| A5   | 12-API Builder      | Challenge, progression routes                   | Validate | `tsc --noEmit` + endpoint tests pass                    |
-| A6   | 12-API Builder      | Admin, audit, config routes                     | Validate | All API tests pass, app-review-subagent APPROVED        |
-| A7   | 13-Frontend Builder | Leaderboard (SSR) + dashboard pages             | Validate | `npm run build` succeeds                                |
-| A8   | 14-Test Writer      | Unit + integration test suite                   | Validate | Coverage >80%, all tests pass                           |
-| A9   | 15-App Deployer     | CI/CD workflows                                 | Approval | Workflows pass dry-run validation                       |
+| Step | Agent               | Output                                        | Gate     | Exit criteria                                    |
+| ---- | ------------------- | --------------------------------------------- | -------- | ------------------------------------------------ |
+| A1   | 11-App Scaffolder   | `apps/web/`, `packages/shared/`, `turbo.json` | Approval | `npm run build` succeeds                         |
+| A2   | 12-API Builder      | Auth middleware, role guards                  | Approval | Role guard unit tests pass                       |
+| A3   | 12-API Builder      | Hackathon, team, join API routes              | Validate | `tsc --noEmit` + endpoint tests pass             |
+| A4   | 12-API Builder      | Scoring, rubric, submission routes            | Validate | `tsc --noEmit` + endpoint tests pass             |
+| A5   | 12-API Builder      | Challenge, progression routes                 | Validate | `tsc --noEmit` + endpoint tests pass             |
+| A6   | 12-API Builder      | Admin, audit, config routes                   | Validate | All API tests pass, app-review-subagent APPROVED |
+| A7   | 13-Frontend Builder | Leaderboard (SSR) + dashboard pages           | Validate | `npm run build` succeeds                         |
+| A8   | 14-Test Writer      | Unit + integration test suite                 | Validate | Coverage >80%, all tests pass                    |
+| A9   | 15-App Deployer     | CI/CD workflows                               | Approval | Workflows pass dry-run validation                |
 
 ## Adversarial Review Schedule
 
 Invoke adversarial subagents at these gates:
 
-| After step | Subagent                           | Focus           | Block on           |
-| ---------- | ---------------------------------- | --------------- | ------------------ |
-| A2         | app-security-challenger-subagent   | `auth`          | Critical/High      |
-| A3         | app-logic-challenger-subagent      | `api-contract`  | Contract drift     |
-| A4         | app-logic-challenger-subagent      | `business-rules`| Scoring errors     |
-| A5         | app-logic-challenger-subagent      | `business-rules`| Gating errors      |
-| A6         | app-security-challenger-subagent   | `full`          | Any Critical/High  |
-| A6         | app-logic-challenger-subagent      | `full`          | Any Critical/High  |
-| A7         | app-security-challenger-subagent   | `data-handling` | Data exposure      |
-| A8         | app-logic-challenger-subagent      | `test-coverage` | Test gaps          |
+| After step | Subagent                         | Focus            | Block on          |
+| ---------- | -------------------------------- | ---------------- | ----------------- |
+| A2         | app-security-challenger-subagent | `auth`           | Critical/High     |
+| A3         | app-logic-challenger-subagent    | `api-contract`   | Contract drift    |
+| A4         | app-logic-challenger-subagent    | `business-rules` | Scoring errors    |
+| A5         | app-logic-challenger-subagent    | `business-rules` | Gating errors     |
+| A6         | app-security-challenger-subagent | `full`           | Any Critical/High |
+| A6         | app-logic-challenger-subagent    | `full`           | Any Critical/High |
+| A7         | app-security-challenger-subagent | `data-handling`  | Data exposure     |
+| A8         | app-logic-challenger-subagent    | `test-coverage`  | Test gaps         |
 
 ## Orchestration Rules
 

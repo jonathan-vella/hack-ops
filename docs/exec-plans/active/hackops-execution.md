@@ -17,20 +17,20 @@
 <!-- When a step completes, close the corresponding issue with a comment. -->
 <!-- When an epic's subtasks all complete, close the epic. -->
 
-| Step                      | Issue | Status                        |
-| ------------------------- | ----- | ----------------------------- |
+| Step                      | Issue | Status                               |
+| ------------------------- | ----- | ------------------------------------ |
 | Epic: Phase A             | #1    | Done (merge complete, need GH_TOKEN) |
-| Epic: Phase C             | #2    | Open                          |
-| A1: PRD                   | #3    | Closed                        |
-| A2: API contract          | #4    | Closed                        |
-| A3: Data model            | #5    | Closed                        |
-| A4: UI pages              | #6    | Done (need GH_TOKEN to close) |
-| A5: Env config            | #7    | Done (need GH_TOKEN to close) |
-| C1: App-dev agents        | #8    | Open                          |
-| C3: App-dev skills        | #9    | Open                          |
-| C4: App-dev instructions  | #10   | Open                          |
-| C4: Register instructions | #11   | Open                          |
-| C1: App-dev subagents     | #12   | Open                          |
+| Epic: Phase C             | #2    | Open                                 |
+| A1: PRD                   | #3    | Closed                               |
+| A2: API contract          | #4    | Closed                               |
+| A3: Data model            | #5    | Closed                               |
+| A4: UI pages              | #6    | Done (need GH_TOKEN to close)        |
+| A5: Env config            | #7    | Done (need GH_TOKEN to close)        |
+| C1: App-dev agents        | #8    | Open                                 |
+| C3: App-dev skills        | #9    | Open                                 |
+| C4: App-dev instructions  | #10   | Open                                 |
+| C4: Register instructions | #11   | Open                                 |
+| C1: App-dev subagents     | #12   | Open                                 |
 
 ---
 

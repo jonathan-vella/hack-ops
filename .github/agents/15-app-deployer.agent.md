@@ -92,13 +92,13 @@ Triggers on push to `main` (after PR merge):
 
 ### Environment Configuration
 
-| Secret/Variable                | Source     | Used in           |
-| ------------------------------ | ---------- | ----------------- |
-| `AZURE_WEBAPP_NAME`            | Infra      | Deploy target     |
-| `AZURE_WEBAPP_PUBLISH_PROFILE` | Azure      | Auth to deploy    |
-| `COSMOS_DB_ENDPOINT`           | Key Vault  | Runtime config    |
-| `COSMOS_DB_KEY`                | Key Vault  | Runtime config    |
-| `NEXT_PUBLIC_APP_URL`         | Config     | Client-side URLs  |
+| Secret/Variable                | Source    | Used in          |
+| ------------------------------ | --------- | ---------------- |
+| `AZURE_WEBAPP_NAME`            | Infra     | Deploy target    |
+| `AZURE_WEBAPP_PUBLISH_PROFILE` | Azure     | Auth to deploy   |
+| `COSMOS_DB_ENDPOINT`           | Key Vault | Runtime config   |
+| `COSMOS_DB_KEY`                | Key Vault | Runtime config   |
+| `NEXT_PUBLIC_APP_URL`          | Config    | Client-side URLs |
 
 ## Exit Criteria
 

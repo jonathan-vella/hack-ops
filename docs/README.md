@@ -57,14 +57,14 @@ See `AGENTS.md` at the repo root for the lightweight map.
 
 ### App-Dev Agents (User-Invokable)
 
-| Agent                | Persona        | Step | Purpose                             |
-| -------------------- | -------------- | ---- | ----------------------------------- |
-| `app-scaffolder`     | 🏗️ Builder    | A1   | Turborepo + Next.js 15 scaffold     |
-| `api-builder`        | 🔌 Connector   | A2-6 | API routes, Zod, role guards        |
-| `frontend-builder`   | 🎨 Painter     | A7   | Pages, layouts, shadcn/ui           |
-| `test-writer`        | 🧪 Tester      | A8   | Vitest unit + integration tests     |
-| `app-deployer`       | 🚢 Shipper     | A9   | CI/CD workflows, App Service deploy |
-| `app-conductor`      | 🎼 Maestro II  | —    | Orchestrates app-dev workflow       |
+| Agent              | Persona       | Step | Purpose                             |
+| ------------------ | ------------- | ---- | ----------------------------------- |
+| `app-scaffolder`   | 🏗️ Builder    | A1   | Turborepo + Next.js 15 scaffold     |
+| `api-builder`      | 🔌 Connector  | A2-6 | API routes, Zod, role guards        |
+| `frontend-builder` | 🎨 Painter    | A7   | Pages, layouts, shadcn/ui           |
+| `test-writer`      | 🧪 Tester     | A8   | Vitest unit + integration tests     |
+| `app-deployer`     | 🚢 Shipper    | A9   | CI/CD workflows, App Service deploy |
+| `app-conductor`    | 🎼 Maestro II | —    | Orchestrates app-dev workflow       |
 
 ### Adversarial Subagents
 
@@ -86,11 +86,11 @@ See `AGENTS.md` at the repo root for the lightweight map.
 
 ### App-Dev Subagents (Agent-Invoked)
 
-| Subagent                | Purpose                            | Returns                        |
-| ----------------------- | ---------------------------------- | ------------------------------ |
-| `app-lint-subagent`     | TypeScript + ESLint validation     | PASS/FAIL with error list      |
-| `app-review-subagent`   | Code review against instructions   | APPROVED/NEEDS_REVISION        |
-| `app-test-subagent`     | Test execution + coverage report   | PASS/FAIL with coverage %      |
+| Subagent              | Purpose                          | Returns                   |
+| --------------------- | -------------------------------- | ------------------------- |
+| `app-lint-subagent`   | TypeScript + ESLint validation   | PASS/FAIL with error list |
+| `app-review-subagent` | Code review against instructions | APPROVED/NEEDS_REVISION   |
+| `app-test-subagent`   | Test execution + coverage report | PASS/FAIL with coverage % |
 
 ---
 

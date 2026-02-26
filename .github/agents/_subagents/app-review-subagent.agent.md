@@ -85,11 +85,11 @@ Summary: {1-2 sentence overall assessment}
 
 ## Severity Definitions
 
-| Severity | Meaning                                        | Blocks approval? |
-| -------- | ---------------------------------------------- | ---------------- |
-| CRITICAL | Security issue, data exposure, auth bypass     | Yes              |
-| HIGH     | Contract violation, missing validation         | Yes              |
-| MEDIUM   | Style violation, missing error handling        | No               |
-| LOW      | Minor improvement suggestion                   | No               |
+| Severity | Meaning                                    | Blocks approval? |
+| -------- | ------------------------------------------ | ---------------- |
+| CRITICAL | Security issue, data exposure, auth bypass | Yes              |
+| HIGH     | Contract violation, missing validation     | Yes              |
+| MEDIUM   | Style violation, missing error handling    | No               |
+| LOW      | Minor improvement suggestion               | No               |
 
 Return APPROVED only if zero CRITICAL and zero HIGH findings.

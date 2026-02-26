@@ -104,13 +104,13 @@ export async function POST(request: Request) {
 
 ## API Domains (Build in Order)
 
-| Step | Domain      | Routes                                    | Key business rules             |
-| ---- | ----------- | ----------------------------------------- | ------------------------------ |
-| A2   | Auth        | middleware, role guards                   | Easy Auth headers, 4 roles     |
-| A3   | Hackathons  | CRUD, team management, join by event code | Team balance, event code rules |
-| A4   | Scoring     | Rubric, submission, review                | Coach-only scoring, tiebreaker |
-| A5   | Challenges  | Challenge CRUD, progression gating        | Prerequisite completion checks |
-| A6   | Admin       | Config, audit, user management            | Admin-only, full audit trail   |
+| Step | Domain     | Routes                                    | Key business rules             |
+| ---- | ---------- | ----------------------------------------- | ------------------------------ |
+| A2   | Auth       | middleware, role guards                   | Easy Auth headers, 4 roles     |
+| A3   | Hackathons | CRUD, team management, join by event code | Team balance, event code rules |
+| A4   | Scoring    | Rubric, submission, review                | Coach-only scoring, tiebreaker |
+| A5   | Challenges | Challenge CRUD, progression gating        | Prerequisite completion checks |
+| A6   | Admin      | Config, audit, user management            | Admin-only, full audit trail   |
 
 ## Adversarial Review Gates
 
