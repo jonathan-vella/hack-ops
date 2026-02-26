@@ -1,169 +1,114 @@
 {
-  "challenged_artifact": "untitled:plan-hackOpsExecution.prompt.md",
-  "artifact_type": "implementation-plan",
-  "challenge_date": "2026-02-24",
-  "resolution_date": "2026-02-24",
-  "challenge_summary": "The execution blueprint is well-structured and correctly sequences infra-before-app with PRD as the foundation. However, it has 5 must-fix issues: (1) Phase A has no prompt/agent/tooling to actually CREATE the 5 product docs — the most critical phase has zero automation; (2) the 5 new skills plan to be hand-written without using the existing microsoft-skill-creator skill or Learn MCP tools, violating agent-research-first instructions; (3) the app-dev workflow has no approval gates, exit criteria, or structured validation — unlike the rigorously gated infra workflow; (4) the Conductor expansion from 10→15 agents with no workflow definition for the app-dev steps violates Principle 3 (invariants not implementations); (5) new instructions are planned but not registered — no update to devcontainer settings or copilot-instructions means they won't auto-apply. Additionally, 5 should-fix issues include missing app-dev subagents, model assignment concerns, no branch strategy, API contract drift risk, and the hackops-domain 'keystone' skill lacking mechanical enforcement (Principle 10).",
-  "resolution_summary": "All 14 findings addressed in updated plan: Phase A now has 3 doc-generation prompts (A0); skills use microsoft-skill-creator workflow; App Conductor (16) created as separate agent with full workflow table and approval gates; instructions include registration steps and applyTo overlap resolution; 3 app-dev subagents added; Frontend Builder upgraded to Opus-primary; branch strategy defined with 3 feature branches; API contract is TypeScript types (compile-time drift detection); validate-business-rules.mjs added for mechanical enforcement; bootstrap issues added (B0); existing MS skills referenced in new agents; effort estimates added; Azure connectivity prerequisite documented.",
-  "risk_level": "low",
-  "must_fix_count": 5,
-  "should_fix_count": 5,
-  "suggestion_count": 4,
-  "all_resolved": true,
-  "issues": [
+  "reviewDate": "2026-02-26",
+  "artifactsReviewed": [
+    "agent-output/hackops/01-requirements.md",
+    "agent-output/hackops/02-architecture-assessment.md",
+    "agent-output/hackops/03-des-adr-0001-serverless-cosmos.md",
+    "agent-output/hackops/03-des-adr-0002-app-service-compute.md",
+    "agent-output/hackops/03-des-adr-0003-easy-auth-github.md",
+    "agent-output/hackops/03-des-diagram.py"
+  ],
+  "previousReview": {
+    "date": "2026-02-24",
+    "target": "plan-hackOpsExecution.prompt.md (execution blueprint)",
+    "result": "14 findings, all resolved before infrastructure execution began"
+  },
+  "findings": [
     {
-      "severity": "must_fix",
-      "category": "missing_failure_mode",
-      "title": "Phase A has no tooling to CREATE the 5 product docs — most critical phase is manual",
-      "description": "Phase A is the foundational phase that all subsequent phases depend on. It lists 5 documents to create (PRD, API contract, data model, UI pages, env config) totaling an estimated 60-80 user stories. Yet it specifies NO prompt, NO agent, and NO automation to produce these documents. Every other phase in the plan has a dedicated prompt and agent assignment. The PRD — described as 'the source of truth that feeds both the backlog and the agent prompts' — is expected to materialize from nowhere. A solo dev writing 60-80 user stories with acceptance criteria manually is weeks of work that could be largely agent-assisted.",
-      "failure_scenario": "Developer reaches Phase A, sees 'Create docs/prd.md' with a bullet list of desired sections, but has no prompt to feed to Copilot. They spend 2-3 weeks manually writing 5 detailed docs. Alternatively, they use generic Copilot without the domain context from plan-hackOps.prompt.md and produce low-quality docs that don't match the plan's invariants. All downstream phases (backlog, agents, prompts) inherit the quality gap.",
-      "artifact_section": "## Phase A — Product Documentation",
-      "suggested_mitigation": "Create dedicated prompts for Phase A: (1) prd-generator.prompt.md — instructs an agent to read plan-hackOps.prompt.md Phases 5-10 + Application Summary + Key Invariants and generate the full PRD with user stories and acceptance criteria; (2) api-contract-generator.prompt.md — reads the plan's ~16 endpoints across Phases 6-10 and generates the typed API contract; (3) data-model-generator.prompt.md — reads the 10 container definitions and generates TypeScript interfaces with sample documents. These prompts should reference the hackops-domain skill for business rule accuracy. Budget: 3 prompts minimum, assigned to a doc-generation agent or the default Copilot agent.",
-      "resolved": true,
-      "resolution": "Added A0 section with 3 doc-generation prompts (doc-prd-generator, doc-api-contract-generator, doc-data-model-generator). Each prompt reads plan-hackOps.prompt.md as primary input."
+      "id": "CF-001",
+      "severity": "high",
+      "category": "reliability",
+      "title": "Deployment slots claimed as Reliability strength but B1 tier does not support them",
+      "description": "The architecture assessment lists 'Deployment slots for zero-downtime deploys' as a Reliability strength (section: Reliability — Score 3/5). However, ADR-0002 correctly states 'Staging slot available on S1+ tiers (not on B1) — dev environment deploys directly.' The dev environment (B1) will NOT have deployment slots. This overstates the reliability posture and could lead to an unexpected direct-deployment workflow in dev without zero-downtime capability. The Implementation Handoff table also lists deployment slots without qualifying the tier restriction.",
+      "recommendation": "Fix the Reliability section to remove deployment slots from B1/dev strengths. Add them only under the prod (S1) posture. Update the Implementation Handoff to clarify that staging slots are S1+ only. Consider whether this changes the Reliability score from 3/5 to 2/5 for dev.",
+      "status": "open"
     },
     {
-      "severity": "must_fix",
-      "category": "untested_assumption",
-      "title": "5 new skills planned as hand-written without microsoft-skill-creator or Learn MCP research",
-      "description": "The plan proposes creating 5 skills (nextjs-patterns, cosmos-db-sdk, shadcn-ui-patterns, zod-validation, hackops-domain) but does not specify HOW their content will be authored. The repo has an existing microsoft-skill-creator skill specifically designed to create skills by querying official Microsoft Learn documentation via MCP tools. The agent-research-first instruction MANDATES 'Query documentation via MCP tools (Azure docs, best practices)' and 'Query Azure docs BEFORE recommending services.' Hand-writing SDK patterns for @azure/cosmos v4 or Next.js 15 App Router without verifying against official docs risks embedding outdated or incorrect information that all 5 new agents will consume.",
-      "failure_scenario": "The cosmos-db-sdk skill is hand-written with assumed @azure/cosmos v4 patterns. The actual v4 SDK has breaking changes from v3 (e.g., different client initialization, changed method signatures for managed identity). The API Builder agent uses the incorrect patterns from the skill, generating code that fails at runtime. Same risk for Next.js 15 — the App Router API has evolved significantly and hand-written patterns may reference deprecated APIs.",
-      "artifact_section": "### C3. New skills",
-      "suggested_mitigation": "For each of the 4 technology skills (nextjs-patterns, cosmos-db-sdk, shadcn-ui-patterns, zod-validation): (1) Use the microsoft-skill-creator skill's creation process — Phase 1 scope discovery, Phase 2 deep dive, Phase 3 skill generation; (2) Query Learn MCP tools (microsoft_docs_search, microsoft_docs_fetch, microsoft_code_sample_search) to verify SDK versions, API signatures, and current best practices; (3) Include Learn doc URLs as references in each skill for freshness auditing. The hackops-domain skill is project-specific and can be hand-written from plan-hackOps.prompt.md. Add this as an explicit step in Phase C: 'Use microsoft-skill-creator workflow for technology skills.'",
-      "resolved": true,
-      "resolution": "C3 now specifies microsoft-skill-creator workflow for 4 technology skills with explicit Learn MCP tool usage. hackops-domain marked as hand-written with justification."
+      "id": "CF-002",
+      "severity": "medium",
+      "category": "cost",
+      "title": "Inconsistent dev cost estimates across three artifacts",
+      "description": "Three different cost figures appear for the dev environment: (1) 01-requirements.md NFR table states '~$30-50/mo'; (2) 02-architecture-assessment.md Executive Summary states '~$20-30 (dev)'; (3) 02-architecture-assessment.md SKU table totals '~$17-26'. All three should converge. The SKU-level rollup ($17-26) is likely the most accurate, but the requirements NFR ($30-50) sets stakeholder expectations higher. If the budget target is $30-50 there is no issue, but the inconsistency undermines trust in the estimates.",
+      "recommendation": "Align all three documents to a single range: use the SKU-level rollup ($17-26) as the estimate and the NFR ($30-50) as the budget ceiling. Add a note: 'Estimated cost: ~$17-26/mo; budget ceiling: $50/mo to absorb spikes and Private DNS zone costs.'",
+      "status": "open"
     },
     {
-      "severity": "must_fix",
-      "category": "governance_gap",
-      "title": "App-dev workflow has no approval gates, exit criteria, or structured validation",
-      "description": "The infra workflow (Phase D) inherits the rigorous 7-step process with human approval gates at Steps 1, 2, 4, and 6 — enforced by the Conductor. The app-dev workflow (Phase E) has no equivalent structure. The plan says 'run app prompts sequentially' but defines no gates, no exit criteria, no validation between steps. Who approves the scaffolded app before API development begins? Who validates the auth middleware before business logic endpoints are built? Who reviews generated code quality? The infra agents have 5 subagents for validation (lint, review, what-if) — the app agents have zero subagents.",
-      "failure_scenario": "The API Builder agent generates 16 route handlers. No code review subagent validates them. The Frontend Builder agent generates pages that import from API routes with different type signatures. The Test Writer agent generates tests against an API contract that has already drifted from the actual implementation. Bugs compound across phases with no checkpoint to catch them.",
-      "artifact_section": "## Phase E — Application Build Execution",
-      "suggested_mitigation": "Define an explicit app-dev workflow with gates: (1) After scaffold (app-01): gate = npm run build succeeds + Cosmos DB emulator connects; (2) After auth (app-02): gate = role guard tests pass; (3) After each API phase (app-03 through app-06): gate = TypeScript compiles + endpoint unit tests pass; (4) After frontend (app-07, app-08): gate = npm run build succeeds + no type errors; (5) After tests (app-09): gate = coverage threshold met. Add app-dev subagents: typescript-lint-subagent (type-check + ESLint), app-review-subagent (code review against instructions), app-test-subagent (run Vitest suite). Document these gates in the Conductor's expanded workflow table.",
-      "resolved": true,
-      "resolution": "Phase E now has explicit Gate and Exit criteria columns for every prompt. App Conductor (16) orchestrates with Approval/Validate gates. 3 subagents handle validation delegation."
+      "id": "CF-003",
+      "severity": "medium",
+      "category": "operations",
+      "title": "No alerting rules or incident escalation defined anywhere",
+      "description": "The architecture assessment, requirements, and all three ADRs acknowledge that no alerting rules are defined. The Operational Excellence gaps section says 'No automated alerting rules defined yet' and recommends deferring to Phase 12 production hardening. However, Phase 12 does not exist in the execution blueprint — the last infra step is infra-07 (as-built docs). Without alerting, Cosmos DB throttling (429s), App Service high CPU, or Key Vault access failures will go unnoticed until users report problems.",
+      "recommendation": "Define at minimum 3 baseline alerts in the Bicep templates (infra-05): (1) App Service CPU > 85% for 5 minutes; (2) Cosmos DB 429 responses > 0 in 5-minute window; (3) App Service HTTP 5xx > 5 in 5-minute window. These are low-effort metric alerts that can use the existing Log Analytics workspace as the action group target. Add an alert module to the Bicep infrastructure.",
+      "status": "open"
     },
     {
-      "severity": "must_fix",
-      "category": "architectural_weakness",
-      "title": "Conductor expansion to 15 agents with undefined app-dev workflow violates Principle 3",
-      "description": "The plan says 'Add agents 11-15 to the Conductor's agents list and handoff table' and 'Add app-dev workflow steps maintaining the approval-gate pattern.' But the current Conductor is specifically designed as 'Master orchestrator for the 7-step Azure infrastructure workflow.' Its 358-line definition contains detailed handoff logic, step-by-step orchestration rules, and agent-specific delegation patterns all tied to the infra workflow. Bolting on 5 more agents without defining the app-dev workflow structure (step numbers, handoff order, gate criteria, input/output artifacts) violates Principle 3: 'Enforce invariants, not implementations.' The plan prescribes the implementation (add agents to list) but doesn't define the invariants (what must be true for app-dev orchestration to work).",
-      "failure_scenario": "The Conductor's agents list grows to 15 entries. User asks the Conductor to 'build my app.' The Conductor has handoff logic for infra steps 1-7 but no equivalent for app steps. It either follows the infra workflow (wrong), delegates to random app agents without ordering (chaotic), or falls back to free-form responses (defeats the purpose of orchestration). The 358-line agent definition grows to 500+ lines, exceeding the 200-line guidance from Principle 2.",
-      "artifact_section": "### C2. Update 01-Conductor",
-      "suggested_mitigation": "Option A (recommended): Create a separate 16-app-conductor.agent.md that orchestrates only the app-dev workflow (agents 11-15) with its own step definitions, gates, and handoff table. The infra Conductor (01) can hand off to the App Conductor (16) after infra deployment completes. This keeps both conductors focused and under 200 lines. Option B: Define the app-dev workflow explicitly in the execution plan — step numbers, required inputs, output artifacts, gate criteria — BEFORE expanding the Conductor. At minimum, document the app-dev equivalent of AGENTS.md's '7-Step Workflow' table.",
-      "resolved": true,
-      "resolution": "Adopted Option A: separate 16-App Conductor with full 9-step workflow table (A1-A9), gate types, and exit criteria. 01-Conductor gets single handoff entry only."
+      "id": "CF-004",
+      "severity": "medium",
+      "category": "reliability",
+      "title": "Cosmos DB Serverless burst limit stated inconsistently — 5K vs 1K RU/s",
+      "description": "ADR-0001 Context section states 'automatic scale to 5K RU/s burst' at the account level, but the Consequences section states '1K RU/s burst limit on individual containers could throttle heavy leaderboard aggregation queries.' The architecture assessment also says 'burst limit (1K RU/s) exceeding peak demand.' These are different numbers for different scopes (account vs container). The actual Cosmos DB serverless burst limit is up to 5,000 RU/s per partition (not per container), but queries reading from many partitions consume RUs across multiple partitions. For the leaderboard aggregation query that reads across all teams, the effective throughput depends on partition fan-out, not a single container limit.",
+      "recommendation": "Correct ADR-0001 to clarify: Serverless Cosmos DB provides burst capacity up to 5,000 RU/s per physical partition. For the leaderboard query (cross-partition on scores container partitioned by /teamId), the effective burst is the sum across all partitions touched. At ~75 users with 4-5 teams, this is well within limits. Remove the '1K RU/s per container' claim as it is not accurate for serverless mode.",
+      "status": "open"
     },
     {
-      "severity": "must_fix",
-      "category": "hidden_dependency",
-      "title": "New instructions won't auto-apply — no registration in devcontainer settings",
-      "description": "The plan creates 5 new instruction files with applyTo patterns (e.g., typescript.instructions.md applyTo '**/*.ts, **/*.tsx'). But instruction auto-application in VS Code Copilot requires that the instructions are discoverable via the workspace configuration. The existing 21 instructions are registered via the VS Code settings in devcontainer.json. The plan says 'create in .github/instructions/' but doesn't mention updating any registration mechanism. The instruction validation script (validate-instruction-references.mjs) checks for orphaned instructions — the new files would either be flagged as orphans or silently ignored.",
-      "failure_scenario": "Developer creates typescript.instructions.md. Copilot generates TypeScript code but doesn't apply the instruction's rules (strict mode, no 'any', shared types) because the instruction wasn't registered. The generated code has 'any' types and inline type definitions instead of using packages/shared. The developer doesn't notice until much later because there's no mechanical enforcement.",
-      "artifact_section": "### C4. New instructions",
-      "suggested_mitigation": "Add explicit steps to Phase C4: (1) Update .devcontainer/devcontainer.json to register new instruction file paths in the Copilot settings; (2) Run npm run validate:instruction-refs to verify new instructions are discoverable and not flagged as orphans; (3) Run npm run lint:instruction-frontmatter to verify frontmatter compliance; (4) Verify that the applyTo patterns don't overlap with existing instructions in ways that create conflicting rules (e.g., react-components.instructions.md '**/*.tsx' would also match .tsx files already covered by typescript.instructions.md '**/*.tsx' — document the precedence).",
-      "resolved": true,
-      "resolution": "C4 now has 5-step registration process including devcontainer.json update, validation runs, and applyTo overlap resolution. react-components scoped to **/components/**/*.tsx to avoid conflict."
+      "id": "CF-005",
+      "severity": "medium",
+      "category": "operations",
+      "title": "WEBSITE_VNET_ROUTE_ALL app setting is deprecated — use site property instead",
+      "description": "ADR-0002 Implementation Notes specify 'Set WEBSITE_VNET_ROUTE_ALL=1 to force VNet routing.' The architecture assessment also references this setting. However, this app setting has been deprecated in favor of the 'vnetRouteAllEnabled' site property (available since API version 2022-03-01). The AVM web/site module supports this as a first-class property. Using the deprecated app setting may work today but could be removed in future API versions and creates a governance inconsistency if policies check the site property instead of app settings.",
+      "recommendation": "Replace WEBSITE_VNET_ROUTE_ALL=1 app setting references with the 'vnetRouteAllEnabled: true' site property in Bicep. Update ADR-0002 and architecture assessment implementation notes. The AVM module parameter is 'vnetRouteAllEnabled'.",
+      "status": "open"
     },
     {
-      "severity": "should_fix",
-      "category": "architectural_weakness",
-      "title": "No app-dev subagents — 5 new agents with zero validation delegation",
-      "description": "The infra workflow has 5 subagents (cost-estimate, governance-discovery, bicep-lint, bicep-review, bicep-whatif) that perform specialized validation. The app-dev workflow has 5 top-level agents but zero subagents. TypeScript compilation, ESLint, Vitest execution, and code review are all validation-heavy tasks that would benefit from subagent delegation — exactly the pattern established by the infra agents. The per-agent-definitions instructions state subagents should 'isolate expensive or specialized work from their parent agent's context window.'",
-      "failure_scenario": "The API Builder agent generates route handlers AND runs type-checking AND validates against the API contract all within one context window. The context grows beyond efficient processing. Validation output gets truncated or missed. The agent decides to skip validation to stay within context limits.",
-      "artifact_section": "### C1. New agents",
-      "suggested_mitigation": "Add 3 app-dev subagents mirroring the infra pattern: (1) app-lint-subagent.agent.md — runs tsc --noEmit + ESLint, returns PASS/FAIL with error list; (2) app-review-subagent.agent.md — code review against api-routes and typescript instructions, returns APPROVED/NEEDS_REVISION; (3) app-test-subagent.agent.md — runs npm test, returns PASS/FAIL with coverage report. These live in .github/agents/_subagents/, use GPT-5.3-Codex, and are called by the API Builder and Frontend Builder after each generation step.",
-      "resolved": true,
-      "resolution": "C1 now includes 3 subagents (app-lint, app-review, app-test) in _subagents/ directory. Each specifies parent agents and PASS/FAIL return contract."
+      "id": "CF-006",
+      "severity": "medium",
+      "category": "security",
+      "title": "GitHub OAuth client secret rotation strategy not defined",
+      "description": "ADR-0003 states the GitHub OAuth Client Secret is stored in Key Vault, but no rotation strategy, expiration monitoring, or renewal process is documented. GitHub OAuth App secrets do not expire automatically, but security best practices and many enterprise policies require periodic credential rotation. If the secret is rotated in GitHub but not updated in Key Vault, Easy Auth breaks silently (authentication just fails for all users).",
+      "recommendation": "Add a section to the operational requirements documenting: (1) GitHub OAuth secret should be rotated at least annually; (2) Add a Key Vault secret expiration date when storing the secret; (3) Create a Key Vault expiration alert (90-day warning) using the existing monitoring stack. Document the rotation procedure: update in GitHub Developer Settings → update in Key Vault → restart App Service to pick up new value.",
+      "status": "open"
     },
     {
-      "severity": "should_fix",
-      "category": "untested_assumption",
-      "title": "Frontend Builder assigned GPT-5.3-Codex but task requires complex reasoning",
-      "description": "The plan assigns GPT-5.3-Codex to the Frontend Builder (13) and Test Writer (14). Per agent-definitions.instructions.md: 'Planning accuracy trumps cost/speed — incorrect plans waste more resources than Opus costs.' The Frontend Builder must understand Next.js 15 App Router (server vs client components), compose shadcn/ui components correctly, implement complex interactive patterns (expandable leaderboard rows, auto-refresh, grade badge logic, drag-and-drop team reassignment), and ensure accessibility. This is reasoning-heavy, not just code generation. The Test Writer must understand business invariants to write meaningful acceptance tests.",
-      "failure_scenario": "Frontend Builder generates a leaderboard page using client-side rendering only (ignoring the SSR requirement) because the speed-optimized model doesn't deeply reason about the Next.js server/client boundary. The generated page has layout shift and poor first paint — violating the plan's explicit 'SSR for leaderboard (fast first paint, no layout shift)' requirement.",
-      "artifact_section": "### C1. New agents",
-      "suggested_mitigation": "Assign Frontend Builder model as ['Claude Opus 4.6', 'GPT-5.3-Codex'] (Opus primary, Codex fallback) — same pattern as the Bicep Code Generator which also does complex generation. Keep Test Writer as GPT-5.3-Codex only if tests are generated from structured acceptance criteria, but consider Opus-primary if tests require inferring edge cases from business rules.",
-      "resolved": true,
-      "resolution": "Frontend Builder model changed to 'Claude Opus 4.6 / GPT-5.3-Codex' (Opus-primary). Key decisions table documents rationale."
+      "id": "CF-007",
+      "severity": "low",
+      "category": "reliability",
+      "title": "Health endpoint /api/health behavior is unspecified",
+      "description": "The requirements list /api/health as the only unauthenticated endpoint but do not define what it checks. A simple 200 OK response only proves the Node.js process is running. It does not validate Cosmos DB connectivity, Key Vault accessibility, or application readiness. App Service health checks and deployment slot warm-up depend on meaningful health probes.",
+      "recommendation": "Define the health endpoint contract: (1) Shallow probe (/api/health) returns 200 if the process is running — used for liveness; (2) Deep probe (/api/health?deep=true) checks Cosmos DB connectivity and Key Vault access — used for readiness and deployment slot warm-up. Document this in the API contract and requirements.",
+      "status": "open"
     },
     {
-      "severity": "should_fix",
-      "category": "missing_failure_mode",
-      "title": "No branch strategy for 34 new files — all work assumed on main",
-      "description": "The plan creates 34 files and modifies 4 more but specifies no branch strategy. The repo has branch rulesets documented in docs/branch-ruleset-config.md. Creating 5 agents, 5 skills, 5 instructions, 18 prompts, and 5 docs directly on main risks: (1) breaking CI validation if incomplete files are pushed; (2) no review checkpoint before agents/skills are committed; (3) no ability to iterate on the toolchain without affecting the working main branch.",
-      "failure_scenario": "Developer creates 3 of 5 agents and pushes to main. The agent-validation CI workflow runs and fails because the Conductor now references agents 11-15 but only 11-13 exist. Main is broken. The backlog generation prompt references docs/prd.md which doesn't exist yet. CI blocks all other work until the full set of 34 files is complete.",
-      "artifact_section": "## Recommended Execution Sequence",
-      "suggested_mitigation": "Define a branch strategy: (1) Create a feature branch feature/app-dev-toolchain for Phase C (agents, skills, instructions); (2) Create feature/product-docs for Phase A; (3) Merge product docs first, then toolchain, then prompts; (4) Each merge must pass npm run validate before landing on main. Alternatively, define a single feature/execution-blueprint branch and merge only when all Phase A + C artifacts are complete and validated.",
-      "resolved": true,
-      "resolution": "Branch strategy section added with 3 feature branches (product-docs, app-dev-toolchain, prompts), merge gates, and merge order."
+      "id": "CF-008",
+      "severity": "low",
+      "category": "reliability",
+      "title": "Cosmos DB periodic backup retention (8 hours) is very short",
+      "description": "The requirements and architecture assessment both state the default periodic backup policy: 2 copies every 4 hours with 8-hour retention. This means only the last 2 backup points exist at any time. If data corruption is discovered more than 8 hours after it occurred, all backup copies may already contain the corrupted data. For a hackathon tool with relaxed RPO this is likely acceptable, but it should be an explicit decision rather than an unstated default.",
+      "recommendation": "Accept the 8-hour retention as a conscious decision for the dev environment and document it as an accepted risk in the ADR or requirements. For production, consider increasing retention to 24 hours (still free tier) by setting backupIntervalInMinutes: 240 and backupRetentionIntervalInHours: 24 in the Cosmos DB account configuration.",
+      "status": "open"
     },
     {
-      "severity": "should_fix",
-      "category": "missing_failure_mode",
-      "title": "API contract doc has no sync mechanism — will drift from generated code",
-      "description": "The plan creates docs/api-contract.md as the 'single source of truth for both the API Builder agent and frontend integration.' But once the API Builder generates actual route handlers across 5 prompts (app-02 through app-06), the implementation may diverge from the contract. There is no validator, no diffing tool, and no instruction requiring the API Builder to update the contract after changes. The infra workflow has artifact template validators — the app workflow has none.",
-      "failure_scenario": "API Builder generates POST /api/submissions with a response field submissionId. The contract doc says the field is id. Frontend Builder reads the contract and generates components using id. Integration fails at runtime. Nobody catches this because there's no contract-vs-code validator.",
-      "artifact_section": "### A2. API Contract Document",
-      "suggested_mitigation": "Option A (recommended): Generate the API contract as TypeScript types in packages/shared/types/api-contract.ts that are imported by BOTH route handlers and frontend code — type errors catch drift at compile time (Principle 10: mechanical enforcement). Option B: Add a validation script (validate-api-contract.mjs) to scripts/ that parses route handler files and compares against the contract doc. Option C: Add an instruction to api-routes.instructions.md requiring route handlers to import response types from a shared package. Option A is strongly recommended.",
-      "resolved": true,
-      "resolution": "Adopted Option A: A2 primary output is packages/shared/types/api-contract.ts. api-routes.instructions.md enforces import. tsc catches drift at compile time. Markdown reference is secondary."
-    },
-    {
-      "severity": "should_fix",
-      "category": "governance_gap",
-      "title": "hackops-domain skill called 'keystone' but has zero mechanical enforcement",
-      "description": "The plan calls hackops-domain the 'keystone skill that prevents agents from violating business rules' including immutable scores, gated challenges, SHA-256 event codes, primary admin protection, and audit trail requirements. But a skill is documentation — agents can ignore it. Golden Principle 10 states: 'If a rule can be a linter check, CI validation, or pre-commit hook, make it one. Documentation is for humans; machines enforce rules.' Several business invariants ARE mechanically enforceable.",
-      "failure_scenario": "The API Builder agent generates a score override endpoint without the required audit fields (reviewedBy, reviewedAt, reviewReason). The hackops-domain skill says audit is mandatory, but there's no validator to catch the violation. The code passes all existing CI checks and is deployed. Audit trail is incomplete for score overrides.",
-      "artifact_section": "### C3. New skills",
-      "suggested_mitigation": "Create validation alongside the skill: (1) Add a validate-business-rules.mjs script that statically checks API route handlers for: audit field presence in mutation endpoints, role guard imports in all protected routes, progression check in submission handlers; (2) Add this to the CI workflow and package.json scripts; (3) The skill documents the WHY, the validator enforces the WHAT. Even basic string presence checks (e.g., reviewedBy appears in reviewer endpoints) provide meaningful guardrails.",
-      "resolved": true,
-      "resolution": "C6 added: validate-business-rules.mjs with 5 specific static checks. Integrated into package.json and CI. hackops-domain skill references the validator."
-    },
-    {
-      "severity": "suggestion",
-      "category": "scope_risk",
-      "title": "Phase ordering A→C→B puts 25+ files before any backlog tracking",
-      "description": "The recommended execution sequence creates all Phase A docs (5 files) and all Phase C toolchain (15+ files: 5 agents, 5 skills, 5 instructions) before creating the backlog in Phase B. That's 20+ files created without any visible tracking in GitHub Issues. If Phase C takes multiple days, there's no progress visibility, no way to mark intermediate completion, and no checkpointing.",
-      "failure_scenario": "Developer completes Phase A (5 docs) and 3 of 5 agents in Phase C, then is interrupted for a week. There's no backlog to show what's done vs remaining. They return and can't remember which skills are complete, which instructions are registered, and which prompts reference which agents.",
-      "artifact_section": "## Recommended Execution Sequence",
-      "suggested_mitigation": "Create a 'bootstrap' issue set manually (5-10 issues) before starting Phase A. These track: 'Create PRD', 'Create API contract', 'Create data model', 'Create UI pages', 'Create env config', 'Create app-dev agents', 'Create app-dev skills', 'Create app-dev instructions', 'Register instructions', 'Update Conductor'. Minimal overhead (10 minutes) for meaningful progress tracking.",
-      "resolved": true,
-      "resolution": "B0 section added: 10-12 manual tracking issues created before Phase A work begins. Execution sequence reordered to start with B0."
-    },
-    {
-      "severity": "suggestion",
-      "category": "hidden_dependency",
-      "title": "Existing microsoft-docs and microsoft-code-reference skills not referenced by new agents",
-      "description": "The repo has two existing skills specifically for querying official Microsoft documentation: microsoft-docs (search learn.microsoft.com) and microsoft-code-reference (verify SDK code, find samples). None of the 5 new app-dev agents reference these skills. The API Builder will work with @azure/cosmos SDK, Easy Auth headers, and Key Vault references. The Frontend Builder will work with Next.js on Azure App Service. Both would benefit from Learn MCP lookups to verify patterns before generating code.",
-      "failure_scenario": "API Builder generates Cosmos DB client initialization using a pattern from the cosmos-db-sdk skill. The skill was written months ago. The @azure/cosmos SDK has been updated with breaking changes. The agent could have caught this by querying microsoft-code-reference, but it wasn't told to.",
-      "artifact_section": "### C1. New agents",
-      "suggested_mitigation": "Add 'Read .github/skills/microsoft-code-reference/SKILL.md for SDK verification' to the API Builder and Frontend Builder agent definitions. Add microsoft-docs to the App Scaffolder for verifying Next.js on App Service deployment patterns. These are existing skills that cost nothing to reference.",
-      "resolved": true,
-      "resolution": "C1 now includes skill references table mapping each new agent to relevant existing skills (microsoft-docs, microsoft-code-reference)."
-    },
-    {
-      "severity": "suggestion",
-      "category": "waf_blind_spot",
-      "title": "No effort/time estimate for the plan itself",
-      "description": "The plan sequences 34 files across 6 phases but provides no effort estimate. Phase A alone (writing a full PRD with 60-80 user stories) is substantial. Phase C (5 agents, 5 skills, 5 instructions with Learn MCP research) is also significant. Without estimates, the user cannot prioritize, cannot judge whether the plan is feasible for a solo dev, and cannot create meaningful milestone due dates for the backlog.",
-      "failure_scenario": "User expects the full plan to take 2 weeks. Phase A alone takes 2 weeks because 80 user stories with acceptance criteria is substantial work. Phases D-E take another month because each prompt requires running the full agent workflow. The project stalls because expectations weren't calibrated.",
-      "artifact_section": "## Artifact Inventory (34 new files)",
-      "suggested_mitigation": "Add rough T-shirt sizing per phase: Phase A (product docs): ~3-5 days if agent-assisted, ~2 weeks if manual. Phase B (backlog): ~1 day with the generation prompt. Phase C (toolchain): ~3-5 days including Learn MCP research. Phase D (infra): ~2-3 days per 7-step workflow run. Phase E (app build): ~1-2 days per prompt, ~2-3 weeks total. Phase F: ongoing. Total estimate: ~6-8 weeks for a solo dev with agent assistance.",
-      "resolved": true,
-      "resolution": "Effort estimates table added to Context section with T-shirt sizing per phase. Total: ~6-8 weeks."
-    },
-    {
-      "severity": "suggestion",
-      "category": "missing_failure_mode",
-      "title": "Phase D infra prompts don't address Azure connectivity failure mode",
-      "description": "The governance instructions mandate: 'If Azure connectivity fails or policies cannot be retrieved, STOP and inform the user.' Phase D assumes Azure connectivity for governance discovery (infra-04), what-if (infra-06), and deployment. The plan doesn't mention the failsafe or what happens if the developer hasn't configured Azure CLI credentials.",
-      "failure_scenario": "Developer runs infra-04-governance.prompt.md. The governance-discovery-subagent attempts REST API calls against Azure. The developer hasn't run 'az login' in the devcontainer. The subagent returns PARTIAL status. Per bicep-governance instructions, this is a hard gate — all subsequent infra phases are blocked.",
-      "artifact_section": "### D1. Infrastructure prompt sequence",
-      "suggested_mitigation": "Add a note to Phase D: 'Before running infra prompts, ensure Azure CLI is authenticated (az login). If Azure connectivity is unavailable, infra-04 through infra-07 are blocked. You can still run infra-01 through infra-03 (requirements, architecture, design) offline, and run bicep build/lint locally without Azure connectivity.' Add an explicit Azure auth prerequisite to infra-04-governance.prompt.md.",
-      "resolved": true,
-      "resolution": "Phase D now has Azure connectivity prerequisite callout specifying which prompts need connectivity (04-07) vs which can run offline (01-03)."
+      "id": "CF-009",
+      "severity": "low",
+      "category": "security",
+      "title": "Key Vault Private Endpoint increases complexity without proportional security gain for dev",
+      "description": "The requirements mandate Key Vault behind Private Endpoint. For Cosmos DB (data plane with user data), Private Endpoint is clearly justified. For Key Vault in a dev environment, the only consumer is App Service (via managed identity over VNet). Key Vault supports service endpoints and firewall rules that can restrict access to the VNet without requiring a full Private Endpoint + DNS zone. The Private Endpoint adds: a second PE resource, a second Private DNS zone (privatelink.vaultcore.azure.net), a second A-record, and DNS resolution complexity.",
+      "recommendation": "For dev, consider using Key Vault firewall rules (allow VNet subnet) instead of Private Endpoint to reduce complexity. For prod, keep Private Endpoint. Alternatively, accept the complexity and document why PE is used for both Cosmos DB and Key Vault consistently. Either way, make it an explicit decision rather than a blanket 'PE on everything' policy.",
+      "status": "open"
     }
-  ]
+  ],
+  "summary": {
+    "critical": 0,
+    "high": 1,
+    "medium": 5,
+    "low": 3,
+    "mustFix": ["CF-001"],
+    "shouldFixBeforeDeployment": ["CF-003", "CF-005"],
+    "wafCoverage": {
+      "security": "CF-006, CF-009 — credential rotation and PE complexity assessed",
+      "reliability": "CF-001, CF-004, CF-007, CF-008 — deployment slots, burst limits, health probes, backup retention",
+      "performance": "No issues found — architecture is appropriate for ~75 users",
+      "cost": "CF-002 — estimate inconsistency flagged",
+      "operations": "CF-003, CF-005 — alerting gap and deprecated setting"
+    }
+  }
 }

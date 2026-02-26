@@ -17,26 +17,26 @@
 <!-- When a step completes, close the corresponding issue with a comment. -->
 <!-- When an epic's subtasks all complete, close the epic. -->
 
-| Step                      | Issue | Status                  |
-| ------------------------- | ----- | ----------------------- |
-| Epic: Phase A             | #1    | Closed                  |
-| Epic: Phase C             | #2    | Closed                  |
-| A1: PRD                   | #3    | Closed                  |
-| A2: API contract          | #4    | Closed                  |
-| A3: Data model            | #5    | Closed                  |
-| A4: UI pages              | #6    | Closed                  |
-| A5: Env config            | #7    | Closed                  |
-| C1: App-dev agents        | #8    | Closed                  |
-| C3: App-dev skills        | #9    | Closed                  |
-| C4: App-dev instructions  | #10   | Closed                  |
-| C4: Register instructions | #11   | Closed                  |
-| C1: App-dev subagents     | #12   | Closed                  |
-| Epic: Phase B             | #21   | Closed                  |
-| B1: Label taxonomy        | #26   | Closed                  |
-| B2: Milestones            | #22   | Closed                  |
-| B3: generate-backlog      | #23   | Closed                  |
-| B4: backlog-triage        | #24   | Closed                  |
-| B5: Projects board docs   | #25   | Closed                  |
+| Step                      | Issue | Status |
+| ------------------------- | ----- | ------ |
+| Epic: Phase A             | #1    | Closed |
+| Epic: Phase C             | #2    | Closed |
+| A1: PRD                   | #3    | Closed |
+| A2: API contract          | #4    | Closed |
+| A3: Data model            | #5    | Closed |
+| A4: UI pages              | #6    | Closed |
+| A5: Env config            | #7    | Closed |
+| C1: App-dev agents        | #8    | Closed |
+| C3: App-dev skills        | #9    | Closed |
+| C4: App-dev instructions  | #10   | Closed |
+| C4: Register instructions | #11   | Closed |
+| C1: App-dev subagents     | #12   | Closed |
+| Epic: Phase B             | #21   | Closed |
+| B1: Label taxonomy        | #26   | Closed |
+| B2: Milestones            | #22   | Closed |
+| B3: generate-backlog      | #23   | Closed |
+| B4: backlog-triage        | #24   | Closed |
+| B5: Projects board docs   | #25   | Closed |
 
 ---
 
@@ -45,11 +45,12 @@
 <!-- Update this at the START of each session -->
 
 **Phase**: D — Infrastructure Execution
-**Step**: Run infra-challenge → review findings
+**Step**: Run infra-04 → governance discovery + implementation plan
 **Branch**: `feature/prompts`
-**Goal**: Run infra-challenge adversarial review of steps 01-03,
-then verify Azure connectivity (`az account show`) for infra-04
-through infra-07.
+**Goal**: Run infra-04 governance discovery against target
+subscription (`noalz`), then generate implementation plan.
+Azure connectivity verified. 9 challenge findings documented
+(0 critical, 1 high, 5 medium, 3 low).
 
 ---
 
@@ -148,8 +149,8 @@ through infra-07.
 - [x] Run infra-01 (offline) → `01-requirements.md`
 - [x] Run infra-02 (offline) → `02-architecture-assessment.md`
 - [x] Run infra-03 (offline) → `03-des-*.md/.py/.png`
-- [ ] Run infra-challenge → review findings
-- [ ] Verify Azure connectivity (`az account show`)
+- [x] Run infra-challenge → review findings
+- [x] Verify Azure connectivity (`az account show`)
 - [ ] Run infra-04 → `04-*.md/.json`
 - [ ] Run infra-05 → `infra/bicep/hackops/`
 - [ ] Run `bicep build infra/bicep/hackops/main.bicep`
@@ -299,7 +300,7 @@ through infra-07.
 |     |            |            | milestones); closed    | through infra-03   |          |
 |     |            |            | issues #22-#26 via     | (offline)          |          |
 |     |            |            | gh CLI                 |                    |          |
-| 13  | 2026-02-26 | B / final  | Confirmed backlog      | Run infra-          | None     |
+| 13  | 2026-02-26 | B / final  | Confirmed backlog      | Run infra-         | None     |
 |     |            | + D /      | already generated      | challenge, then    |          |
 |     |            | D2-D4      | (105 issues on board); | verify Azure       |          |
 |     |            |            | added Domain +         | connectivity for   |          |
@@ -310,6 +311,14 @@ through infra-07.
 |     |            |            | (architecture), 03     |                    |          |
 |     |            |            | (diagram + 3 ADRs);    |                    |          |
 |     |            |            | commit 8fa0c7b         |                    |          |
+| 14  | 2026-02-26 | D /        | Infra-challenge review | Run infra-04       | None     |
+|     |            | challenge  | of steps 01-03: 9      | governance         |          |
+|     |            |            | findings (0 critical,  | discovery against  |          |
+|     |            |            | 1 high, 5 medium,      | target sub, then   |          |
+|     |            |            | 3 low); verified Azure | infra-05 Bicep     |          |
+|     |            |            | connectivity (sub:     | generation         |          |
+|     |            |            | noalz); challenge-     |                    |          |
+|     |            |            | findings.json updated  |                    |          |
 
 ---
 
