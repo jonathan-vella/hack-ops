@@ -202,11 +202,24 @@ async function checkAgentTable() {
   );
 
   const agentDir = join(ROOT, ".github", "agents");
+  const allAgentFiles = (await readdir(agentDir, { withFileTypes: true }))
+    .filter((e) => e.isFile() && e.name.endsWith(".agent.md"))
+    .map((e) => e.name);
+  const allSubagentFiles = (
+    await readdir(join(agentDir, "_subagents"), { withFileTypes: true }).catch(
+      () => [],
+    )
+  )
+    .filter((e) => e.isFile && e.name && e.name.endsWith(".agent.md"))
+    .map((e) => e.name);
+
   for (const name of agentNames) {
-    // Check both as direct .agent.md and in _subagents/
-    const directPath = join(agentDir, `${name}.agent.md`);
-    const subPath = join(agentDir, "_subagents", `${name}.agent.md`);
-    if (!(await exists(directPath)) && !(await exists(subPath))) {
+    // Match direct, numbered-prefix (e.g. 02-requirements), and subagent variants
+    const matches = (files) =>
+      files.some(
+        (f) => f === `${name}.agent.md` || f.endsWith(`-${name}.agent.md`),
+      );
+    if (!matches(allAgentFiles) && !matches(allSubagentFiles)) {
       addFinding(
         "docs/README.md",
         0,

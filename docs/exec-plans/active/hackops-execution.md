@@ -17,20 +17,20 @@
 <!-- When a step completes, close the corresponding issue with a comment. -->
 <!-- When an epic's subtasks all complete, close the epic. -->
 
-| Step                      | Issue | Status          |
-| ------------------------- | ----- | --------------- |
-| Epic: Phase A             | #1    | Open (4/7 done) |
-| Epic: Phase C             | #2    | Open            |
-| A1: PRD                   | #3    | Closed          |
-| A2: API contract          | #4    | Closed          |
-| A3: Data model            | #5    | Closed          |
-| A4: UI pages              | #6    | Open            |
-| A5: Env config            | #7    | Open            |
-| C1: App-dev agents        | #8    | Open            |
-| C3: App-dev skills        | #9    | Open            |
-| C4: App-dev instructions  | #10   | Open            |
-| C4: Register instructions | #11   | Open            |
-| C1: App-dev subagents     | #12   | Open            |
+| Step                      | Issue | Status                        |
+| ------------------------- | ----- | ----------------------------- |
+| Epic: Phase A             | #1    | Open (6/7 done)               |
+| Epic: Phase C             | #2    | Open                          |
+| A1: PRD                   | #3    | Closed                        |
+| A2: API contract          | #4    | Closed                        |
+| A3: Data model            | #5    | Closed                        |
+| A4: UI pages              | #6    | Done (need GH_TOKEN to close) |
+| A5: Env config            | #7    | Done (need GH_TOKEN to close) |
+| C1: App-dev agents        | #8    | Open                          |
+| C3: App-dev skills        | #9    | Open                          |
+| C4: App-dev instructions  | #10   | Open                          |
+| C4: Register instructions | #11   | Open                          |
+| C1: App-dev subagents     | #12   | Open                          |
 
 ---
 
@@ -39,9 +39,9 @@
 <!-- Update this at the START of each session -->
 
 **Phase**: A — Product Documentation
-**Step**: A4 — Create `docs/ui-pages.md`
+**Step**: Merge `feature/product-docs` → main
 **Branch**: `feature/product-docs`
-**Goal**: Create UI page inventory with routes, roles, components, and data deps
+**Goal**: All Phase A docs complete — merge branch to main
 
 ---
 
@@ -66,8 +66,8 @@
 - [x] A2: Run API contract generator →
       `packages/shared/types/api-contract.ts` + `docs/api-contract.md`
 - [x] A3: Run data model generator → `docs/data-model.md`
-- [ ] A4: Create `docs/ui-pages.md`
-- [ ] A5: Create `docs/environment-config.md`
+- [x] A4: Create `docs/ui-pages.md`
+- [x] A5: Create `docs/environment-config.md`
 - [ ] Merge `feature/product-docs` → main
 
 ### Phase C — App-Dev Toolchain
@@ -227,6 +227,13 @@
 |     |            |            | 10 containers, TS     | inventory          |          |
 |     |            |            | interfaces, samples,  |                    |          |
 |     |            |            | query patterns        |                    |          |
+| 6   | 2026-02-26 | A / A4-A5  | Created ui-pages.md   | Merge branch,      | GH_TOKEN |
+|     |            |            | (10 pages, 11 shared  | close issues #6 #7 | not set  |
+|     |            |            | components) and       |                    |          |
+|     |            |            | environment-config.md |                    |          |
+|     |            |            | (Easy Auth contract,  |                    |          |
+|     |            |            | Key Vault refs,       |                    |          |
+|     |            |            | .env template)        |                    |          |
 
 ---
 

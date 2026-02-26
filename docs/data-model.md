@@ -28,18 +28,18 @@ automatically and NOT included in the TypeScript interfaces.
 
 ## Container Summary Table
 
-| Container      | Partition Key    | Purpose                 | Avg Doc Size | Query Pattern           |
-| -------------- | ---------------- | ----------------------- | ------------ | ----------------------- |
-| `hackathons`   | `/id`            | Event lifecycle         | ~0.5 KB      | Point read by ID        |
-| `teams`        | `/hackathonId`   | Team roster             | ~1 KB        | Fan-out by hackathon    |
-| `hackers`      | `/hackathonId`   | Hacker profiles         | ~0.3 KB      | Fan-out by hackathon    |
-| `scores`       | `/teamId`        | Approved scores         | ~0.5 KB      | Fan-out by team         |
-| `submissions`  | `/teamId`        | Staging queue           | ~2 KB        | Filter by state         |
-| `rubrics`      | `/id`            | Scoring rubrics         | ~3 KB        | Point read (pointer)    |
-| `config`       | `/id`            | App configuration       | ~0.2 KB      | Point read by key       |
-| `roles`        | `/hackathonId`   | Role assignments        | ~0.3 KB      | Fan-out by hackathon    |
-| `challenges`   | `/hackathonId`   | Challenge definitions   | ~1 KB        | Fan-out + sort by order |
-| `progression`  | `/teamId`        | Unlock state            | ~0.5 KB      | Point read by team      |
+| Container     | Partition Key  | Purpose               | Avg Doc Size | Query Pattern           |
+| ------------- | -------------- | --------------------- | ------------ | ----------------------- |
+| `hackathons`  | `/id`          | Event lifecycle       | ~0.5 KB      | Point read by ID        |
+| `teams`       | `/hackathonId` | Team roster           | ~1 KB        | Fan-out by hackathon    |
+| `hackers`     | `/hackathonId` | Hacker profiles       | ~0.3 KB      | Fan-out by hackathon    |
+| `scores`      | `/teamId`      | Approved scores       | ~0.5 KB      | Fan-out by team         |
+| `submissions` | `/teamId`      | Staging queue         | ~2 KB        | Filter by state         |
+| `rubrics`     | `/id`          | Scoring rubrics       | ~3 KB        | Point read (pointer)    |
+| `config`      | `/id`          | App configuration     | ~0.2 KB      | Point read by key       |
+| `roles`       | `/hackathonId` | Role assignments      | ~0.3 KB      | Fan-out by hackathon    |
+| `challenges`  | `/hackathonId` | Challenge definitions | ~1 KB        | Fan-out + sort by order |
+| `progression` | `/teamId`      | Unlock state          | ~0.5 KB      | Point read by team      |
 
 ---
 
@@ -286,9 +286,7 @@ interface Submission {
   "challengeId": "ch-001-setup",
   "state": "pending",
   "description": "## Environment Setup\n\nWe configured the Azure OpenAI endpoint and verified connectivity from our Next.js app.\n\n**Evidence**: Screenshot of successful API call and response time metrics.",
-  "attachments": [
-    "evidence/team-alpha-4821/ch-001/screenshot-api-call.png"
-  ],
+  "attachments": ["evidence/team-alpha-4821/ch-001/screenshot-api-call.png"],
   "submittedBy": "github|87654321",
   "submittedAt": "2026-02-21T11:45:00Z",
   "scores": null,
@@ -639,9 +637,9 @@ volume in HackOps.
 
 | Container     | Adjustment                                                        | Rationale                                                                                    |
 | ------------- | ----------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
-| `submissions` | Exclude `/description` and `/attachments/*`                       | Large Markdown text and attachment URLs are never queried by value; saves ~30% index storage  |
-| `rubrics`     | Exclude `/categories/*/description`                               | Markdown descriptions in rubric categories are read-only after creation; never filtered       |
-| `challenges`  | Exclude `/description`                                            | Markdown challenge descriptions are never queried by value                                    |
+| `submissions` | Exclude `/description` and `/attachments/*`                       | Large Markdown text and attachment URLs are never queried by value; saves ~30% index storage |
+| `rubrics`     | Exclude `/categories/*/description`                               | Markdown descriptions in rubric categories are read-only after creation; never filtered      |
+| `challenges`  | Exclude `/description`                                            | Markdown challenge descriptions are never queried by value                                   |
 | `scores`      | Composite index: `(hackathonId ASC, total DESC)`                  | Enables efficient sorted leaderboard query without in-memory sorting                         |
 | `submissions` | Composite index: `(hackathonId ASC, state ASC, submittedAt DESC)` | Efficient review queue with state filter and chronological ordering                          |
 
@@ -651,9 +649,7 @@ volume in HackOps.
 {
   "indexingMode": "consistent",
   "automatic": true,
-  "includedPaths": [
-    { "path": "/*" }
-  ],
+  "includedPaths": [{ "path": "/*" }],
   "excludedPaths": [
     { "path": "/description/?" },
     { "path": "/attachments/*" },
@@ -673,15 +669,15 @@ volume in HackOps.
 
 ## Key Invariants Encoded in the Schema
 
-| Invariant                    | Where Enforced                                   | Schema Detail                                                                                                     |
-| ---------------------------- | ------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------- |
-| **Staging pattern**          | `submissions.state`                              | Union type `"pending" \| "approved" \| "rejected"` — scores only copied to `scores` container on `approved`       |
-| **One active rubric**        | `rubrics` container                              | Pointer document (`_type: "rubric-pointer"`) + versioned documents (`_type: "rubric-version"`); atomic swap       |
-| **Rubric-driven scoring**    | `rubrics.categories`                             | All scoring UI and validation derived from `RubricCategory[]` — nothing hardcoded                                 |
-| **Team-scoped submissions**  | `submissions.teamId` (partition key)             | Hackers can only submit for their own team; cross-team attempts return 403                                        |
-| **Plaintext event codes**    | `hackers.eventCode`                              | Stored as plaintext string; security via rate limiting (5/min/IP) on join endpoint                                |
-| **Sequential gating**        | `challenges.order` + `progression`               | Challenge N+1 gated until N is approved; `unlockedChallenges[]` tracks unlock history                             |
-| **Audit trail**              | `submissions.reviewedBy/At/Reason`               | All reviewer actions carry `reviewedBy`, `reviewedAt`, `reviewReason` fields                                      |
-| **Primary admin protection** | `roles.isPrimaryAdmin`                           | Boolean flag prevents demotion; checked in role management API                                                    |
-| **Tiebreaker rule**          | `scores.approvedAt`                              | Earliest last-approval timestamp wins when total scores are equal                                                 |
-| **Team balance**             | `hackathons.teamSize`                            | `ceil(teamSize / 2)` minimum per team enforced at assignment time                                                 |
+| Invariant                    | Where Enforced                       | Schema Detail                                                                                               |
+| ---------------------------- | ------------------------------------ | ----------------------------------------------------------------------------------------------------------- |
+| **Staging pattern**          | `submissions.state`                  | Union type `"pending" \| "approved" \| "rejected"` — scores only copied to `scores` container on `approved` |
+| **One active rubric**        | `rubrics` container                  | Pointer document (`_type: "rubric-pointer"`) + versioned documents (`_type: "rubric-version"`); atomic swap |
+| **Rubric-driven scoring**    | `rubrics.categories`                 | All scoring UI and validation derived from `RubricCategory[]` — nothing hardcoded                           |
+| **Team-scoped submissions**  | `submissions.teamId` (partition key) | Hackers can only submit for their own team; cross-team attempts return 403                                  |
+| **Plaintext event codes**    | `hackers.eventCode`                  | Stored as plaintext string; security via rate limiting (5/min/IP) on join endpoint                          |
+| **Sequential gating**        | `challenges.order` + `progression`   | Challenge N+1 gated until N is approved; `unlockedChallenges[]` tracks unlock history                       |
+| **Audit trail**              | `submissions.reviewedBy/At/Reason`   | All reviewer actions carry `reviewedBy`, `reviewedAt`, `reviewReason` fields                                |
+| **Primary admin protection** | `roles.isPrimaryAdmin`               | Boolean flag prevents demotion; checked in role management API                                              |
+| **Tiebreaker rule**          | `scores.approvedAt`                  | Earliest last-approval timestamp wins when total scores are equal                                           |
+| **Team balance**             | `hackathons.teamSize`                | `ceil(teamSize / 2)` minimum per team enforced at assignment time                                           |
