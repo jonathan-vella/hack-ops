@@ -45,12 +45,11 @@
 <!-- Update this at the START of each session -->
 
 **Phase**: D — Infrastructure Execution
-**Step**: Run infra-05 → Bicep code generation
+**Step**: Run infra-06 → Deploy to rg-hackops-dev
 **Branch**: `feature/prompts`
-**Goal**: Generate Bicep templates in `infra/bicep/hackops/`
-following 04-implementation-plan.md. All governance
-constraints documented (9 tags, Cosmos RBAC-only, zero
-blocking Deny policies). Implementation plan approved.
+**Goal**: Deploy HackOps infrastructure using deploy.ps1.
+Run what-if analysis first, then deploy via Deployment
+Stacks. Verify PE connectivity and managed identity RBAC.
 
 ---
 
@@ -152,8 +151,8 @@ blocking Deny policies). Implementation plan approved.
 - [x] Run infra-challenge → review findings
 - [x] Verify Azure connectivity (`az account show`)
 - [x] Run infra-04 → `04-*.md/.json`
-- [ ] Run infra-05 → `infra/bicep/hackops/`
-- [ ] Run `bicep build infra/bicep/hackops/main.bicep`
+- [x] Run infra-05 → `infra/bicep/hackops/`
+- [x] Run `bicep build infra/bicep/hackops/main.bicep`
 - [ ] Run infra-06 → deployment to `rg-hackops-dev`
 - [ ] Run infra-07 → `07-*.md` documentation suite
 
@@ -327,6 +326,17 @@ blocking Deny policies). Implementation plan approved.
 |     |            |            | 0 blocking Deny        |                    |          |
 |     |            |            | policies; generated    |                    |          |
 |     |            |            | impl plan + 2 diagrams |                    |          |
+| 16  | 2026-02-26 | D / D5     | Generated 8 Bicep      | Run infra-06       | None     |
+|     |            |            | files: main.bicep,     | deploy to          |          |
+|     |            |            | main.bicepparam, 5     | rg-hackops-dev     |          |
+|     |            |            | modules (networking,   |                    |          |
+|     |            |            | monitoring, key-vault, |                    |          |
+|     |            |            | cosmos-db, app-svc),   |                    |          |
+|     |            |            | deploy.ps1; 8 AVM      |                    |          |
+|     |            |            | modules; bicep build   |                    |          |
+|     |            |            | + lint clean; created  |                    |          |
+|     |            |            | 05-implementation-     |                    |          |
+|     |            |            | reference.md           |                    |          |
 
 ---
 
