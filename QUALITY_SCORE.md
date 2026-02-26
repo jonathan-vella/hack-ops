@@ -2,14 +2,14 @@
 
 > Project health at a glance. Updated by the doc-gardening workflow and manual review.
 
-| Domain              | Grade | Gap Summary                                            | Next Action                                |
-| ------------------- | ----- | ------------------------------------------------------ | ------------------------------------------ |
-| **Agents**          | B+    | 9 agents + 8 subagents functional; 1 frontmatter warn  | Fix conductor 'agents' array format warn   |
-| **Skills**          | B+    | All 14 skills pass GA format validation                | Add progressive-loading to azure-defaults  |
-| **Instructions**    | A-    | 20 instructions; 0 errors, 7 info-level warnings       | Monitor for drift after next feature add   |
-| **Infrastructure**  | B-    | Bicep patterns cover common cases; no Terraform        | Expand hub-spoke pattern coverage          |
-| **Documentation**   | B+    | Freshness checker clean (0 issues); agent table fixed  | Verify lingering quickstart/glossary links |
-| **CI / Validation** | B+    | 14 validators; freshness checker false-positives fixed | Wire up entropy-check.yml                  |
+| Domain              | Grade | Gap Summary                                              | Next Action                              |
+| ------------------- | ----- | -------------------------------------------------------- | ---------------------------------------- |
+| **Agents**          | A-    | 15 agents + 11 subagents; 1 conductor frontmatter warn   | Fix conductor 'agents' array format warn |
+| **Skills**          | B+    | All 14 skills pass GA format; 5 more planned for Phase C | Create C3 skills (nextjs, cosmos, etc.)  |
+| **Instructions**    | A-    | 21 instructions; 0 errors, 7 info-level warnings         | Create C4 instructions (5 planned)       |
+| **Infrastructure**  | B-    | Bicep patterns cover common cases; no Terraform          | Phase D infra execution                  |
+| **Documentation**   | A-    | All counts updated; dead links resolved                  | Keep in sync after Phase C/D changes     |
+| **CI / Validation** | B+    | 14 validators; freshness checker functional              | Wire up entropy-check.yml                |
 
 ## Grading Scale
 
@@ -25,6 +25,9 @@
 
 | Date       | Domain        | Change                                                                                  |
 | ---------- | ------------- | --------------------------------------------------------------------------------------- |
+| 2026-02-26 | Agents        | Added 6 app-dev agents (11-16) + 3 subagents; grade B+→A-                          |
+| 2026-02-26 | Docs          | Updated README + AGENTS.md: counts 15+11, added app-dev agent tables                |
+| 2026-02-26 | Docs          | Resolved dead links (quickstart, workflow, glossary, troubleshooting, prompt-guide)  |
 | 2026-02-26 | Docs          | Fixed agent table: bicep-plan→bicep-planner, bicep-code→bicep-code-generator            |
 | 2026-02-26 | Instructions  | Added ❌ markers to prohibited-refs list (fixed 3 false-positives in freshness checker) |
 | 2026-02-26 | CI/Validation | Fixed check-docs-freshness.mjs agent table lookup to handle numbered-prefix filenames   |
