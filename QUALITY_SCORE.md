@@ -9,7 +9,7 @@
 | **Instructions**    | A-    | 21 instructions; 0 errors, 7 info-level warnings         | Create C4 instructions (5 planned)       |
 | **Infrastructure**  | B-    | Bicep patterns cover common cases; no Terraform          | Phase D infra execution                  |
 | **Documentation**   | A-    | All counts updated; dead links resolved                  | Keep in sync after Phase C/D changes     |
-| **CI / Validation** | B+    | 14 validators; freshness checker functional              | Wire up entropy-check.yml                |
+| **CI / Validation** | A-    | 14 validators; all pass; 06-template attribution fixed   | Wire up entropy-check.yml                |
 
 ## Grading Scale
 
@@ -25,6 +25,7 @@
 
 | Date       | Domain        | Change                                                                                  |
 | ---------- | ------------- | --------------------------------------------------------------------------------------- |
+| 2026-02-26 | CI/Validation | Fixed 06-deployment-summary.template.md missing attribution header; grade B+→A-         |
 | 2026-02-26 | Agents        | Added 6 app-dev agents (11-16) + 3 subagents; grade B+→A-                               |
 | 2026-02-26 | Docs          | Updated README + AGENTS.md: counts 15+11, added app-dev agent tables                    |
 | 2026-02-26 | Docs          | Resolved dead links (quickstart, workflow, glossary, troubleshooting, prompt-guide)     |

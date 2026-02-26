@@ -17,20 +17,26 @@
 <!-- When a step completes, close the corresponding issue with a comment. -->
 <!-- When an epic's subtasks all complete, close the epic. -->
 
-| Step                      | Issue | Status                               |
-| ------------------------- | ----- | ------------------------------------ |
-| Epic: Phase A             | #1    | Done (merge complete, need GH_TOKEN) |
-| Epic: Phase C             | #2    | Open                                 |
-| A1: PRD                   | #3    | Closed                               |
-| A2: API contract          | #4    | Closed                               |
-| A3: Data model            | #5    | Closed                               |
-| A4: UI pages              | #6    | Done (need GH_TOKEN to close)        |
-| A5: Env config            | #7    | Done (need GH_TOKEN to close)        |
-| C1: App-dev agents        | #8    | Open                                 |
-| C3: App-dev skills        | #9    | Open                                 |
-| C4: App-dev instructions  | #10   | Open                                 |
-| C4: Register instructions | #11   | Open                                 |
-| C1: App-dev subagents     | #12   | Open                                 |
+| Step                      | Issue | Status |
+| ------------------------- | ----- | ------ |
+| Epic: Phase A             | #1    | Closed |
+| Epic: Phase C             | #2    | Closed |
+| A1: PRD                   | #3    | Closed |
+| A2: API contract          | #4    | Closed |
+| A3: Data model            | #5    | Closed |
+| A4: UI pages              | #6    | Closed |
+| A5: Env config            | #7    | Closed |
+| C1: App-dev agents        | #8    | Closed |
+| C3: App-dev skills        | #9    | Closed |
+| C4: App-dev instructions  | #10   | Closed |
+| C4: Register instructions | #11   | Closed |
+| C1: App-dev subagents     | #12   | Closed |
+| Epic: Phase B             | #21   | Open   |
+| B1: Label taxonomy        | #26   | Done (file, needs GH sync) |
+| B2: Milestones            | #22   | Done (file, needs GH sync) |
+| B3: generate-backlog      | #23   | Done (file, needs GH sync) |
+| B4: backlog-triage        | #24   | Done (file, needs GH sync) |
+| B5: Projects board docs   | #25   | Done (file, needs GH sync) |
 
 ---
 
@@ -38,10 +44,11 @@
 
 <!-- Update this at the START of each session -->
 
-**Phase**: C — App-Dev Toolchain
-**Step**: C2 — Verify App Conductor workflow + C3 skills
-**Branch**: `feature/app-dev-toolchain`
-**Goal**: Verify C2 workflow table, then create C3 skills
+**Phase**: B — Backlog Scaffold
+**Step**: Run label/milestone scripts + backlog generation
+**Branch**: `feature/prompts`
+**Goal**: Execute setup scripts (requires GH_TOKEN), then run
+generate-backlog prompt to create issues
 
 ---
 
@@ -85,37 +92,40 @@
 - [x] C1: Create `app-review-subagent.agent.md`
 - [x] C1: Create `app-test-subagent.agent.md`
 - [x] C2: Verify App Conductor workflow table matches blueprint
-- [ ] C3: Run microsoft-skill-creator for `nextjs-patterns`
-- [ ] C3: Run microsoft-skill-creator for `cosmos-db-sdk`
-- [ ] C3: Run microsoft-skill-creator for `shadcn-ui-patterns`
-- [ ] C3: Run microsoft-skill-creator for `zod-validation`
-- [ ] C3: Hand-write `hackops-domain` skill
-- [ ] C4: Create `typescript.instructions.md`
-- [ ] C4: Create `nextjs.instructions.md`
-- [ ] C4: Create `react-components.instructions.md`
-- [ ] C4: Create `testing.instructions.md`
-- [ ] C4: Create `api-routes.instructions.md`
-- [ ] C4: Register instructions in devcontainer.json
-- [ ] C4: Run `npm run lint:instruction-frontmatter`
-- [ ] C4: Run `npm run validate:instruction-refs`
-- [ ] C5: Create `app-feature.yml` issue template
-- [ ] C5: Create `app-bug.yml` issue template
-- [ ] C6: Create `scripts/validate-business-rules.mjs`
-- [ ] C6: Register in `package.json` scripts
-- [ ] Run `npm run validate` — full suite passes
-- [ ] Merge `feature/app-dev-toolchain` → main
+- [x] C3: Run microsoft-skill-creator for `nextjs-patterns`
+- [x] C3: Run microsoft-skill-creator for `cosmos-db-sdk`
+- [x] C3: Run microsoft-skill-creator for `shadcn-ui-patterns`
+- [x] C3: Run microsoft-skill-creator for `zod-validation`
+- [x] C3: Hand-write `hackops-domain` skill
+- [x] C4: Create `typescript.instructions.md`
+- [x] C4: Create `nextjs.instructions.md`
+- [x] C4: Create `react-components.instructions.md`
+- [x] C4: Create `testing.instructions.md`
+- [x] C4: Create `api-routes.instructions.md`
+- [x] C4: Register instructions in devcontainer.json
+- [x] C4: Run `npm run lint:instruction-frontmatter`
+- [x] C4: Run `npm run validate:instruction-refs`
+- [x] C5: Create `app-feature.yml` issue template
+- [x] C5: Create `app-bug.yml` issue template
+- [x] C6: Create `scripts/validate-business-rules.mjs`
+- [x] C6: Register in `package.json` scripts
+- [x] Run `npm run validate` — full suite passes
+- [x] Merge `feature/app-dev-toolchain` → main (PR #20)
 
 ### Phase B — Backlog Scaffold
 
 **Branch**: `feature/prompts`
 **Merge gate**: `npm run lint:md` passes
+**Epic**: #21
 
-- [ ] B1: Create label taxonomy
-- [ ] B2: Create milestones
-- [ ] B3: Create `generate-backlog.prompt.md`
-- [ ] B4: Create `backlog-triage.prompt.md`
-- [ ] B5: Document Projects board setup in
-      `docs/exec-plans/backlog-setup.md`
+- [x] B1: Create label taxonomy — `scripts/setup-labels.sh` (#26)
+- [x] B2: Create milestones — `scripts/setup-milestones.sh` (#22)
+- [x] B3: Create `generate-backlog.prompt.md` (#23)
+- [x] B4: Create `backlog-triage.prompt.md` (#24)
+- [x] B5: Document Projects board setup in
+      `docs/exec-plans/backlog-setup.md` (#25)
+- [ ] Run `scripts/setup-labels.sh` (requires GH_TOKEN)
+- [ ] Run `scripts/setup-milestones.sh` (requires GH_TOKEN)
 - [ ] Run backlog generation prompt → verify issues created
 
 ### Phase D — Infrastructure Execution
@@ -241,6 +251,35 @@
 |     |            |            | 3 subagents; added    |                    | #7 need  |
 |     |            |            | App Conductor handoff |                    | closing) |
 |     |            |            | to 01-Conductor       |                    |          |
+| 8   | 2026-02-26 | C / C3-C6  | Created 5 skills      | Merge branch →     | GH_TOKEN |
+|     |            |            | (nextjs-patterns,     | main, then start   | not set  |
+|     |            |            | cosmos-db-sdk,        | Phase B            | (issues  |
+|     |            |            | shadcn-ui-patterns,   |                    | #8-#12   |
+|     |            |            | zod-validation,       |                    | need     |
+|     |            |            | hackops-domain);      |                    | closing) |
+|     |            |            | 5 instructions;       |                    |          |
+|     |            |            | 2 issue templates;    |                    |          |
+|     |            |            | business rules        |                    |          |
+|     |            |            | validator;            |                    |          |
+|     |            |            | validate:all passes   |                    |          |
+| 9   | 2026-02-26 | C / merge  | PR #20 created and    | Phase B: B1 label  | None     |
+|     |            | + B / init | merged to main;       | taxonomy, B2       |          |
+|     |            |            | closed issues #1, #2, | milestones, B3-B4  |          |
+|     |            |            | #6-#12 via MCP;       | prompt files       |          |
+|     |            |            | created branch        |                    |          |
+|     |            |            | feature/prompts;      |                    |          |
+|     |            |            | created Epic #21 +    |                    |          |
+|     |            |            | issues #22-#26 for    |                    |          |
+|     |            |            | Phase B               |                    |          |
+| 10  | 2026-02-26 | B / B1-B5  | Created label script  | Run setup scripts  | GH_TOKEN |
+|     |            |            | (setup-labels.sh),    | + backlog prompt   | not set  |
+|     |            |            | milestone script      | (needs GH auth),   | (issues  |
+|     |            |            | (setup-milestones.sh),| then Phase D       | #22-#26  |
+|     |            |            | generate-backlog      | prompts            | need     |
+|     |            |            | prompt, backlog-triage|                    | closing) |
+|     |            |            | prompt, and backlog   |                    |          |
+|     |            |            | setup docs; lint:md   |                    |          |
+|     |            |            | passes                |                    |          |
 
 ---
 
@@ -285,4 +324,6 @@ have enough context for the current step.
 | 2026-02-25 | Unlimited evidence resubmissions allowed                   | Scores only entered by Coach on review; no reason to limit    |
 | 2026-02-25 | Team balance: `ceil(teamSize/2)` minimum per team          | Prevents runt teams of 1; balanced distribution is fairer     |
 | 2026-02-25 | Coach review queue is hackathon-scoped                     | Coaches should only see submissions for their assigned events |
-| 2026-02-25 | Moved 10-Challenger to infra-challenger-subagent           | Adversarial review is invoked by parent agents, not directly  |
+| 2026-02-26 | Moved 10-Challenger to infra-challenger-subagent           | Adversarial review is invoked by parent agents, not directly  |
+| 2026-02-26 | C3 skills created manually (no Learn MCP tools available)  | Skills include Learn MCP search queries for future freshness  |
+| 2026-02-26 | Instructions auto-discovered (no devcontainer.json change) | `.github/instructions/*.instructions.md` auto-apply by glob   |
