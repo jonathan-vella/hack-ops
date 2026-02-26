@@ -45,12 +45,12 @@
 <!-- Update this at the START of each session -->
 
 **Phase**: D — Infrastructure Execution
-**Step**: Run infra-04 → governance discovery + implementation plan
+**Step**: Run infra-05 → Bicep code generation
 **Branch**: `feature/prompts`
-**Goal**: Run infra-04 governance discovery against target
-subscription (`noalz`), then generate implementation plan.
-Azure connectivity verified. 9 challenge findings documented
-(0 critical, 1 high, 5 medium, 3 low).
+**Goal**: Generate Bicep templates in `infra/bicep/hackops/`
+following 04-implementation-plan.md. All governance
+constraints documented (9 tags, Cosmos RBAC-only, zero
+blocking Deny policies). Implementation plan approved.
 
 ---
 
@@ -151,7 +151,7 @@ Azure connectivity verified. 9 challenge findings documented
 - [x] Run infra-03 (offline) → `03-des-*.md/.py/.png`
 - [x] Run infra-challenge → review findings
 - [x] Verify Azure connectivity (`az account show`)
-- [ ] Run infra-04 → `04-*.md/.json`
+- [x] Run infra-04 → `04-*.md/.json`
 - [ ] Run infra-05 → `infra/bicep/hackops/`
 - [ ] Run `bicep build infra/bicep/hackops/main.bicep`
 - [ ] Run infra-06 → deployment to `rg-hackops-dev`
@@ -319,6 +319,14 @@ Azure connectivity verified. 9 challenge findings documented
 |     |            |            | connectivity (sub:     | generation         |          |
 |     |            |            | noalz); challenge-     |                    |          |
 |     |            |            | findings.json updated  |                    |          |
+| 15  | 2026-02-26 | D / D4     | Governance discovery   | Run infra-05       | None     |
+|     |            |            | via REST API: 21       | Bicep code gen     |          |
+|     |            |            | policies, 9 mandatory  |                    |          |
+|     |            |            | tags (RG Deny), Cosmos |                    |          |
+|     |            |            | RBAC-only (Modify),    |                    |          |
+|     |            |            | 0 blocking Deny        |                    |          |
+|     |            |            | policies; generated    |                    |          |
+|     |            |            | impl plan + 2 diagrams |                    |          |
 
 ---
 
@@ -366,3 +374,6 @@ have enough context for the current step.
 | 2026-02-26 | Moved 10-Challenger to infra-challenger-subagent           | Adversarial review is invoked by parent agents, not directly  |
 | 2026-02-26 | C3 skills created manually (no Learn MCP tools available)  | Skills include Learn MCP search queries for future freshness  |
 | 2026-02-26 | Instructions auto-discovered (no devcontainer.json change) | `.github/instructions/*.instructions.md` auto-apply by glob   |
+| 2026-02-26 | 9 tags required on RG (not 4 baseline) — lowercase keys    | Deny policy JV-Enforce RG Tags v3 requires 9 tags             |
+| 2026-02-26 | Cosmos DB uses Entra ID RBAC only (no connection strings)  | Modify policy auto-disables local auth; comply rather than exempt |
+| 2026-02-26 | Tag keys use lowercase (not PascalCase from azure-defaults)| Policy checks `tags['environment']`, not `tags['Environment']` |
