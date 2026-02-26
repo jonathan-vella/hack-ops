@@ -1,0 +1,77 @@
+name: App Feature Request
+description: Request a new feature or enhancement for the HackOps web application
+title: "[App Feature]: "
+labels: ["app", "enhancement"]
+assignees: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Feature Request
+
+        Describe a new feature or enhancement for the HackOps Next.js application.
+
+  - type: dropdown
+    id: domain
+    attributes:
+      label: Feature Domain
+      description: Which part of the application does this affect?
+      options:
+        - Authentication & Roles
+        - Hackathon Lifecycle
+        - Team Management
+        - Hacker Onboarding
+        - Scoring Engine
+        - Leaderboard
+        - Challenge Progression
+        - Admin Operations
+        - UI/UX Components
+        - CI/CD & Deployment
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Feature Description
+      description: Clearly describe the feature and its expected behavior
+      placeholder: "As a [role], I want [feature] so that [benefit]..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: acceptance-criteria
+    attributes:
+      label: Acceptance Criteria
+      description: How will we know this feature is complete?
+      placeholder: |
+        - Given [context], when [action], then [expected result]
+        - ...
+    validations:
+      required: true
+
+  - type: dropdown
+    id: agent
+    attributes:
+      label: Target Agent
+      description: Which agent should implement this feature?
+      options:
+        - 11-App Scaffolder
+        - 12-API Builder
+        - 13-Frontend Builder
+        - 14-Test Writer
+        - 15-App Deployer
+        - 16-App Conductor
+        - Not sure
+    validations:
+      required: false
+
+  - type: textarea
+    id: prd-reference
+    attributes:
+      label: PRD Reference
+      description: Link to relevant user story or PRD section (if applicable)
+      placeholder: "US-001, US-015, etc."
+    validations:
+      required: false

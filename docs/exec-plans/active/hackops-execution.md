@@ -20,17 +20,17 @@
 | Step                      | Issue | Status                               |
 | ------------------------- | ----- | ------------------------------------ |
 | Epic: Phase A             | #1    | Done (merge complete, need GH_TOKEN) |
-| Epic: Phase C             | #2    | Open                                 |
+| Epic: Phase C             | #2    | Done (need GH_TOKEN to close)        |
 | A1: PRD                   | #3    | Closed                               |
 | A2: API contract          | #4    | Closed                               |
 | A3: Data model            | #5    | Closed                               |
 | A4: UI pages              | #6    | Done (need GH_TOKEN to close)        |
 | A5: Env config            | #7    | Done (need GH_TOKEN to close)        |
-| C1: App-dev agents        | #8    | Open                                 |
-| C3: App-dev skills        | #9    | Open                                 |
-| C4: App-dev instructions  | #10   | Open                                 |
-| C4: Register instructions | #11   | Open                                 |
-| C1: App-dev subagents     | #12   | Open                                 |
+| C1: App-dev agents        | #8    | Done (need GH_TOKEN to close)        |
+| C3: App-dev skills        | #9    | Done (need GH_TOKEN to close)        |
+| C4: App-dev instructions  | #10   | Done (need GH_TOKEN to close)        |
+| C4: Register instructions | #11   | Done (need GH_TOKEN to close)        |
+| C1: App-dev subagents     | #12   | Done (need GH_TOKEN to close)        |
 
 ---
 
@@ -39,9 +39,9 @@
 <!-- Update this at the START of each session -->
 
 **Phase**: C — App-Dev Toolchain
-**Step**: C2 — Verify App Conductor workflow + C3 skills
+**Step**: Merge `feature/app-dev-toolchain` → main
 **Branch**: `feature/app-dev-toolchain`
-**Goal**: Verify C2 workflow table, then create C3 skills
+**Goal**: Merge Phase C branch after all validations pass
 
 ---
 
@@ -85,24 +85,24 @@
 - [x] C1: Create `app-review-subagent.agent.md`
 - [x] C1: Create `app-test-subagent.agent.md`
 - [x] C2: Verify App Conductor workflow table matches blueprint
-- [ ] C3: Run microsoft-skill-creator for `nextjs-patterns`
-- [ ] C3: Run microsoft-skill-creator for `cosmos-db-sdk`
-- [ ] C3: Run microsoft-skill-creator for `shadcn-ui-patterns`
-- [ ] C3: Run microsoft-skill-creator for `zod-validation`
-- [ ] C3: Hand-write `hackops-domain` skill
-- [ ] C4: Create `typescript.instructions.md`
-- [ ] C4: Create `nextjs.instructions.md`
-- [ ] C4: Create `react-components.instructions.md`
-- [ ] C4: Create `testing.instructions.md`
-- [ ] C4: Create `api-routes.instructions.md`
-- [ ] C4: Register instructions in devcontainer.json
-- [ ] C4: Run `npm run lint:instruction-frontmatter`
-- [ ] C4: Run `npm run validate:instruction-refs`
-- [ ] C5: Create `app-feature.yml` issue template
-- [ ] C5: Create `app-bug.yml` issue template
-- [ ] C6: Create `scripts/validate-business-rules.mjs`
-- [ ] C6: Register in `package.json` scripts
-- [ ] Run `npm run validate` — full suite passes
+- [x] C3: Run microsoft-skill-creator for `nextjs-patterns`
+- [x] C3: Run microsoft-skill-creator for `cosmos-db-sdk`
+- [x] C3: Run microsoft-skill-creator for `shadcn-ui-patterns`
+- [x] C3: Run microsoft-skill-creator for `zod-validation`
+- [x] C3: Hand-write `hackops-domain` skill
+- [x] C4: Create `typescript.instructions.md`
+- [x] C4: Create `nextjs.instructions.md`
+- [x] C4: Create `react-components.instructions.md`
+- [x] C4: Create `testing.instructions.md`
+- [x] C4: Create `api-routes.instructions.md`
+- [x] C4: Register instructions in devcontainer.json
+- [x] C4: Run `npm run lint:instruction-frontmatter`
+- [x] C4: Run `npm run validate:instruction-refs`
+- [x] C5: Create `app-feature.yml` issue template
+- [x] C5: Create `app-bug.yml` issue template
+- [x] C6: Create `scripts/validate-business-rules.mjs`
+- [x] C6: Register in `package.json` scripts
+- [x] Run `npm run validate` — full suite passes
 - [ ] Merge `feature/app-dev-toolchain` → main
 
 ### Phase B — Backlog Scaffold
@@ -241,6 +241,17 @@
 |     |            |            | 3 subagents; added    |                    | #7 need  |
 |     |            |            | App Conductor handoff |                    | closing) |
 |     |            |            | to 01-Conductor       |                    |          |
+| 8   | 2026-02-26 | C / C3-C6  | Created 5 skills      | Merge branch →     | GH_TOKEN |
+|     |            |            | (nextjs-patterns,     | main, then start   | not set  |
+|     |            |            | cosmos-db-sdk,        | Phase B            | (issues  |
+|     |            |            | shadcn-ui-patterns,   |                    | #8-#12   |
+|     |            |            | zod-validation,       |                    | need     |
+|     |            |            | hackops-domain);      |                    | closing) |
+|     |            |            | 5 instructions;       |                    |          |
+|     |            |            | 2 issue templates;    |                    |          |
+|     |            |            | business rules        |                    |          |
+|     |            |            | validator;            |                    |          |
+|     |            |            | validate:all passes   |                    |          |
 
 ---
 
@@ -286,3 +297,5 @@ have enough context for the current step.
 | 2026-02-25 | Team balance: `ceil(teamSize/2)` minimum per team          | Prevents runt teams of 1; balanced distribution is fairer     |
 | 2026-02-25 | Coach review queue is hackathon-scoped                     | Coaches should only see submissions for their assigned events |
 | 2026-02-25 | Moved 10-Challenger to infra-challenger-subagent           | Adversarial review is invoked by parent agents, not directly  |
+| 2026-02-26 | C3 skills created manually (no Learn MCP tools available)  | Skills include Learn MCP search queries for future freshness  |
+| 2026-02-26 | Instructions auto-discovered (no devcontainer.json change) | `.github/instructions/*.instructions.md` auto-apply by glob  |

@@ -1,0 +1,82 @@
+name: App Bug Report
+description: Report a bug in the HackOps web application
+title: "[App Bug]: "
+labels: ["app", "bug"]
+assignees: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Bug Report
+
+        Found an issue with the HackOps Next.js application? Report it here.
+
+  - type: dropdown
+    id: domain
+    attributes:
+      label: Affected Area
+      description: Which part of the application is affected?
+      options:
+        - API Routes (app/api/)
+        - Authentication & Middleware
+        - Frontend Pages
+        - UI Components
+        - Cosmos DB Data Layer
+        - Business Logic (scoring, gating, teams)
+        - CI/CD Workflows
+        - Type Errors
+        - Other
+    validations:
+      required: true
+
+  - type: input
+    id: file-path
+    attributes:
+      label: Affected File(s)
+      description: Path to the affected file(s)
+      placeholder: "apps/web/src/app/api/hackathons/route.ts"
+    validations:
+      required: false
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Bug Description
+      description: Describe what happened and what you expected
+      placeholder: |
+        **What happened**: ...
+        **What I expected**: ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to Reproduce
+      description: How can we reproduce this issue?
+      placeholder: |
+        1. Call `POST /api/hackathons` with body `{...}`
+        2. Observe the response...
+    validations:
+      required: true
+
+  - type: dropdown
+    id: severity
+    attributes:
+      label: Severity
+      options:
+        - Critical (data loss, security, auth bypass)
+        - High (feature broken, incorrect business logic)
+        - Medium (degraded experience, workaround exists)
+        - Low (cosmetic, minor inconvenience)
+    validations:
+      required: true
+
+  - type: textarea
+    id: error-output
+    attributes:
+      label: Error Output
+      description: Paste any error messages, stack traces, or logs
+      render: shell
+    validations:
+      required: false
