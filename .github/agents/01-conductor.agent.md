@@ -14,6 +14,7 @@ agents:
     "07-Deploy",
     "08-As-Built",
     "09-Diagnose",
+    "16-App Conductor",
   ]
 tools:
   [
@@ -163,6 +164,10 @@ handoffs:
     agent: 09-Diagnose
     prompt: "Troubleshoot issues with the current workflow or Azure resources."
     send: false
+  - label: "🚀 App Build Workflow"
+    agent: 16-App Conductor
+    prompt: "Begin or resume the application build workflow. Infrastructure deployment is complete — hand off to the App Conductor for agents 11-15."
+    send: true
 ---
 
 # InfraOps Conductor Agent

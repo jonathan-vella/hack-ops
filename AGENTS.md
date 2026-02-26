@@ -32,6 +32,17 @@ All outputs → `agent-output/{project}/`.
 | 08-As-Built      | Post-deployment documentation suite                 |
 | 09-Diagnose      | Resource health assessment and troubleshooting      |
 
+### App-Dev Agents
+
+| Agent               | Purpose                                              |
+| ------------------- | ---------------------------------------------------- |
+| 11-App Scaffolder   | Turborepo + Next.js 15 monorepo scaffold             |
+| 12-API Builder      | API route handlers with Zod, role guards, audit logs |
+| 13-Frontend Builder | Pages, layouts, shadcn/ui components                 |
+| 14-Test Writer      | Unit tests (Vitest), integration tests, E2E stubs    |
+| 15-App Deployer     | CI/CD workflows, App Service deployment              |
+| 16-App Conductor    | Orchestrates app-dev workflow (agents 11-15)         |
+
 Agent definitions: `.github/agents/*.agent.md`
 
 ### Adversarial Subagents
@@ -51,6 +62,14 @@ Agent definitions: `.github/agents/*.agent.md`
 | bicep-lint-subagent           | Bicep Code   | `bicep build` + `bicep lint`    |
 | bicep-review-subagent         | Bicep Code   | AVM/security/naming code review |
 | bicep-whatif-subagent         | Deploy       | `az deployment group what-if`   |
+
+### App-Dev Subagents
+
+| Subagent            | Parent Agent                  | Purpose                            |
+| ------------------- | ----------------------------- | ---------------------------------- |
+| app-lint-subagent   | API Builder, Frontend Builder | `tsc --noEmit` + ESLint validation |
+| app-review-subagent | API Builder, Frontend Builder | Code review against instructions   |
+| app-test-subagent   | Test Writer                   | `npm test` + coverage reporting    |
 
 Subagent definitions: `.github/agents/_subagents/`
 

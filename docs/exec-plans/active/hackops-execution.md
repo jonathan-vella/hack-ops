@@ -17,20 +17,20 @@
 <!-- When a step completes, close the corresponding issue with a comment. -->
 <!-- When an epic's subtasks all complete, close the epic. -->
 
-| Step                      | Issue | Status                        |
-| ------------------------- | ----- | ----------------------------- |
-| Epic: Phase A             | #1    | Done (need GH_TOKEN to close) |
-| Epic: Phase C             | #2    | Open                          |
-| A1: PRD                   | #3    | Closed                        |
-| A2: API contract          | #4    | Closed                        |
-| A3: Data model            | #5    | Closed                        |
-| A4: UI pages              | #6    | Done (need GH_TOKEN to close) |
-| A5: Env config            | #7    | Done (need GH_TOKEN to close) |
-| C1: App-dev agents        | #8    | Open                          |
-| C3: App-dev skills        | #9    | Open                          |
-| C4: App-dev instructions  | #10   | Open                          |
-| C4: Register instructions | #11   | Open                          |
-| C1: App-dev subagents     | #12   | Open                          |
+| Step                      | Issue | Status                               |
+| ------------------------- | ----- | ------------------------------------ |
+| Epic: Phase A             | #1    | Done (merge complete, need GH_TOKEN) |
+| Epic: Phase C             | #2    | Open                                 |
+| A1: PRD                   | #3    | Closed                               |
+| A2: API contract          | #4    | Closed                               |
+| A3: Data model            | #5    | Closed                               |
+| A4: UI pages              | #6    | Done (need GH_TOKEN to close)        |
+| A5: Env config            | #7    | Done (need GH_TOKEN to close)        |
+| C1: App-dev agents        | #8    | Open                                 |
+| C3: App-dev skills        | #9    | Open                                 |
+| C4: App-dev instructions  | #10   | Open                                 |
+| C4: Register instructions | #11   | Open                                 |
+| C1: App-dev subagents     | #12   | Open                                 |
 
 ---
 
@@ -39,9 +39,9 @@
 <!-- Update this at the START of each session -->
 
 **Phase**: C — App-Dev Toolchain
-**Step**: C1 — Create agent definitions
+**Step**: C2 — Verify App Conductor workflow + C3 skills
 **Branch**: `feature/app-dev-toolchain`
-**Goal**: Start Phase C toolchain creation
+**Goal**: Verify C2 workflow table, then create C3 skills
 
 ---
 
@@ -75,16 +75,16 @@
 **Branch**: `feature/app-dev-toolchain`
 **Merge gate**: `npm run validate` passes
 
-- [ ] C1: Create `11-app-scaffolder.agent.md`
-- [ ] C1: Create `12-api-builder.agent.md`
-- [ ] C1: Create `13-frontend-builder.agent.md`
-- [ ] C1: Create `14-test-writer.agent.md`
-- [ ] C1: Create `15-app-deployer.agent.md`
-- [ ] C1: Create `16-app-conductor.agent.md`
-- [ ] C1: Create `app-lint-subagent.agent.md`
-- [ ] C1: Create `app-review-subagent.agent.md`
-- [ ] C1: Create `app-test-subagent.agent.md`
-- [ ] C2: Verify App Conductor workflow table matches blueprint
+- [x] C1: Create `11-app-scaffolder.agent.md`
+- [x] C1: Create `12-api-builder.agent.md`
+- [x] C1: Create `13-frontend-builder.agent.md`
+- [x] C1: Create `14-test-writer.agent.md`
+- [x] C1: Create `15-app-deployer.agent.md`
+- [x] C1: Create `16-app-conductor.agent.md`
+- [x] C1: Create `app-lint-subagent.agent.md`
+- [x] C1: Create `app-review-subagent.agent.md`
+- [x] C1: Create `app-test-subagent.agent.md`
+- [x] C2: Verify App Conductor workflow table matches blueprint
 - [ ] C3: Run microsoft-skill-creator for `nextjs-patterns`
 - [ ] C3: Run microsoft-skill-creator for `cosmos-db-sdk`
 - [ ] C3: Run microsoft-skill-creator for `shadcn-ui-patterns`
@@ -234,6 +234,13 @@
 |     |            |            | (Easy Auth contract,  |                    |          |
 |     |            |            | Key Vault refs,       |                    |          |
 |     |            |            | .env template)        |                    |          |
+| 7   | 2026-02-26 | A / merge  | Merged                | Phase C: C1 agent  | GH_TOKEN |
+|     |            | + C / C1   | feature/product-docs  | definitions        | not set  |
+|     |            |            | to main; created 6    |                    | (issues  |
+|     |            |            | top-level agents +    |                    | #1,#5,#6 |
+|     |            |            | 3 subagents; added    |                    | #7 need  |
+|     |            |            | App Conductor handoff |                    | closing) |
+|     |            |            | to 01-Conductor       |                    |          |
 
 ---
 

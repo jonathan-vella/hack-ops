@@ -19,19 +19,19 @@ See the [conductor agent](../.github/agents/01-conductor.agent.md) for orchestra
 
 ## Quick Links
 
-| Resource                                     | Description                   |
-| -------------------------------------------- | ----------------------------- |
-| [HackOps User Guide](hackops-user-guide.md)  | Step-by-step runbook          |
-| [PRD](prd.md)                                | Product Requirements Document |
-| [API Contract](api-contract.md)              | 26-endpoint REST API spec     |
-| [Data Model](data-model.md)                  | Cosmos DB containers & schema |
-| [UI Pages](ui-pages.md)                      | Page inventory & route map    |
-| [Environment Config](environment-config.md)  | Env vars & Key Vault refs     |
-| [Dev Containers](dev-containers.md)          | Docker setup and alternatives |
+| Resource                                    | Description                   |
+| ------------------------------------------- | ----------------------------- |
+| [HackOps User Guide](hackops-user-guide.md) | Step-by-step runbook          |
+| [PRD](prd.md)                               | Product Requirements Document |
+| [API Contract](api-contract.md)             | 26-endpoint REST API spec     |
+| [Data Model](data-model.md)                 | Cosmos DB containers & schema |
+| [UI Pages](ui-pages.md)                     | Page inventory & route map    |
+| [Environment Config](environment-config.md) | Env vars & Key Vault refs     |
+| [Dev Containers](dev-containers.md)         | Docker setup and alternatives |
 
 ---
 
-## Agents (9 + 8 Subagents)
+## Agents (15 + 11 Subagents)
 
 Agents are interactive AI assistants for specific workflow phases. Invoke via `Ctrl+Shift+A`.
 See `AGENTS.md` at the repo root for the lightweight map.
@@ -55,6 +55,17 @@ See `AGENTS.md` at the repo root for the lightweight map.
 | `as-built`             | 📝 Chronicler | 7     | Post-deployment documentation      |
 | `diagnose`             | 🔍 Sentinel   | —     | Post-deployment diagnostics        |
 
+### App-Dev Agents (User-Invokable)
+
+| Agent              | Persona       | Step | Purpose                             |
+| ------------------ | ------------- | ---- | ----------------------------------- |
+| `app-scaffolder`   | 🏗️ Builder    | A1   | Turborepo + Next.js 15 scaffold     |
+| `api-builder`      | 🔌 Connector  | A2-6 | API routes, Zod, role guards        |
+| `frontend-builder` | 🎨 Painter    | A7   | Pages, layouts, shadcn/ui           |
+| `test-writer`      | 🧪 Tester     | A8   | Vitest unit + integration tests     |
+| `app-deployer`     | 🚢 Shipper    | A9   | CI/CD workflows, App Service deploy |
+| `app-conductor`    | 🎼 Maestro II | —    | Orchestrates app-dev workflow       |
+
 ### Adversarial Subagents
 
 | Subagent                           | Parent Agents                 | Purpose                                               |
@@ -72,6 +83,14 @@ See `AGENTS.md` at the repo root for the lightweight map.
 | `bicep-review-subagent`         | Code review against AVM standards     | APPROVED/NEEDS_REVISION/FAILED |
 | `cost-estimate-subagent`        | Pricing MCP queries                   | Cost breakdown                 |
 | `governance-discovery-subagent` | Azure Policy REST API discovery       | Policy constraints             |
+
+### App-Dev Subagents (Agent-Invoked)
+
+| Subagent              | Purpose                          | Returns                   |
+| --------------------- | -------------------------------- | ------------------------- |
+| `app-lint-subagent`   | TypeScript + ESLint validation   | PASS/FAIL with error list |
+| `app-review-subagent` | Code review against instructions | APPROVED/NEEDS_REVISION   |
+| `app-test-subagent`   | Test execution + coverage report | PASS/FAIL with coverage % |
 
 ---
 
@@ -150,9 +169,9 @@ azure-agentic-infraops/
 ├── AGENTS.md             # Lightweight map (start here)
 ├── QUALITY_SCORE.md      # Project health grades
 ├── .github/
-│   ├── agents/           # 9 agent definitions + 8 subagents
+│   ├── agents/           # 15 agent definitions + 11 subagents
 │   ├── skills/           # 14 skill definitions (incl. golden-principles)
-│   └── instructions/     # ~20 file-type rules (consolidated)
+│   └── instructions/     # 21 file-type rules (consolidated)
 ├── agent-output/         # Generated artifacts
 ├── infra/bicep/          # Bicep templates
 ├── docs/
