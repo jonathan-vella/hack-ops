@@ -17,20 +17,20 @@
 <!-- When a step completes, close the corresponding issue with a comment. -->
 <!-- When an epic's subtasks all complete, close the epic. -->
 
-| Step                      | Issue | Status          |
-| ------------------------- | ----- | --------------- |
-| Epic: Phase A             | #1    | Open (3/7 done) |
-| Epic: Phase C             | #2    | Open            |
-| A1: PRD                   | #3    | Closed          |
-| A2: API contract          | #4    | Closed          |
-| A3: Data model            | #5    | Open            |
-| A4: UI pages              | #6    | Open            |
-| A5: Env config            | #7    | Open            |
-| C1: App-dev agents        | #8    | Open            |
-| C3: App-dev skills        | #9    | Open            |
-| C4: App-dev instructions  | #10   | Open            |
-| C4: Register instructions | #11   | Open            |
-| C1: App-dev subagents     | #12   | Open            |
+| Step                      | Issue | Status                        |
+| ------------------------- | ----- | ----------------------------- |
+| Epic: Phase A             | #1    | Done (need GH_TOKEN to close) |
+| Epic: Phase C             | #2    | Open                          |
+| A1: PRD                   | #3    | Closed                        |
+| A2: API contract          | #4    | Closed                        |
+| A3: Data model            | #5    | Closed                        |
+| A4: UI pages              | #6    | Done (need GH_TOKEN to close) |
+| A5: Env config            | #7    | Done (need GH_TOKEN to close) |
+| C1: App-dev agents        | #8    | Open                          |
+| C3: App-dev skills        | #9    | Open                          |
+| C4: App-dev instructions  | #10   | Open                          |
+| C4: Register instructions | #11   | Open                          |
+| C1: App-dev subagents     | #12   | Open                          |
 
 ---
 
@@ -38,10 +38,10 @@
 
 <!-- Update this at the START of each session -->
 
-**Phase**: A — Product Documentation
-**Step**: A3 — Run `doc-data-model-generator.prompt.md` → produce `docs/data-model.md`
-**Branch**: `feature/product-docs`
-**Goal**: Generate the Cosmos DB data model reference
+**Phase**: C — App-Dev Toolchain
+**Step**: C1 — Create agent definitions
+**Branch**: `feature/app-dev-toolchain`
+**Goal**: Start Phase C toolchain creation
 
 ---
 
@@ -65,10 +65,10 @@
 - [x] A1: Run PRD generator → `docs/prd.md`
 - [x] A2: Run API contract generator →
       `packages/shared/types/api-contract.ts` + `docs/api-contract.md`
-- [ ] A3: Run data model generator → `docs/data-model.md`
-- [ ] A4: Create `docs/ui-pages.md`
-- [ ] A5: Create `docs/environment-config.md`
-- [ ] Merge `feature/product-docs` → main
+- [x] A3: Run data model generator → `docs/data-model.md`
+- [x] A4: Create `docs/ui-pages.md`
+- [x] A5: Create `docs/environment-config.md`
+- [x] Merge `feature/product-docs` → main
 
 ### Phase C — App-Dev Toolchain
 
@@ -223,6 +223,17 @@
 |     |            |            | contract: 26          | generator          |          |
 |     |            |            | endpoints, TS         |                    |          |
 |     |            |            | types + MD ref        |                    |          |
+| 5   | 2026-02-25 | A / A3     | Generated data model: | A4: UI pages       | None     |
+|     |            |            | 10 containers, TS     | inventory          |          |
+|     |            |            | interfaces, samples,  |                    |          |
+|     |            |            | query patterns        |                    |          |
+| 6   | 2026-02-26 | A / A4-A5  | Created ui-pages.md   | Merge branch,      | GH_TOKEN |
+|     |            |            | (10 pages, 11 shared  | close issues #6 #7 | not set  |
+|     |            |            | components) and       |                    |          |
+|     |            |            | environment-config.md |                    |          |
+|     |            |            | (Easy Auth contract,  |                    |          |
+|     |            |            | Key Vault refs,       |                    |          |
+|     |            |            | .env template)        |                    |          |
 
 ---
 

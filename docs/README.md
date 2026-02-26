@@ -19,18 +19,19 @@ See the [conductor agent](../.github/agents/01-conductor.agent.md) for orchestra
 
 ## Quick Links
 
-| Resource                              | Description                   |
-| ------------------------------------- | ----------------------------- |
-| [Quickstart](quickstart.md)           | Get running in 10 minutes     |
-| [Workflow](workflow.md)               | 7-step agent + skill workflow |
-| [Dev Containers](dev-containers.md)   | Docker setup and alternatives |
-| [Prompt Guide](prompt-guide/)         | Agent & skill prompt examples |
-| [Troubleshooting](troubleshooting.md) | Common issues and solutions   |
-| [Glossary](GLOSSARY.md)               | Terms and definitions         |
+| Resource                                     | Description                   |
+| -------------------------------------------- | ----------------------------- |
+| [HackOps User Guide](hackops-user-guide.md)  | Step-by-step runbook          |
+| [PRD](prd.md)                                | Product Requirements Document |
+| [API Contract](api-contract.md)              | 26-endpoint REST API spec     |
+| [Data Model](data-model.md)                  | Cosmos DB containers & schema |
+| [UI Pages](ui-pages.md)                      | Page inventory & route map    |
+| [Environment Config](environment-config.md)  | Env vars & Key Vault refs     |
+| [Dev Containers](dev-containers.md)          | Docker setup and alternatives |
 
 ---
 
-## Agents (10 + 5 Subagents)
+## Agents (9 + 8 Subagents)
 
 Agents are interactive AI assistants for specific workflow phases. Invoke via `Ctrl+Shift+A`.
 See `AGENTS.md` at the repo root for the lightweight map.
@@ -43,23 +44,34 @@ See `AGENTS.md` at the repo root for the lightweight map.
 
 ### Primary Agents (User-Invokable)
 
-| Agent          | Persona       | Phase | Purpose                            |
-| -------------- | ------------- | ----- | ---------------------------------- |
-| `requirements` | 📜 Scribe     | 1     | Gather infrastructure requirements |
-| `architect`    | 🏛️ Oracle     | 2     | WAF assessment and design          |
-| `design`       | 🎨 Artisan    | 3     | Diagrams and ADRs                  |
-| `bicep-plan`   | 📐 Strategist | 4     | Implementation planning            |
-| `bicep-code`   | ⚒️ Forge      | 5     | Bicep template generation          |
-| `deploy`       | 🚀 Envoy      | 6     | Azure deployment                   |
-| `diagnose`     | 🔍 Sentinel   | —     | Post-deployment diagnostics        |
+| Agent                  | Persona       | Phase | Purpose                            |
+| ---------------------- | ------------- | ----- | ---------------------------------- |
+| `requirements`         | 📜 Scribe     | 1     | Gather infrastructure requirements |
+| `architect`            | 🏛️ Oracle     | 2     | WAF assessment and design          |
+| `design`               | 🎨 Artisan    | 3     | Diagrams and ADRs                  |
+| `bicep-planner`        | 📐 Strategist | 4     | Implementation planning            |
+| `bicep-code-generator` | ⚒️ Forge      | 5     | Bicep template generation          |
+| `deploy`               | 🚀 Envoy      | 6     | Azure deployment                   |
+| `as-built`             | 📝 Chronicler | 7     | Post-deployment documentation      |
+| `diagnose`             | 🔍 Sentinel   | —     | Post-deployment diagnostics        |
+
+### Adversarial Subagents
+
+| Subagent                           | Parent Agents                 | Purpose                                               |
+| ---------------------------------- | ----------------------------- | ----------------------------------------------------- |
+| `infra-challenger-subagent`        | Requirements, Architect, Plan | Challenges infra plans for governance/WAF/feasibility |
+| `app-security-challenger-subagent` | API Builder, Test Writer      | Challenges app code for auth bypass, IDOR, injection  |
+| `app-logic-challenger-subagent`    | Test Writer, App Conductor    | Challenges business rules, contract drift, edge cases |
 
 ### Validation Subagents (Conductor-Invoked)
 
-| Subagent                | Purpose                               | Returns                        |
-| ----------------------- | ------------------------------------- | ------------------------------ |
-| `bicep-lint-subagent`   | Bicep syntax validation               | PASS/FAIL with diagnostics     |
-| `bicep-whatif-subagent` | Deployment preview (what-if analysis) | Change summary, violations     |
-| `bicep-review-subagent` | Code review against AVM standards     | APPROVED/NEEDS_REVISION/FAILED |
+| Subagent                        | Purpose                               | Returns                        |
+| ------------------------------- | ------------------------------------- | ------------------------------ |
+| `bicep-lint-subagent`           | Bicep syntax validation               | PASS/FAIL with diagnostics     |
+| `bicep-whatif-subagent`         | Deployment preview (what-if analysis) | Change summary, violations     |
+| `bicep-review-subagent`         | Code review against AVM standards     | APPROVED/NEEDS_REVISION/FAILED |
+| `cost-estimate-subagent`        | Pricing MCP queries                   | Cost breakdown                 |
+| `governance-discovery-subagent` | Azure Policy REST API discovery       | Policy constraints             |
 
 ---
 
@@ -75,10 +87,12 @@ Skills are reusable capabilities that agents invoke or that activate automatical
 
 ### Azure Conventions (Category 1)
 
-| Skill             | Purpose                                      | Triggers                                   |
-| ----------------- | -------------------------------------------- | ------------------------------------------ |
-| `azure-defaults`  | Azure conventions, naming, AVM, WAF, pricing | "azure defaults", "naming", "AVM"          |
-| `azure-artifacts` | Template H2 structures, styling, generation  | "generate documentation", "create runbook" |
+| Skill                   | Purpose                                       | Triggers                                         |
+| ----------------------- | --------------------------------------------- | ------------------------------------------------ |
+| `azure-defaults`        | Azure conventions, naming, AVM, WAF, pricing  | "azure defaults", "naming", "AVM"                |
+| `azure-artifacts`       | Template H2 structures, styling, generation   | "generate documentation", "create runbook"       |
+| `azure-bicep-patterns`  | Common Bicep infra patterns (hub-spoke, etc.) | "bicep pattern", "hub-spoke", "private endpoint" |
+| `azure-troubleshooting` | Azure resource troubleshooting and KQL        | "troubleshoot", "diagnose resource"              |
 
 ### Document Creation (Category 2)
 
@@ -89,12 +103,15 @@ Skills are reusable capabilities that agents invoke or that activate automatical
 
 ### Workflow & Tool Integration (Category 3)
 
-| Skill                 | Purpose                                    | Triggers                                      |
-| --------------------- | ------------------------------------------ | --------------------------------------------- |
-| `github-operations`   | GitHub issues, PRs, CLI, Actions, releases | "create issue", "create PR", "gh command"     |
-| `git-commit`          | Commit message conventions                 | "commit", "conventional commit"               |
-| `docs-writer`         | Repo-aware docs maintenance                | "audit docs", "fix counts", "freshness check" |
-| `make-skill-template` | Create new skills                          | "create skill", "scaffold skill"              |
+| Skill                      | Purpose                                    | Triggers                                       |
+| -------------------------- | ------------------------------------------ | ---------------------------------------------- |
+| `github-operations`        | GitHub issues, PRs, CLI, Actions, releases | "create issue", "create PR", "gh command"      |
+| `git-commit`               | Commit message conventions                 | "commit", "conventional commit"                |
+| `docs-writer`              | Repo-aware docs maintenance                | "audit docs", "fix counts", "freshness check"  |
+| `make-skill-template`      | Create new skills                          | "create skill", "scaffold skill"               |
+| `microsoft-code-reference` | Look up Microsoft API refs and samples     | "API reference", "SDK sample", "verify method" |
+| `microsoft-docs`           | Query official Microsoft documentation     | "microsoft docs", "learn.microsoft.com"        |
+| `microsoft-skill-creator`  | Create agent skills for Microsoft tech     | "create microsoft skill", "foundry skill"      |
 
 ---
 
@@ -106,7 +123,7 @@ Requirements → Architecture → Design → Planning → Implementation → Dep
    Agent        Agent       Skills     Agent         Agent       Agent       Skills
 ```
 
-See [workflow.md](workflow.md) for detailed step-by-step guide.
+See [AGENTS.md](../AGENTS.md) for the detailed agent workflow map.
 
 ---
 
@@ -122,7 +139,7 @@ prompt examples in `docs/prompt-guide/`:
 | Skill Reference         | Independent skill invocation         |
 | Tips & Patterns         | Advanced prompting techniques        |
 
-See [prompt-guide/](prompt-guide/) for the full guide.
+<!-- Prompt guide planned for Phase F -->
 
 ---
 
@@ -133,7 +150,7 @@ azure-agentic-infraops/
 ├── AGENTS.md             # Lightweight map (start here)
 ├── QUALITY_SCORE.md      # Project health grades
 ├── .github/
-│   ├── agents/           # 10 agent definitions + 5 subagents
+│   ├── agents/           # 9 agent definitions + 8 subagents
 │   ├── skills/           # 14 skill definitions (incl. golden-principles)
 │   └── instructions/     # ~20 file-type rules (consolidated)
 ├── agent-output/         # Generated artifacts
@@ -150,4 +167,4 @@ azure-agentic-infraops/
 
 - **Issues**: [GitHub Issues](https://github.com/jonathan-vella/azure-agentic-infraops/issues)
 - **Discussions**: [GitHub Discussions](https://github.com/jonathan-vella/azure-agentic-infraops/discussions)
-- **Troubleshooting**: [troubleshooting.md](troubleshooting.md)
+- **Troubleshooting**: Check [GitHub Issues](https://github.com/jonathan-vella/hack-ops/issues)

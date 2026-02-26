@@ -73,10 +73,10 @@ Check if documentation updates are needed when any of these occur:
 
 Do NOT reference these removed agents/skills:
 
-- `diagram.agent.md`, `adr.agent.md`, `docs.agent.md`
-- `azure-workload-docs`, `azure-deployment-preflight`, `orchestration-helper` skills
-- `github-issues`, `github-pull-requests`, `gh-cli` skills
-- `_shared/` directory
+- ❌ `diagram.agent.md`, `adr.agent.md`, `docs.agent.md`
+- ❌ `azure-workload-docs`, `azure-deployment-preflight`, `orchestration-helper` skills
+- ❌ `github-issues`, `github-pull-requests`, `gh-cli` skills
+- ❌ `_shared/` directory
 
 ## Validation
 
