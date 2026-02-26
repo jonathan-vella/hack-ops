@@ -6,12 +6,12 @@ Updated by the doc-gardening workflow and referenced by `QUALITY_SCORE.md`.
 
 ## Active Debt Items
 
-| ID  | Category | Description                                       | Severity | Owner | Target |
-| --- | -------- | ------------------------------------------------- | -------- | ----- | ------ |
-| 5   | Agents   | 01-conductor 'agents' frontmatter format warning  | Low      | —     | —      |
-| 7   | Docs     | AGENTS.md missing app-dev workflow table          | Low      | —     | Ph F   |
-| 9   | Instruct | 7 applyTo glob warnings — cosmetic, not blocking  | Low      | —     | —      |
-| 12  | Artifact | Template drift: 01-req, 02-arch, 04-gov (14 warn) | Low      | —     | Ph E   |
+| ID  | Category      | Description                                                        | Severity | Owner | Target  |
+| --- | ------------- | ------------------------------------------------------------------ | -------- | ----- | ------- |
+| 5   | Agents        | 01-conductor.agent.md 'agents' frontmatter format warning          | Low      | —     | —       |
+| 7   | Documentation | AGENTS.md missing app-dev workflow table (only infra 7-step shown) | Low      | —     | Phase F |
+| 9   | Instructions  | 7 applyTo warnings (wildcards) — cosmetic, not blocking            | Low      | —     | —       |
+| 12  | Artifact      | Template drift: 01-req, 02-arch, 04-gov (14 warn)                  | Low      | —     | Phase E |
 
 ## Resolved Items
 
