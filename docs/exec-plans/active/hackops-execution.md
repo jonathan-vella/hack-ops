@@ -17,26 +17,26 @@
 <!-- When a step completes, close the corresponding issue with a comment. -->
 <!-- When an epic's subtasks all complete, close the epic. -->
 
-| Step                      | Issue | Status                  |
-| ------------------------- | ----- | ----------------------- |
-| Epic: Phase A             | #1    | Closed                  |
-| Epic: Phase C             | #2    | Closed                  |
-| A1: PRD                   | #3    | Closed                  |
-| A2: API contract          | #4    | Closed                  |
-| A3: Data model            | #5    | Closed                  |
-| A4: UI pages              | #6    | Closed                  |
-| A5: Env config            | #7    | Closed                  |
-| C1: App-dev agents        | #8    | Closed                  |
-| C3: App-dev skills        | #9    | Closed                  |
-| C4: App-dev instructions  | #10   | Closed                  |
-| C4: Register instructions | #11   | Closed                  |
-| C1: App-dev subagents     | #12   | Closed                  |
-| Epic: Phase B             | #21   | Open (1 item remaining) |
-| B1: Label taxonomy        | #26   | Closed                  |
-| B2: Milestones            | #22   | Closed                  |
-| B3: generate-backlog      | #23   | Closed                  |
-| B4: backlog-triage        | #24   | Closed                  |
-| B5: Projects board docs   | #25   | Closed                  |
+| Step                      | Issue | Status |
+| ------------------------- | ----- | ------ |
+| Epic: Phase A             | #1    | Closed |
+| Epic: Phase C             | #2    | Closed |
+| A1: PRD                   | #3    | Closed |
+| A2: API contract          | #4    | Closed |
+| A3: Data model            | #5    | Closed |
+| A4: UI pages              | #6    | Closed |
+| A5: Env config            | #7    | Closed |
+| C1: App-dev agents        | #8    | Closed |
+| C3: App-dev skills        | #9    | Closed |
+| C4: App-dev instructions  | #10   | Closed |
+| C4: Register instructions | #11   | Closed |
+| C1: App-dev subagents     | #12   | Closed |
+| Epic: Phase B             | #21   | Closed |
+| B1: Label taxonomy        | #26   | Closed |
+| B2: Milestones            | #22   | Closed |
+| B3: generate-backlog      | #23   | Closed |
+| B4: backlog-triage        | #24   | Closed |
+| B5: Projects board docs   | #25   | Closed |
 
 ---
 
@@ -45,11 +45,12 @@
 <!-- Update this at the START of each session -->
 
 **Phase**: D — Infrastructure Execution
-**Step**: Run infra-01 (offline) → requirements doc
+**Step**: Run infra-05 → Bicep code generation
 **Branch**: `feature/prompts`
-**Goal**: Run infra-01 through infra-03 offline, then verify
-Azure connectivity for infra-04 through infra-07. Also run
-`/generate-backlog` when ready (Phase B final item).
+**Goal**: Generate Bicep templates in `infra/bicep/hackops/`
+following 04-implementation-plan.md. All governance
+constraints documented (9 tags, Cosmos RBAC-only, zero
+blocking Deny policies). Implementation plan approved.
 
 ---
 
@@ -128,9 +129,9 @@ Azure connectivity for infra-04 through infra-07. Also run
 - [x] Run `scripts/setup-labels.sh` (requires GH_TOKEN)
 - [x] Run `scripts/setup-milestones.sh` (requires GH_TOKEN)
 - [x] Create GitHub Projects board ("HackOps Backlog", [#6](https://github.com/jonathan-vella/hack-ops/projects))
-- [ ] Configure board custom fields (Phase, Domain, Complexity) and views
-- [ ] Run backlog generation prompt → verify issues created
-- [ ] Add generated issues to the GitHub Project
+- [x] Configure board custom fields (Phase, Domain, Complexity) and views
+- [x] Run backlog generation prompt → verify issues created
+- [x] Add generated issues to the GitHub Project
 
 ### Phase D — Infrastructure Execution
 
@@ -145,12 +146,12 @@ Azure connectivity for infra-04 through infra-07. Also run
 - [x] D1: Create `infra-06-deploy.prompt.md`
 - [x] D1: Create `infra-07-as-built.prompt.md`
 - [x] D1: Create `infra-challenge.prompt.md`
-- [ ] Run infra-01 (offline) → `01-requirements.md`
-- [ ] Run infra-02 (offline) → `02-architecture-assessment.md`
-- [ ] Run infra-03 (offline) → `03-des-*.md/.py/.png`
-- [ ] Run infra-challenge → review findings
-- [ ] Verify Azure connectivity (`az account show`)
-- [ ] Run infra-04 → `04-*.md/.json`
+- [x] Run infra-01 (offline) → `01-requirements.md`
+- [x] Run infra-02 (offline) → `02-architecture-assessment.md`
+- [x] Run infra-03 (offline) → `03-des-*.md/.py/.png`
+- [x] Run infra-challenge → review findings
+- [x] Verify Azure connectivity (`az account show`)
+- [x] Run infra-04 → `04-*.md/.json`
 - [ ] Run infra-05 → `infra/bicep/hackops/`
 - [ ] Run `bicep build infra/bicep/hackops/main.bicep`
 - [ ] Run infra-06 → deployment to `rg-hackops-dev`
@@ -299,6 +300,33 @@ Azure connectivity for infra-04 through infra-07. Also run
 |     |            |            | milestones); closed    | through infra-03   |          |
 |     |            |            | issues #22-#26 via     | (offline)          |          |
 |     |            |            | gh CLI                 |                    |          |
+| 13  | 2026-02-26 | B / final  | Confirmed backlog      | Run infra-         | None     |
+|     |            | + D /      | already generated      | challenge, then    |          |
+|     |            | D2-D4      | (105 issues on board); | verify Azure       |          |
+|     |            |            | added Domain +         | connectivity for   |          |
+|     |            |            | Complexity fields;     | infra-04 through   |          |
+|     |            |            | closed Epic #21;       | infra-07           |          |
+|     |            |            | generated infra-01     |                    |          |
+|     |            |            | (requirements), 02     |                    |          |
+|     |            |            | (architecture), 03     |                    |          |
+|     |            |            | (diagram + 3 ADRs);    |                    |          |
+|     |            |            | commit 8fa0c7b         |                    |          |
+| 14  | 2026-02-26 | D /        | Infra-challenge review | Run infra-04       | None     |
+|     |            | challenge  | of steps 01-03: 9      | governance         |          |
+|     |            |            | findings (0 critical,  | discovery against  |          |
+|     |            |            | 1 high, 5 medium,      | target sub, then   |          |
+|     |            |            | 3 low); verified Azure | infra-05 Bicep     |          |
+|     |            |            | connectivity (sub:     | generation         |          |
+|     |            |            | noalz); challenge-     |                    |          |
+|     |            |            | findings.json updated  |                    |          |
+| 15  | 2026-02-26 | D / D4     | Governance discovery   | Run infra-05       | None     |
+|     |            |            | via REST API: 21       | Bicep code gen     |          |
+|     |            |            | policies, 9 mandatory  |                    |          |
+|     |            |            | tags (RG Deny), Cosmos |                    |          |
+|     |            |            | RBAC-only (Modify),    |                    |          |
+|     |            |            | 0 blocking Deny        |                    |          |
+|     |            |            | policies; generated    |                    |          |
+|     |            |            | impl plan + 2 diagrams |                    |          |
 
 ---
 
@@ -335,14 +363,17 @@ have enough context for the current step.
 
 <!-- Record any runtime decisions that deviate from the blueprint -->
 
-| Date       | Decision                                                   | Rationale                                                     |
-| ---------- | ---------------------------------------------------------- | ------------------------------------------------------------- |
-| 2026-02-25 | Hackers submit evidence; Coaches enter rubric scores       | Scoring authority belongs with Coaches, not Hackers           |
-| 2026-02-25 | Event codes stored as plaintext + rate limiting (5/min/IP) | SHA-256 hashing adds complexity without real security gain    |
-| 2026-02-25 | Tiebreaker: earliest last-approval timestamp wins          | Rewards faster completion when total scores are equal         |
-| 2026-02-25 | Unlimited evidence resubmissions allowed                   | Scores only entered by Coach on review; no reason to limit    |
-| 2026-02-25 | Team balance: `ceil(teamSize/2)` minimum per team          | Prevents runt teams of 1; balanced distribution is fairer     |
-| 2026-02-25 | Coach review queue is hackathon-scoped                     | Coaches should only see submissions for their assigned events |
-| 2026-02-26 | Moved 10-Challenger to infra-challenger-subagent           | Adversarial review is invoked by parent agents, not directly  |
-| 2026-02-26 | C3 skills created manually (no Learn MCP tools available)  | Skills include Learn MCP search queries for future freshness  |
-| 2026-02-26 | Instructions auto-discovered (no devcontainer.json change) | `.github/instructions/*.instructions.md` auto-apply by glob   |
+| Date       | Decision                                                    | Rationale                                                         |
+| ---------- | ----------------------------------------------------------- | ----------------------------------------------------------------- |
+| 2026-02-25 | Hackers submit evidence; Coaches enter rubric scores        | Scoring authority belongs with Coaches, not Hackers               |
+| 2026-02-25 | Event codes stored as plaintext + rate limiting (5/min/IP)  | SHA-256 hashing adds complexity without real security gain        |
+| 2026-02-25 | Tiebreaker: earliest last-approval timestamp wins           | Rewards faster completion when total scores are equal             |
+| 2026-02-25 | Unlimited evidence resubmissions allowed                    | Scores only entered by Coach on review; no reason to limit        |
+| 2026-02-25 | Team balance: `ceil(teamSize/2)` minimum per team           | Prevents runt teams of 1; balanced distribution is fairer         |
+| 2026-02-25 | Coach review queue is hackathon-scoped                      | Coaches should only see submissions for their assigned events     |
+| 2026-02-26 | Moved 10-Challenger to infra-challenger-subagent            | Adversarial review is invoked by parent agents, not directly      |
+| 2026-02-26 | C3 skills created manually (no Learn MCP tools available)   | Skills include Learn MCP search queries for future freshness      |
+| 2026-02-26 | Instructions auto-discovered (no devcontainer.json change)  | `.github/instructions/*.instructions.md` auto-apply by glob       |
+| 2026-02-26 | 9 tags required on RG (not 4 baseline) — lowercase keys     | Deny policy JV-Enforce RG Tags v3 requires 9 tags                 |
+| 2026-02-26 | Cosmos DB uses Entra ID RBAC only (no connection strings)   | Modify policy auto-disables local auth; comply rather than exempt |
+| 2026-02-26 | Tag keys use lowercase (not PascalCase from azure-defaults) | Policy checks `tags['environment']`, not `tags['Environment']`    |
