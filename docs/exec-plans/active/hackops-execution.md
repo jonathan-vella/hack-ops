@@ -363,17 +363,17 @@ have enough context for the current step.
 
 <!-- Record any runtime decisions that deviate from the blueprint -->
 
-| Date       | Decision                                                   | Rationale                                                     |
-| ---------- | ---------------------------------------------------------- | ------------------------------------------------------------- |
-| 2026-02-25 | Hackers submit evidence; Coaches enter rubric scores       | Scoring authority belongs with Coaches, not Hackers           |
-| 2026-02-25 | Event codes stored as plaintext + rate limiting (5/min/IP) | SHA-256 hashing adds complexity without real security gain    |
-| 2026-02-25 | Tiebreaker: earliest last-approval timestamp wins          | Rewards faster completion when total scores are equal         |
-| 2026-02-25 | Unlimited evidence resubmissions allowed                   | Scores only entered by Coach on review; no reason to limit    |
-| 2026-02-25 | Team balance: `ceil(teamSize/2)` minimum per team          | Prevents runt teams of 1; balanced distribution is fairer     |
-| 2026-02-25 | Coach review queue is hackathon-scoped                     | Coaches should only see submissions for their assigned events |
-| 2026-02-26 | Moved 10-Challenger to infra-challenger-subagent           | Adversarial review is invoked by parent agents, not directly  |
-| 2026-02-26 | C3 skills created manually (no Learn MCP tools available)  | Skills include Learn MCP search queries for future freshness  |
-| 2026-02-26 | Instructions auto-discovered (no devcontainer.json change) | `.github/instructions/*.instructions.md` auto-apply by glob   |
-| 2026-02-26 | 9 tags required on RG (not 4 baseline) — lowercase keys    | Deny policy JV-Enforce RG Tags v3 requires 9 tags             |
-| 2026-02-26 | Cosmos DB uses Entra ID RBAC only (no connection strings)  | Modify policy auto-disables local auth; comply rather than exempt |
-| 2026-02-26 | Tag keys use lowercase (not PascalCase from azure-defaults)| Policy checks `tags['environment']`, not `tags['Environment']` |
+| Date       | Decision                                                    | Rationale                                                         |
+| ---------- | ----------------------------------------------------------- | ----------------------------------------------------------------- |
+| 2026-02-25 | Hackers submit evidence; Coaches enter rubric scores        | Scoring authority belongs with Coaches, not Hackers               |
+| 2026-02-25 | Event codes stored as plaintext + rate limiting (5/min/IP)  | SHA-256 hashing adds complexity without real security gain        |
+| 2026-02-25 | Tiebreaker: earliest last-approval timestamp wins           | Rewards faster completion when total scores are equal             |
+| 2026-02-25 | Unlimited evidence resubmissions allowed                    | Scores only entered by Coach on review; no reason to limit        |
+| 2026-02-25 | Team balance: `ceil(teamSize/2)` minimum per team           | Prevents runt teams of 1; balanced distribution is fairer         |
+| 2026-02-25 | Coach review queue is hackathon-scoped                      | Coaches should only see submissions for their assigned events     |
+| 2026-02-26 | Moved 10-Challenger to infra-challenger-subagent            | Adversarial review is invoked by parent agents, not directly      |
+| 2026-02-26 | C3 skills created manually (no Learn MCP tools available)   | Skills include Learn MCP search queries for future freshness      |
+| 2026-02-26 | Instructions auto-discovered (no devcontainer.json change)  | `.github/instructions/*.instructions.md` auto-apply by glob       |
+| 2026-02-26 | 9 tags required on RG (not 4 baseline) — lowercase keys     | Deny policy JV-Enforce RG Tags v3 requires 9 tags                 |
+| 2026-02-26 | Cosmos DB uses Entra ID RBAC only (no connection strings)   | Modify policy auto-disables local auth; comply rather than exempt |
+| 2026-02-26 | Tag keys use lowercase (not PascalCase from azure-defaults) | Policy checks `tags['environment']`, not `tags['Environment']`    |

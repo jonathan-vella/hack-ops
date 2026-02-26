@@ -46,12 +46,12 @@ by the built-in Easy Auth feature.
 
 ## 🔄 Alternatives Considered
 
-| Option                      | Pros                               | Cons                                           | WAF Impact                          |
-| --------------------------- | ---------------------------------- | ---------------------------------------------- | ----------------------------------- |
-| **App Service** (chosen)    | Easy Auth built-in, no Docker, mature | No scale-to-zero, B1 lacks SLA               | Cost: →, Operations: ↑             |
-| Azure Container Apps        | Scale-to-zero, modern platform     | Requires Dockerfile, no Easy Auth, more complex | Cost: ↑, Operations: ↓             |
-| Azure Functions             | Event-driven, auto-scale           | Cold start latency, no SSR support              | Performance: ↓, Cost: ↑            |
-| Azure Static Web Apps + API | Free tier, global CDN              | Limited API routes, no SSR, no VNet integration | Performance: ↓, Security: ↓        |
+| Option                      | Pros                                  | Cons                                            | WAF Impact                  |
+| --------------------------- | ------------------------------------- | ----------------------------------------------- | --------------------------- |
+| **App Service** (chosen)    | Easy Auth built-in, no Docker, mature | No scale-to-zero, B1 lacks SLA                  | Cost: →, Operations: ↑      |
+| Azure Container Apps        | Scale-to-zero, modern platform        | Requires Dockerfile, no Easy Auth, more complex | Cost: ↑, Operations: ↓      |
+| Azure Functions             | Event-driven, auto-scale              | Cold start latency, no SSR support              | Performance: ↓, Cost: ↑     |
+| Azure Static Web Apps + API | Free tier, global CDN                 | Limited API routes, no SSR, no VNet integration | Performance: ↓, Security: ↓ |
 
 **Rejection rationale**:
 
@@ -96,10 +96,10 @@ by the built-in Easy Auth feature.
 
 ## 🏛️ WAF Pillar Analysis
 
-| Pillar      | Impact | Notes                                              |
-| ----------- | ------ | -------------------------------------------------- |
+| Pillar      | Impact | Notes                                               |
+| ----------- | ------ | --------------------------------------------------- |
 | Security    | ↑      | Easy Auth reduces attack surface (no custom auth)   |
-| Reliability | →      | B1 has no SLA; S1 provides 99.95%                  |
+| Reliability | →      | B1 has no SLA; S1 provides 99.95%                   |
 | Performance | →      | Always-on eliminates cold starts; B1 is entry-level |
 | Cost        | →      | ~$13/mo (B1); competitive with Container Apps min   |
 | Operations  | ↑      | Simplest deployment model; no container management  |

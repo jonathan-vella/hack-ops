@@ -7,7 +7,7 @@
 | **Agents**          | A-    | 15 agents + 11 subagents; 1 conductor frontmatter warn   | Fix conductor 'agents' array format warn |
 | **Skills**          | B+    | All 14 skills pass GA format; 5 more planned for Phase C | Create C3 skills (nextjs, cosmos, etc.)  |
 | **Instructions**    | A-    | 21 instructions; 0 errors, 7 info-level warnings         | Create C4 instructions (5 planned)       |
-| **Infrastructure**  | B-    | Bicep patterns cover common cases; no Terraform          | Phase D infra execution                  |
+| **Infrastructure**  | B     | Governance constraints + impl plan done; Bicep pending   | Phase D5-D6 Bicep code generation        |
 | **Documentation**   | A     | All docs fresh; dead links resolved; URLs fixed          | Keep in sync after Phase D/E changes     |
 | **CI / Validation** | A     | 14 validators; all pass; `validate` alias added          | Maintain as new validators are added     |
 | **Backlog**         | A     | 105 issues, 15 epics, 13 milestones, GitHub Project #6   | Begin Phase D execution                  |
@@ -26,6 +26,8 @@
 
 | Date       | Domain        | Change                                                                                  |
 | ---------- | ------------- | --------------------------------------------------------------------------------------- |
+| 2026-02-26 | All           | Doc-gardening: 14 validators green, 0 errors; Infra B-→B (D4 done); debt #12 updated    |
+| 2026-02-27 | All           | Doc-gardening: all 5 validators green; grades hold; resolved debt #4; added debt #12    |
 | 2026-02-26 | CI/Validation | Added `validate` alias to package.json; resolved debt #11; grade A-→A                   |
 | 2026-02-26 | Backlog       | Created 105 GitHub issues (15 epics + 64 PRD + 25 infra), GitHub Project #6             |
 | 2026-02-26 | Docs          | Fixed docs/README.md GitHub URLs from old repo name; grade A-→A; resolved debt #8       |

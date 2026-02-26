@@ -18,24 +18,24 @@ role-based access control.
 
 ### Target Workload Profile
 
-| Attribute              | Value                                               |
-| ---------------------- | --------------------------------------------------- |
-| Concurrent events      | 2–3 parallel hackathons                             |
-| Teams per event        | 4–5 teams of ~5 members                             |
-| Max concurrent users   | ~75                                                 |
-| Roles                  | Admin, Coach, Hacker, Anonymous                     |
+| Attribute              | Value                                                |
+| ---------------------- | ---------------------------------------------------- |
+| Concurrent events      | 2–3 parallel hackathons                              |
+| Teams per event        | 4–5 teams of ~5 members                              |
+| Max concurrent users   | ~75                                                  |
+| Roles                  | Admin, Coach, Hacker, Anonymous                      |
 | API surface            | ~16 REST endpoints (all authenticated except health) |
-| Deployment model       | Solo-dev, enterprise-policy-compliant               |
-| Infrastructure as Code | Bicep with Azure Verified Modules (AVM)             |
+| Deployment model       | Solo-dev, enterprise-policy-compliant                |
+| Infrastructure as Code | Bicep with Azure Verified Modules (AVM)              |
 
 ### Application Stack
 
-| Layer    | Technology                          |
-| -------- | ----------------------------------- |
+| Layer    | Technology                                         |
+| -------- | -------------------------------------------------- |
 | Frontend | Next.js 15 (App Router), Tailwind CSS 4, shadcn/ui |
-| Backend  | Next.js API Routes (Route Handlers), TypeScript     |
-| Database | Azure Cosmos DB NoSQL (Serverless)                  |
-| Auth     | GitHub OAuth via Azure App Service Easy Auth        |
+| Backend  | Next.js API Routes (Route Handlers), TypeScript    |
+| Database | Azure Cosmos DB NoSQL (Serverless)                 |
+| Auth     | GitHub OAuth via Azure App Service Easy Auth       |
 | Runtime  | Node.js 22 LTS on Linux                            |
 
 ---
@@ -113,29 +113,29 @@ role-based access control.
 
 ### Performance
 
-| Metric                     | Target          |
-| -------------------------- | --------------- |
-| Leaderboard SSR response   | < 2 seconds     |
-| API CRUD response time     | < 500 ms        |
-| Auto-refresh interval      | 30 seconds      |
-| Hackathon creation to join | < 15 minutes    |
+| Metric                     | Target       |
+| -------------------------- | ------------ |
+| Leaderboard SSR response   | < 2 seconds  |
+| API CRUD response time     | < 500 ms     |
+| Auto-refresh interval      | 30 seconds   |
+| Hackathon creation to join | < 15 minutes |
 
 ### Availability
 
-| Metric                | Target                        |
-| --------------------- | ----------------------------- |
-| Uptime target         | 99.5% (single-region, no SLA) |
-| Recovery strategy     | Redeploy from IaC             |
-| Backup policy         | Cosmos DB periodic (default)  |
-| Deployment slots      | Staging + production swap     |
+| Metric            | Target                        |
+| ----------------- | ----------------------------- |
+| Uptime target     | 99.5% (single-region, no SLA) |
+| Recovery strategy | Redeploy from IaC             |
+| Backup policy     | Cosmos DB periodic (default)  |
+| Deployment slots  | Staging + production swap     |
 
 ### Scalability
 
-| Metric           | Current   | Growth path                      |
-| ---------------- | --------- | -------------------------------- |
-| Concurrent users | ~75       | Serverless Cosmos DB auto-scales |
-| Cosmos DB RUs    | Burst 1K  | Switch to provisioned if needed  |
-| App Service SKU  | B1 (dev)  | Scale to S1/P1 for production    |
+| Metric           | Current  | Growth path                      |
+| ---------------- | -------- | -------------------------------- |
+| Concurrent users | ~75      | Serverless Cosmos DB auto-scales |
+| Cosmos DB RUs    | Burst 1K | Switch to provisioned if needed  |
+| App Service SKU  | B1 (dev) | Scale to S1/P1 for production    |
 
 ### Cost Targets
 
@@ -186,16 +186,16 @@ role-based access control.
 
 ### Cost Drivers
 
-| Resource         | SKU/Tier           | Est. monthly (dev) | Est. monthly (prod) |
-| ---------------- | ------------------ | ------------------ | ------------------- |
-| App Service Plan | B1 / S1            | ~$13               | ~$55                |
-| Cosmos DB        | Serverless         | ~$1–5              | ~$5–15              |
-| Key Vault        | Standard           | ~$0.50             | ~$0.50              |
-| Log Analytics    | Pay-as-you-go      | ~$2–5              | ~$5–10              |
-| App Insights     | Pay-as-you-go      | ~$0–2              | ~$2–5               |
-| Private DNS Zone | —                  | ~$0.50             | ~$0.50              |
-| VNet/NSG         | Free               | $0                 | $0                  |
-| **Total**        |                    | **~$17–26**        | **~$68–86**         |
+| Resource         | SKU/Tier      | Est. monthly (dev) | Est. monthly (prod) |
+| ---------------- | ------------- | ------------------ | ------------------- |
+| App Service Plan | B1 / S1       | ~$13               | ~$55                |
+| Cosmos DB        | Serverless    | ~$1–5              | ~$5–15              |
+| Key Vault        | Standard      | ~$0.50             | ~$0.50              |
+| Log Analytics    | Pay-as-you-go | ~$2–5              | ~$5–10              |
+| App Insights     | Pay-as-you-go | ~$0–2              | ~$2–5               |
+| Private DNS Zone | —             | ~$0.50             | ~$0.50              |
+| VNet/NSG         | Free          | $0                 | $0                  |
+| **Total**        |               | **~$17–26**        | **~$68–86**         |
 
 > Cost estimates are parametric approximations. Verify against
 > Azure Pricing Calculator or Pricing MCP tools.
@@ -231,10 +231,10 @@ role-based access control.
 
 ## 🌍 Regional Preferences
 
-| Preference  | Region                 | Justification                 |
-| ----------- | ---------------------- | ----------------------------- |
-| Primary     | `swedencentral`        | EU GDPR-compliant, all services available |
-| Failover    | `germanywestcentral`   | EU paired alternative         |
+| Preference | Region               | Justification                             |
+| ---------- | -------------------- | ----------------------------------------- |
+| Primary    | `swedencentral`      | EU GDPR-compliant, all services available |
+| Failover   | `germanywestcentral` | EU paired alternative                     |
 
 All resources deployed to `swedencentral` unless governance
 constraints dictate otherwise.
@@ -245,26 +245,26 @@ constraints dictate otherwise.
 
 ### Resource Inventory
 
-| #  | Resource              | AVM Module                                           | Min Version | Naming Pattern                       |
-| -- | --------------------- | ---------------------------------------------------- | ----------- | ------------------------------------ |
-| 1  | Virtual Network       | `br/public:avm/res/network/virtual-network`          | `0.5.0`     | `vnet-hackops-{env}-{suffix}`        |
-| 2  | NSG (× 3)            | `br/public:avm/res/network/network-security-group`   | `0.5.0`     | `nsg-{purpose}-{env}`               |
-| 3  | App Service Plan      | `br/public:avm/res/web/serverfarm`                   | `0.4.0`     | `asp-hackops-{env}-{suffix}`         |
-| 4  | App Service           | `br/public:avm/res/web/site`                         | `0.12.0`    | `app-hackops-{env}-{suffix}`         |
-| 5  | Cosmos DB Account     | `br/public:avm/res/document-db/database-account`     | `0.10.0`    | `cosmos-hackops-{env}-{suffix}`      |
-| 6  | Key Vault             | `br/public:avm/res/key-vault/vault`                  | `0.11.0`    | `kv-hackops-{env}-{suffix}`          |
-| 7  | Log Analytics         | `br/public:avm/res/operational-insights/workspace`   | `0.9.0`     | `log-hackops-{env}-{suffix}`         |
-| 8  | Application Insights  | `br/public:avm/res/insights/component`               | `0.4.0`     | `appi-hackops-{env}-{suffix}`        |
-| 9  | Private DNS Zone      | `br/public:avm/res/network/private-dns-zone`         | `0.7.0`     | `privatelink.documents.azure.com`    |
+| #   | Resource             | AVM Module                                         | Min Version | Naming Pattern                    |
+| --- | -------------------- | -------------------------------------------------- | ----------- | --------------------------------- |
+| 1   | Virtual Network      | `br/public:avm/res/network/virtual-network`        | `0.5.0`     | `vnet-hackops-{env}-{suffix}`     |
+| 2   | NSG (× 3)            | `br/public:avm/res/network/network-security-group` | `0.5.0`     | `nsg-{purpose}-{env}`             |
+| 3   | App Service Plan     | `br/public:avm/res/web/serverfarm`                 | `0.4.0`     | `asp-hackops-{env}-{suffix}`      |
+| 4   | App Service          | `br/public:avm/res/web/site`                       | `0.12.0`    | `app-hackops-{env}-{suffix}`      |
+| 5   | Cosmos DB Account    | `br/public:avm/res/document-db/database-account`   | `0.10.0`    | `cosmos-hackops-{env}-{suffix}`   |
+| 6   | Key Vault            | `br/public:avm/res/key-vault/vault`                | `0.11.0`    | `kv-hackops-{env}-{suffix}`       |
+| 7   | Log Analytics        | `br/public:avm/res/operational-insights/workspace` | `0.9.0`     | `log-hackops-{env}-{suffix}`      |
+| 8   | Application Insights | `br/public:avm/res/insights/component`             | `0.4.0`     | `appi-hackops-{env}-{suffix}`     |
+| 9   | Private DNS Zone     | `br/public:avm/res/network/private-dns-zone`       | `0.7.0`     | `privatelink.documents.azure.com` |
 
 ### Networking Topology
 
-| Subnet       | CIDR             | IPs | Purpose                          |
-| ------------ | ---------------- | --- | -------------------------------- |
-| `snet-app`   | `10.0.0.0/26`   | 64  | App Service VNet integration     |
-| `snet-pe`    | `10.0.0.64/27`  | 32  | Private Endpoints (Cosmos, KV)   |
-| `snet-spare` | `10.0.0.96/27`  | 32  | Reserved for future services     |
-| **VNet**     | `10.0.0.0/24`   | 256 | Total address space              |
+| Subnet       | CIDR           | IPs | Purpose                        |
+| ------------ | -------------- | --- | ------------------------------ |
+| `snet-app`   | `10.0.0.0/26`  | 64  | App Service VNet integration   |
+| `snet-pe`    | `10.0.0.64/27` | 32  | Private Endpoints (Cosmos, KV) |
+| `snet-spare` | `10.0.0.96/27` | 32  | Reserved for future services   |
+| **VNet**     | `10.0.0.0/24`  | 256 | Total address space            |
 
 ### Cosmos DB Containers
 
@@ -294,12 +294,12 @@ constraints dictate otherwise.
 
 ### Deployment Target
 
-| Parameter       | Value              |
-| --------------- | ------------------ |
-| Resource Group  | `rg-hackops-dev`   |
-| Environment     | `dev`              |
-| Project Name    | `hackops`          |
-| Deployment Mode | Deployment Stacks  |
+| Parameter       | Value             |
+| --------------- | ----------------- |
+| Resource Group  | `rg-hackops-dev`  |
+| Environment     | `dev`             |
+| Project Name    | `hackops`         |
+| Deployment Mode | Deployment Stacks |
 
 ---
 

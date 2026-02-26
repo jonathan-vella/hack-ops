@@ -14,19 +14,19 @@ All requirements from `01-requirements.md` have been reviewed.
 The proposed architecture satisfies every functional and
 non-functional requirement.
 
-| Requirement area            | Status | Notes                                          |
-| --------------------------- | ------ | ---------------------------------------------- |
-| Hackathon lifecycle         | ✅      | Cosmos DB state machine, App Service API        |
-| Hacker onboarding           | ✅      | Rate-limited join endpoint, event code lookup   |
-| Team management             | ✅      | Fisher-Yates in API route, Cosmos DB storage    |
-| Scoring engine              | ✅      | Pointer + versioned rubric pattern in Cosmos DB |
-| Leaderboard                 | ✅      | SSR via Next.js, aggregation query on scores    |
-| Challenge progression       | ✅      | Progression container, gate middleware          |
-| Auth & authorization        | ✅      | Easy Auth + role resolution from roles container |
-| Admin operations            | ✅      | Audit trail in submissions, role management     |
-| Network security            | ✅      | Private Endpoint, VNet integration, NSGs        |
-| Cost target (dev ~$30-50)   | ✅      | Serverless Cosmos + B1 App Service              |
-| Performance (< 2s SSR)      | ✅      | App Service always-on, SSR server components    |
+| Requirement area          | Status | Notes                                            |
+| ------------------------- | ------ | ------------------------------------------------ |
+| Hackathon lifecycle       | ✅     | Cosmos DB state machine, App Service API         |
+| Hacker onboarding         | ✅     | Rate-limited join endpoint, event code lookup    |
+| Team management           | ✅     | Fisher-Yates in API route, Cosmos DB storage     |
+| Scoring engine            | ✅     | Pointer + versioned rubric pattern in Cosmos DB  |
+| Leaderboard               | ✅     | SSR via Next.js, aggregation query on scores     |
+| Challenge progression     | ✅     | Progression container, gate middleware           |
+| Auth & authorization      | ✅     | Easy Auth + role resolution from roles container |
+| Admin operations          | ✅     | Audit trail in submissions, role management      |
+| Network security          | ✅     | Private Endpoint, VNet integration, NSGs         |
+| Cost target (dev ~$30-50) | ✅     | Serverless Cosmos + B1 App Service               |
+| Performance (< 2s SSR)    | ✅     | App Service always-on, SSR server components     |
 
 ---
 
@@ -160,29 +160,29 @@ runbook during Phase 12 production hardening.
 
 ### WAF Score Summary
 
-| Pillar                   | Score | Rationale                           |
-| ------------------------ | ----- | ----------------------------------- |
-| Security                 | 4/5   | Private networking, managed identity |
-| Reliability              | 3/5   | Single-region, relaxed SLA          |
-| Performance Efficiency   | 4/5   | SSR + serverless, always-on compute |
-| Cost Optimization        | 5/5   | Serverless, right-sized tiers       |
-| Operational Excellence   | 4/5   | Full IaC, observability, CI/CD      |
-| **Weighted Average**     | **4.0** | Appropriate for workload profile  |
+| Pillar                 | Score   | Rationale                            |
+| ---------------------- | ------- | ------------------------------------ |
+| Security               | 4/5     | Private networking, managed identity |
+| Reliability            | 3/5     | Single-region, relaxed SLA           |
+| Performance Efficiency | 4/5     | SSR + serverless, always-on compute  |
+| Cost Optimization      | 5/5     | Serverless, right-sized tiers        |
+| Operational Excellence | 4/5     | Full IaC, observability, CI/CD       |
+| **Weighted Average**   | **4.0** | Appropriate for workload profile     |
 
 ---
 
 ## 📦 Resource SKU Recommendations
 
-| Resource              | Dev SKU            | Prod SKU           | Est. Dev $/mo | Est. Prod $/mo |
-| --------------------- | ------------------ | ------------------ | ------------- | -------------- |
-| App Service Plan      | B1 (1C/1.75GB)    | S1 (1C/1.75GB)     | ~$13          | ~$55           |
-| Cosmos DB NoSQL       | Serverless         | Serverless         | ~$1-5         | ~$5-15         |
-| Key Vault             | Standard           | Standard           | ~$0.50        | ~$0.50         |
-| Log Analytics         | Pay-as-you-go      | Pay-as-you-go      | ~$2-5         | ~$5-10         |
-| Application Insights  | Pay-as-you-go      | Pay-as-you-go      | ~$0-2         | ~$2-5          |
-| Private DNS Zone      | —                  | —                  | ~$0.50        | ~$0.50         |
-| VNet / NSG            | Free               | Free               | $0            | $0             |
-| **Total**             |                    |                    | **~$17-26**   | **~$68-86**    |
+| Resource             | Dev SKU        | Prod SKU       | Est. Dev $/mo | Est. Prod $/mo |
+| -------------------- | -------------- | -------------- | ------------- | -------------- |
+| App Service Plan     | B1 (1C/1.75GB) | S1 (1C/1.75GB) | ~$13          | ~$55           |
+| Cosmos DB NoSQL      | Serverless     | Serverless     | ~$1-5         | ~$5-15         |
+| Key Vault            | Standard       | Standard       | ~$0.50        | ~$0.50         |
+| Log Analytics        | Pay-as-you-go  | Pay-as-you-go  | ~$2-5         | ~$5-10         |
+| Application Insights | Pay-as-you-go  | Pay-as-you-go  | ~$0-2         | ~$2-5          |
+| Private DNS Zone     | —              | —              | ~$0.50        | ~$0.50         |
+| VNet / NSG           | Free           | Free           | $0            | $0             |
+| **Total**            |                |                | **~$17-26**   | **~$68-86**    |
 
 > Estimates are parametric approximations. Azure Pricing MCP was
 > not available for this assessment. Verify with the Azure Pricing
@@ -269,41 +269,41 @@ runbook during Phase 12 production hardening.
 
 ### Deployment Phases
 
-| Phase     | Resources                                | Dependencies |
-| --------- | ---------------------------------------- | ------------ |
-| Phase 1.5 | Governance discovery                     | Azure access |
-| Phase 2   | VNet, subnets, NSGs, Log Analytics, AI, KV | None       |
-| Phase 3   | Cosmos DB, Private Endpoint, DNS Zone    | Phase 2      |
-| Phase 4   | App Service Plan, App Service, Easy Auth | Phase 2, 3   |
+| Phase     | Resources                                  | Dependencies |
+| --------- | ------------------------------------------ | ------------ |
+| Phase 1.5 | Governance discovery                       | Azure access |
+| Phase 2   | VNet, subnets, NSGs, Log Analytics, AI, KV | None         |
+| Phase 3   | Cosmos DB, Private Endpoint, DNS Zone      | Phase 2      |
+| Phase 4   | App Service Plan, App Service, Easy Auth   | Phase 2, 3   |
 
 ### Phase 2 Module Map
 
-| Module               | Resources                                |
-| -------------------- | ---------------------------------------- |
-| `networking.bicep`   | VNet, 3 subnets, 3 NSGs                 |
-| `monitoring.bicep`   | Log Analytics workspace, App Insights    |
-| `key-vault.bicep`    | Key Vault, private endpoint, DNS         |
+| Module             | Resources                             |
+| ------------------ | ------------------------------------- |
+| `networking.bicep` | VNet, 3 subnets, 3 NSGs               |
+| `monitoring.bicep` | Log Analytics workspace, App Insights |
+| `key-vault.bicep`  | Key Vault, private endpoint, DNS      |
 
 ### Phase 3 Module Map
 
-| Module              | Resources                                    |
-| ------------------- | -------------------------------------------- |
-| `cosmos-db.bicep`   | Cosmos DB account, 10 containers, PE, DNS, SQL role |
+| Module            | Resources                                           |
+| ----------------- | --------------------------------------------------- |
+| `cosmos-db.bicep` | Cosmos DB account, 10 containers, PE, DNS, SQL role |
 
 ### Phase 4 Module Map
 
-| Module               | Resources                                       |
-| -------------------- | ----------------------------------------------- |
-| `app-service.bicep`  | ASP, App Service, VNet integration, Easy Auth, slots |
+| Module              | Resources                                            |
+| ------------------- | ---------------------------------------------------- |
+| `app-service.bicep` | ASP, App Service, VNet integration, Easy Auth, slots |
 
 ### Bicep Parameters
 
-| Parameter       | Type   | Default            |
-| --------------- | ------ | ------------------ |
-| `environment`   | string | `'dev'`            |
-| `projectName`   | string | `'hackops'`        |
-| `location`      | string | `'swedencentral'`  |
-| `owner`         | string | Required           |
+| Parameter     | Type   | Default           |
+| ------------- | ------ | ----------------- |
+| `environment` | string | `'dev'`           |
+| `projectName` | string | `'hackops'`       |
+| `location`    | string | `'swedencentral'` |
+| `owner`       | string | Required          |
 
 ---
 

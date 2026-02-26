@@ -49,11 +49,11 @@ provisioning is required.
 
 ## 🔄 Alternatives Considered
 
-| Option                  | Pros                               | Cons                                         | WAF Impact                     |
-| ----------------------- | ---------------------------------- | -------------------------------------------- | ------------------------------ |
-| **Serverless** (chosen) | Pay-per-use, no minimum, auto-burst | No guaranteed throughput, 1K RU/s burst cap  | Cost: ↑, Reliability: →       |
-| Provisioned (400 RU/s)  | Guaranteed throughput, SLA covered  | ~$23/mo minimum even with zero traffic       | Cost: ↓, Reliability: ↑       |
-| Provisioned autoscale   | Scales 10-100% of max RU/s         | Minimum 1000 RU/s max = ~$58/mo min          | Cost: ↓↓, Reliability: ↑      |
+| Option                  | Pros                                | Cons                                        | WAF Impact               |
+| ----------------------- | ----------------------------------- | ------------------------------------------- | ------------------------ |
+| **Serverless** (chosen) | Pay-per-use, no minimum, auto-burst | No guaranteed throughput, 1K RU/s burst cap | Cost: ↑, Reliability: →  |
+| Provisioned (400 RU/s)  | Guaranteed throughput, SLA covered  | ~$23/mo minimum even with zero traffic      | Cost: ↓, Reliability: ↑  |
+| Provisioned autoscale   | Scales 10-100% of max RU/s          | Minimum 1000 RU/s max = ~$58/mo min         | Cost: ↓↓, Reliability: ↑ |
 
 **Rejection rationale**:
 
@@ -88,8 +88,8 @@ provisioning is required.
 
 ## 🏛️ WAF Pillar Analysis
 
-| Pillar      | Impact | Notes                                              |
-| ----------- | ------ | -------------------------------------------------- |
+| Pillar      | Impact | Notes                                               |
+| ----------- | ------ | --------------------------------------------------- |
 | Security    | →      | Same Private Endpoint, managed identity access      |
 | Reliability | ↓      | No SLA on serverless; acceptable for hackathon tool |
 | Performance | →      | 1K RU/s burst sufficient for ~75 users              |

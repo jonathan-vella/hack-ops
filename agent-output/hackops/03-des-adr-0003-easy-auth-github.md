@@ -49,12 +49,12 @@ authentication, using the `roles` Cosmos DB container.
 
 ## 🔄 Alternatives Considered
 
-| Option                          | Pros                                  | Cons                                             | WAF Impact                   |
-| ------------------------------- | ------------------------------------- | ------------------------------------------------ | ---------------------------- |
-| **Easy Auth + GitHub** (chosen) | Zero auth code, built-in, secure      | App Service lock-in, enterprise may block GitHub  | Security: ↑, Operations: ↑  |
-| NextAuth.js                     | Platform-agnostic, flexible providers | Custom code, session management, token storage    | Security: ↓, Operations: ↓  |
-| Entra ID with external IDs      | Enterprise-approved, SAML/OIDC        | Complex setup, overkill for GitHub-centric tool   | Security: ↑, Operations: ↓  |
-| MSAL + custom middleware        | Full control, Entra ID native         | Heavy implementation burden for solo dev          | Security: →, Operations: ↓↓ |
+| Option                          | Pros                                  | Cons                                             | WAF Impact                  |
+| ------------------------------- | ------------------------------------- | ------------------------------------------------ | --------------------------- |
+| **Easy Auth + GitHub** (chosen) | Zero auth code, built-in, secure      | App Service lock-in, enterprise may block GitHub | Security: ↑, Operations: ↑  |
+| NextAuth.js                     | Platform-agnostic, flexible providers | Custom code, session management, token storage   | Security: ↓, Operations: ↓  |
+| Entra ID with external IDs      | Enterprise-approved, SAML/OIDC        | Complex setup, overkill for GitHub-centric tool  | Security: ↑, Operations: ↓  |
+| MSAL + custom middleware        | Full control, Entra ID native         | Heavy implementation burden for solo dev         | Security: →, Operations: ↓↓ |
 
 **Rejection rationale**:
 
@@ -104,13 +104,13 @@ authentication, using the `roles` Cosmos DB container.
 
 ## 🏛️ WAF Pillar Analysis
 
-| Pillar      | Impact | Notes                                              |
-| ----------- | ------ | -------------------------------------------------- |
-| Security    | ↑↑     | No custom auth code = smaller attack surface       |
-| Reliability | →      | Depends on App Service + GitHub availability       |
+| Pillar      | Impact | Notes                                                |
+| ----------- | ------ | ---------------------------------------------------- |
+| Security    | ↑↑     | No custom auth code = smaller attack surface         |
+| Reliability | →      | Depends on App Service + GitHub availability         |
 | Performance | →      | Negligible overhead — auth handled at platform level |
-| Cost        | ↑      | Free feature, no additional service needed          |
-| Operations  | ↑↑     | Zero auth code to maintain, patch, or audit         |
+| Cost        | ↑      | Free feature, no additional service needed           |
+| Operations  | ↑↑     | Zero auth code to maintain, patch, or audit          |
 
 ## 🔒 Compliance Considerations
 
