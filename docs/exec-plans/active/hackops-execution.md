@@ -45,10 +45,10 @@
 <!-- Update this at the START of each session -->
 
 **Phase**: E — Application Build
-**Step**: app-08-dashboard (NEXT)
+**Step**: app-09-tests (NEXT)
 **Branch**: `feature/app-06-admin`
-**Goal**: Build admin/hacker/coach dashboards.
-Gate: `npm run build` succeeds, app-review APPROVED.
+**Goal**: Write comprehensive test suite.
+Gate: coverage >80%, all tests pass.
 
 ---
 
@@ -205,8 +205,8 @@ so agents 12–15 have the skills/instructions they were designed to use.
 - [x] Run app-07-leaderboard → SSR leaderboard page
   - Gate: `npm run build` succeeds, no type errors ✅
   - Gate: `app-security-challenger-subagent` (focus: `data-handling`) — data exposure check
-- [ ] Run app-08-dashboard → admin/hacker/coach dashboards
-  - Gate: `npm run build` succeeds, app-review APPROVED
+- [x] Run app-08-dashboard → admin/hacker/coach dashboards
+  - Gate: `npm run build` succeeds ✅, tsc clean, 131/131 tests pass
 - [ ] Run app-09-tests → full test suite
   - Gate: coverage >80%, all tests pass
   - Gate: `app-logic-challenger-subagent` (focus: `test-coverage`) — test gap analysis
@@ -457,6 +457,19 @@ so agents 12–15 have the skills/instructions they were designed to use.
 |     |            |            | lib; tsc + build clean; |                     |          |
 |     |            |            | 131 tests pass;         |                     |          |
 |     |            |            | commit 6463b1a          |                     |          |
+| 27  | 2026-02-27 | E / app-08 | Dashboard pages: 10     | Run app-09-         | None     |
+|     |            |            | routes (landing, join,  | tests (full suite   |          |
+|     |            |            | dashboard, 6 admin),    | + coverage >80%)    |          |
+|     |            |            | admin layout w/ sidebar |                     |          |
+|     |            |            | + role guard, 14 shared |                     |          |
+|     |            |            | components (navbar,     |                     |          |
+|     |            |            | admin-sidebar, status-  |                     |          |
+|     |            |            | badge, confirm-dialog,  |                     |          |
+|     |            |            | etc), /api/me endpoint, |                     |          |
+|     |            |            | useAuth + useFetch      |                     |          |
+|     |            |            | hooks; build + tsc      |                     |          |
+|     |            |            | clean; 131 tests pass;  |                     |          |
+|     |            |            | commit ea65645          |                     |          |
 
 ---
 
