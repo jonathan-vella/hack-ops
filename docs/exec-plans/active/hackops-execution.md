@@ -351,7 +351,7 @@ Gate: role guard unit tests pass + security review.
 |     |            |            | lint:md passes (0      | monorepo            |          |
 |     |            |            | errors)                |                     |          |
 | 19  | 2026-02-27 | E / app-01 | Scaffolded Turborepo   | Run app-02-auth     | None     |
-|     |            |            | + Next.js 15 monorepo; | (auth middleware +   |          |
+|     |            |            | + Next.js 15 monorepo; | (auth middleware +  |          |
 |     |            |            | 10 shared types, 10    | role guards)        |          |
 |     |            |            | shadcn/ui components,  |                     |          |
 |     |            |            | Cosmos client, health  |                     |          |
