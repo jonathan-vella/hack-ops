@@ -27,13 +27,13 @@ All automated tests run in CI on every pull request.
 
 ## Tools
 
-| Tool                     | Purpose                              |
-| ------------------------ | ------------------------------------ |
-| **Vitest**               | Test runner (v4, ES modules native)  |
-| **jsdom**                | DOM environment for React components |
-| **@testing-library/react** | Component testing utilities        |
-| **@vitest/coverage-v8**  | Coverage reporting (V8 engine)       |
-| **Playwright** (planned) | Browser-based E2E tests              |
+| Tool                       | Purpose                              |
+| -------------------------- | ------------------------------------ |
+| **Vitest**                 | Test runner (v4, ES modules native)  |
+| **jsdom**                  | DOM environment for React components |
+| **@testing-library/react** | Component testing utilities          |
+| **@vitest/coverage-v8**    | Coverage reporting (V8 engine)       |
+| **Playwright** (planned)   | Browser-based E2E tests              |
 
 ## Coverage Targets
 
@@ -55,7 +55,7 @@ Excluded: test files, `cosmos.ts` (infra), hooks (client-only), validation barre
 | Auth principal  | `vi.mock("@/lib/auth")` — return test principal   |
 | Role resolution | `vi.mock("@/lib/roles")` — return desired role    |
 | Audit logger    | `vi.mock("@/lib/audit")` — spy on calls           |
-| `NextRequest`   | Construct with test URL and headers                |
+| `NextRequest`   | Construct with test URL and headers               |
 
 ## What to Test Against Emulator
 

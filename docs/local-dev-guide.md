@@ -4,11 +4,11 @@
 
 ## Prerequisites
 
-| Tool      | Version | Purpose                      |
-| --------- | ------- | ---------------------------- |
-| Node.js   | ≥20 LTS | Runtime                      |
-| npm       | ≥10     | Package manager (workspaces) |
-| Docker    | Latest  | Cosmos DB emulator           |
+| Tool    | Version | Purpose                      |
+| ------- | ------- | ---------------------------- |
+| Node.js | ≥20 LTS | Runtime                      |
+| npm     | ≥10     | Package manager (workspaces) |
+| Docker  | Latest  | Cosmos DB emulator           |
 
 ## 1. Clone and Install
 
@@ -27,7 +27,7 @@ docker run -d --name cosmos-emulator \
   mcr.microsoft.com/cosmosdb/linux/azure-cosmos-emulator:latest
 ```
 
-Wait for the emulator to be ready (check https://localhost:8081/_explorer/index.html).
+Wait for the emulator to be ready (check https://localhost:8081/\_explorer/index.html).
 
 > The emulator uses a well-known key for local development. Never use this
 > key in production.
@@ -89,20 +89,20 @@ npm run test -- --coverage          # Coverage report
 
 Key routes to verify after setup:
 
-| Method | Route                              | Expected |
-| ------ | ---------------------------------- | -------- |
-| GET    | `/api/hackathons`                  | 200 + array |
-| POST   | `/api/hackathons`                  | 201 (admin) |
-| GET    | `/api/hackathons/:id`              | 200 + object |
-| POST   | `/api/hackathons/:id/join`         | 200 (hacker) |
-| GET    | `/api/hackathons/:id/teams`        | 200 + array |
-| GET    | `/api/hackathons/:id/leaderboard`  | 200 + array |
+| Method | Route                             | Expected     |
+| ------ | --------------------------------- | ------------ |
+| GET    | `/api/hackathons`                 | 200 + array  |
+| POST   | `/api/hackathons`                 | 201 (admin)  |
+| GET    | `/api/hackathons/:id`             | 200 + object |
+| POST   | `/api/hackathons/:id/join`        | 200 (hacker) |
+| GET    | `/api/hackathons/:id/teams`       | 200 + array  |
+| GET    | `/api/hackathons/:id/leaderboard` | 200 + array  |
 
 ## Troubleshooting
 
-| Problem                          | Solution                                           |
-| -------------------------------- | -------------------------------------------------- |
-| Cosmos emulator not reachable    | Check Docker container is running: `docker ps`     |
-| Certificate errors               | Set `NODE_TLS_REJECT_UNAUTHORIZED=0` in `.env.local` |
-| Port 3000 in use                 | Kill existing process: `lsof -ti:3000 \| xargs kill` |
-| Seed script fails                | Ensure emulator is fully started (takes ~30s)      |
+| Problem                       | Solution                                             |
+| ----------------------------- | ---------------------------------------------------- |
+| Cosmos emulator not reachable | Check Docker container is running: `docker ps`       |
+| Certificate errors            | Set `NODE_TLS_REJECT_UNAUTHORIZED=0` in `.env.local` |
+| Port 3000 in use              | Kill existing process: `lsof -ti:3000 \| xargs kill` |
+| Seed script fails             | Ensure emulator is fully started (takes ~30s)        |

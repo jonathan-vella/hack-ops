@@ -39,7 +39,8 @@ const sampleDocs: Record<string, object[]> = {
       id: "hack-2026-swedenai",
       _type: "hackathon",
       name: "Sweden AI MicroHack 2026",
-      description: "Build AI-powered solutions using Azure OpenAI and Cosmos DB",
+      description:
+        "Build AI-powered solutions using Azure OpenAI and Cosmos DB",
       status: "active",
       eventCode: "4821",
       teamSize: 5,
@@ -56,9 +57,21 @@ const sampleDocs: Record<string, object[]> = {
       hackathonId: "hack-2026-swedenai",
       name: "Team Alpha",
       members: [
-        { hackerId: "hkr-a1b2c3d4", githubLogin: "alice-dev", displayName: "Alice Andersson" },
-        { hackerId: "hkr-e5f6g7h8", githubLogin: "bob-coder", displayName: "Bob Bergström" },
-        { hackerId: "hkr-i9j0k1l2", githubLogin: "carol-hacks", displayName: "Carol Chen" },
+        {
+          hackerId: "hkr-a1b2c3d4",
+          githubLogin: "alice-dev",
+          displayName: "Alice Andersson",
+        },
+        {
+          hackerId: "hkr-e5f6g7h8",
+          githubLogin: "bob-coder",
+          displayName: "Bob Bergström",
+        },
+        {
+          hackerId: "hkr-i9j0k1l2",
+          githubLogin: "carol-hacks",
+          displayName: "Carol Chen",
+        },
       ],
     },
   ],
@@ -94,7 +107,8 @@ const sampleDocs: Record<string, object[]> = {
       hackathonId: "hack-2026-swedenai",
       order: 1,
       title: "Environment Setup",
-      description: "Configure your development environment with Azure OpenAI access.",
+      description:
+        "Configure your development environment with Azure OpenAI access.",
       maxScore: 30,
       createdBy: "github|12345678",
       createdAt: "2026-02-18T10:00:00Z",
@@ -113,9 +127,19 @@ const sampleDocs: Record<string, object[]> = {
       scoredBy: "github|11111111",
       scoredAt: "2026-02-21T14:00:00Z",
       breakdown: [
-        { criterionId: "c1", label: "Environment configured", score: 10, maxScore: 10 },
+        {
+          criterionId: "c1",
+          label: "Environment configured",
+          score: 10,
+          maxScore: 10,
+        },
         { criterionId: "c2", label: "API key working", score: 8, maxScore: 10 },
-        { criterionId: "c3", label: "Documentation quality", score: 7, maxScore: 10 },
+        {
+          criterionId: "c3",
+          label: "Documentation quality",
+          score: 7,
+          maxScore: 10,
+        },
       ],
     },
   ],
@@ -126,7 +150,8 @@ const sampleDocs: Record<string, object[]> = {
       teamId: "team-alpha-4821",
       hackathonId: "hack-2026-swedenai",
       challengeId: "ch-001-setup",
-      evidenceUrl: "https://github.com/team-alpha/evidence/blob/main/challenge-1.md",
+      evidenceUrl:
+        "https://github.com/team-alpha/evidence/blob/main/challenge-1.md",
       submittedBy: "github|87654321",
       submittedAt: "2026-02-21T12:00:00Z",
       status: "reviewed",
@@ -143,9 +168,24 @@ const sampleDocs: Record<string, object[]> = {
       version: 1,
       isActive: true,
       criteria: [
-        { id: "c1", label: "Environment configured", maxScore: 10, description: "Dev env is fully set up" },
-        { id: "c2", label: "API key working", maxScore: 10, description: "Azure OpenAI key validated" },
-        { id: "c3", label: "Documentation quality", maxScore: 10, description: "Clear setup instructions" },
+        {
+          id: "c1",
+          label: "Environment configured",
+          maxScore: 10,
+          description: "Dev env is fully set up",
+        },
+        {
+          id: "c2",
+          label: "API key working",
+          maxScore: 10,
+          description: "Azure OpenAI key validated",
+        },
+        {
+          id: "c3",
+          label: "Documentation quality",
+          maxScore: 10,
+          description: "Clear setup instructions",
+        },
       ],
       createdBy: "github|12345678",
       createdAt: "2026-02-18T10:30:00Z",
@@ -158,7 +198,12 @@ const sampleDocs: Record<string, object[]> = {
       teamId: "team-alpha-4821",
       hackathonId: "hack-2026-swedenai",
       challenges: [
-        { challengeId: "ch-001-setup", status: "approved", unlockedAt: "2026-02-20T08:00:00Z", approvedAt: "2026-02-21T14:00:00Z" },
+        {
+          challengeId: "ch-001-setup",
+          status: "approved",
+          unlockedAt: "2026-02-20T08:00:00Z",
+          approvedAt: "2026-02-21T14:00:00Z",
+        },
       ],
       _etag: undefined,
     },
@@ -206,7 +251,9 @@ async function seed() {
   const client = new CosmosClient({ endpoint, key });
   console.log("Connecting to Cosmos DB...");
 
-  const { database } = await client.databases.createIfNotExists({ id: databaseName });
+  const { database } = await client.databases.createIfNotExists({
+    id: databaseName,
+  });
   console.log(`Database '${databaseName}' ready`);
 
   for (const def of containers) {
@@ -214,7 +261,9 @@ async function seed() {
       id: def.id,
       partitionKey: { paths: [def.partitionKey] },
     });
-    console.log(`  Container '${def.id}' ready (partition: ${def.partitionKey})`);
+    console.log(
+      `  Container '${def.id}' ready (partition: ${def.partitionKey})`,
+    );
 
     const docs = sampleDocs[def.id];
     if (docs) {

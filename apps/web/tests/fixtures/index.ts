@@ -30,9 +30,21 @@ export const fixtures = {
     hackathonId: HACKATHON_ID,
     name: "Team Alpha",
     members: [
-      { hackerId: "hkr-a1b2c3d4", githubLogin: "alice-dev", displayName: "Alice Andersson" },
-      { hackerId: "hkr-e5f6g7h8", githubLogin: "bob-coder", displayName: "Bob Bergström" },
-      { hackerId: "hkr-i9j0k1l2", githubLogin: "carol-hacks", displayName: "Carol Chen" },
+      {
+        hackerId: "hkr-a1b2c3d4",
+        githubLogin: "alice-dev",
+        displayName: "Alice Andersson",
+      },
+      {
+        hackerId: "hkr-e5f6g7h8",
+        githubLogin: "bob-coder",
+        displayName: "Bob Bergström",
+      },
+      {
+        hackerId: "hkr-i9j0k1l2",
+        githubLogin: "carol-hacks",
+        displayName: "Carol Chen",
+      },
     ],
   },
 
@@ -56,7 +68,8 @@ export const fixtures = {
     hackathonId: HACKATHON_ID,
     order: 1,
     title: "Environment Setup",
-    description: "Configure your development environment with Azure OpenAI access.",
+    description:
+      "Configure your development environment with Azure OpenAI access.",
     maxScore: 30,
     createdBy: ADMIN_USER_ID,
     createdAt: "2026-02-18T10:00:00Z",
@@ -70,9 +83,24 @@ export const fixtures = {
     version: 1,
     isActive: true,
     criteria: [
-      { id: "c1", label: "Environment configured", maxScore: 10, description: "Dev env is fully set up" },
-      { id: "c2", label: "API key working", maxScore: 10, description: "Azure OpenAI key validated" },
-      { id: "c3", label: "Documentation quality", maxScore: 10, description: "Clear setup instructions" },
+      {
+        id: "c1",
+        label: "Environment configured",
+        maxScore: 10,
+        description: "Dev env is fully set up",
+      },
+      {
+        id: "c2",
+        label: "API key working",
+        maxScore: 10,
+        description: "Azure OpenAI key validated",
+      },
+      {
+        id: "c3",
+        label: "Documentation quality",
+        maxScore: 10,
+        description: "Clear setup instructions",
+      },
     ],
     createdBy: ADMIN_USER_ID,
     createdAt: "2026-02-18T10:30:00Z",
@@ -84,7 +112,8 @@ export const fixtures = {
     teamId: "team-alpha-4821",
     hackathonId: HACKATHON_ID,
     challengeId: "ch-001-setup",
-    evidenceUrl: "https://github.com/team-alpha/evidence/blob/main/challenge-1.md",
+    evidenceUrl:
+      "https://github.com/team-alpha/evidence/blob/main/challenge-1.md",
     submittedBy: HACKER_USER_ID,
     submittedAt: "2026-02-21T12:00:00Z",
     status: "reviewed" as const,
@@ -104,9 +133,19 @@ export const fixtures = {
     scoredBy: COACH_USER_ID,
     scoredAt: "2026-02-21T14:00:00Z",
     breakdown: [
-      { criterionId: "c1", label: "Environment configured", score: 10, maxScore: 10 },
+      {
+        criterionId: "c1",
+        label: "Environment configured",
+        score: 10,
+        maxScore: 10,
+      },
       { criterionId: "c2", label: "API key working", score: 8, maxScore: 10 },
-      { criterionId: "c3", label: "Documentation quality", score: 7, maxScore: 10 },
+      {
+        criterionId: "c3",
+        label: "Documentation quality",
+        score: 7,
+        maxScore: 10,
+      },
     ],
   },
 
