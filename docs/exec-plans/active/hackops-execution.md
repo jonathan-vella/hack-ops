@@ -44,11 +44,10 @@
 
 <!-- Update this at the START of each session -->
 
-**Phase**: E — Application Build
-**Step**: app-10-ci-cd (NEXT)
+**Phase**: F — Supporting Artifacts
+**Step**: F1: seed-cosmos.ts (NEXT)
 **Branch**: `feature/app-06-admin`
-**Goal**: Create CI/CD workflows (lint, type-check, test, deploy).
-Gate: workflows pass dry-run validation.
+**Goal**: Phase E complete. Create seed script, docs, and update repo metadata.
 
 ---
 
@@ -210,8 +209,8 @@ so agents 12–15 have the skills/instructions they were designed to use.
 - [x] Run app-09-tests → full test suite
   - Gate: coverage >80%, all tests pass ✅ (178/178, lines 93%, branches 86%)
   - Gate: `app-logic-challenger-subagent` (focus: `test-coverage`) — test gap analysis
-- [ ] Run app-10-ci-cd → CI/CD workflows
-  - Gate: workflows pass dry-run validation
+- [x] Run app-10-ci-cd → CI/CD workflows
+  - Gate: actionlint passes on all 5 workflows, 178 tests pass ✅
 
 ### Phase F — Supporting Artifacts
 
@@ -482,6 +481,16 @@ so agents 12–15 have the skills/instructions they were designed to use.
 |     |            |            | pass; lines 93%,        |                     |          |
 |     |            |            | branches 86%;           |                     |          |
 |     |            |            | commit 1a92ad3          |                     |          |
+| 29  | 2026-02-27 | E / app-10 | CI/CD workflows: CI     | Phase F: F1 seed    | None     |
+|     |            |            | (5 jobs: lint, type-    | script, F2 OpenAPI, |          |
+|     |            |            | check, test+coverage,   | F3-F6 docs + repo   |          |
+|     |            |            | bicep-validate, build), | metadata updates    |          |
+|     |            |            | deploy (dev+prod envs,  |                     |          |
+|     |            |            | OIDC, staging slot      |                     |          |
+|     |            |            | swap, health check);    |                     |          |
+|     |            |            | actionlint 0 errors;    |                     |          |
+|     |            |            | Phase E complete;       |                     |          |
+|     |            |            | commit 4b0447b          |                     |          |
 
 ---
 
