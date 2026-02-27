@@ -8,7 +8,7 @@
 | **Skills**          | A     | 20/20 skills committed and pass GA format validation         | Maintain as new skills are added                   |
 | **Instructions**    | A     | 28 on disk; 2 non-blocking applyTo warnings (cosmetic only)  | Maintain; warnings are cosmetic and non-blocking   |
 | **Infrastructure**  | B+    | Core Bicep modules + deployment artifacts complete           | Finish open Phase 4 items (#147, #148)             |
-| **Application**     | A     | 24 API routes, 10 pages, 26 components; 178 tests (18 files); 93% line coverage; app-09 done | Complete app-10 CI/CD |
+| **Application**     | A     | 24 API routes, 10 pages, 26 components; 178 tests (18 files); 93% line coverage; CI/CD done | Phase F complete — all supporting artifacts created |
 | **Documentation**   | A     | Docs fresh; skill count in README fixed; all counts accurate | Run doc-gardening after each bulk addition         |
 | **CI / Validation** | A     | 15 validators pass; ESLint flat config clean; all CI green   | Maintain; add validators as new domains arrive     |
 | **Backlog**         | A     | Issue hygiene maintained; all tech debt resolved             | Continue closure cadence by milestone              |
@@ -27,6 +27,8 @@
 
 | Date       | Domain         | Change                                                                                     |
 | ---------- | -------------- | ------------------------------------------------------------------------------------------ |
+| 2026-02-27 | Application    | Phase F complete: seed script, test fixtures, testing-strategy, security-checklist, local-dev-guide |
+| 2026-02-27 | Documentation  | Phase F: added 3 new docs (testing-strategy, security-checklist, local-dev-guide); meta-docs updated |
 | 2026-02-27 | Application    | doc-gardening: A-→A; 178 tests (18 files), 93% coverage, 24 routes, 10 pages, 26 components |
 | 2026-02-27 | Documentation  | doc-gardening: fixed instruction count 21→28 in docs/README.md                             |
 | 2026-02-27 | Application    | doc-gardening: B+→A-; 107 tests, 16 routes, app-05 complete; 4 biz-rule warnings (planned) |

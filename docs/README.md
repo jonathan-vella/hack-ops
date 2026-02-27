@@ -29,6 +29,9 @@ See the [conductor agent](../.github/agents/01-conductor.agent.md) for orchestra
 | [UI Pages](ui-pages.md)                      | Page inventory & route map    |
 | [Environment Config](environment-config.md)  | Env vars & Key Vault refs     |
 | [Dev Containers](dev-containers.md)          | Docker setup and alternatives |
+| [Testing Strategy](testing-strategy.md)      | Test pyramid & coverage       |
+| [Security Checklist](security-checklist.md)  | Security invariants           |
+| [Local Dev Guide](local-dev-guide.md)        | Local setup step-by-step      |
 | [Backlog Setup](exec-plans/backlog-setup.md) | GitHub Project board config   |
 
 ---
