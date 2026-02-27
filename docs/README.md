@@ -102,7 +102,7 @@ See `AGENTS.md` at the repo root for the lightweight map.
 
 ---
 
-## Skills (15)
+## Skills (20)
 
 Skills are reusable capabilities that agents invoke or that activate automatically based on prompts.
 
@@ -146,6 +146,16 @@ Skills are reusable capabilities that agents invoke or that activate automatical
 | `microsoft-docs`           | Query official Microsoft documentation     | "microsoft docs", "learn.microsoft.com"        |
 | `microsoft-skill-creator`  | Create agent skills for Microsoft tech     | "create microsoft skill", "foundry skill"      |
 
+### App-Dev / HackOps (Category 4)
+
+| Skill                | Purpose                                          | Triggers                                 |
+| -------------------- | ------------------------------------------------ | ---------------------------------------- |
+| `hackops-domain`     | HackOps business rules, roles, lifecycle states  | "hackops", "hackathon rules", "scoring"  |
+| `nextjs-patterns`    | Next.js 15+ App Router patterns and conventions  | "next.js", "app router", "route handler" |
+| `cosmos-db-sdk`      | Cosmos DB for NoSQL SDK patterns (@azure/cosmos) | "cosmos db", "cosmos query", "upsert"    |
+| `shadcn-ui-patterns` | shadcn/ui components + Tailwind CSS v4 patterns  | "shadcn", "ui component", "tailwind"     |
+| `zod-validation`     | Zod 4 schema patterns for API + form validation  | "zod", "schema", "validate request"      |
+
 ---
 
 ## 7-Step Workflow (with Conductor)
@@ -183,8 +193,8 @@ azure-agentic-infraops/
 ├── AGENTS.md             # Lightweight map (start here)
 ├── QUALITY_SCORE.md      # Project health grades
 ├── .github/
-│   ├── agents/           # 15 agent definitions + 11 subagents
-│   ├── skills/           # 14 skill definitions (incl. golden-principles)
+│   ├── agents/           # 16 agent definitions + 11 subagents
+│   ├── skills/           # 20 skill definitions (incl. golden-principles)
 │   └── instructions/     # 21 file-type rules (consolidated)
 ├── agent-output/         # Generated artifacts
 ├── infra/bicep/          # Bicep templates

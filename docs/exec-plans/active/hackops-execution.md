@@ -44,13 +44,15 @@
 
 <!-- Update this at the START of each session -->
 
-**Phase**: E — Application Build (C-fix first)
-**Step**: C-fix 1–6 → remediate phantom completions from Phase C
-**Branch**: `feature/app-02-auth`
-**Goal**: Recreate the 5 missing skills, 5 missing instructions,
-fix `next lint`, recreate issue templates + business rules validator,
-and correct tracker checkboxes. Then continue with app-04-api-scoring.
-Gate: `npm run validate` + `npx next lint` pass.
+**Phase**: E — Application Build
+**Step**: app-04-api-scoring (IN PROGRESS — partially scaffolded)
+**Branch**: `feature/app-04-scoring` (created from main)
+**Goal**: Implement rubric CRUD, submission pipeline, review queue,
+approve/reject, and score override API routes.
+Gate: `tsc --noEmit` + endpoint tests pass.
+**Partial work**: Zod schemas created (`rubric.ts`, `submission.ts`,
+`score.ts` in `lib/validation/`). Route directories created but route
+handler files are empty. Resume by writing route handlers, then tests.
 
 ---
 
@@ -178,22 +180,22 @@ Doc-gardening discovered that Phase C sessions 8–9 marked items complete
 but artifacts were never committed. Recreate before continuing app builds
 so agents 12–15 have the skills/instructions they were designed to use.
 
-- [ ] C-fix 1: Recreate 5 app-dev skills (debt #15)
+- [x] C-fix 1: Recreate 5 app-dev skills (debt #15)
   - `hackops-domain`, `nextjs-patterns`, `cosmos-db-sdk`,
     `shadcn-ui-patterns`, `zod-validation`
-  - Gate: `npm run validate` passes
-- [ ] C-fix 2: Recreate 5 app-dev instructions (debt #16)
+  - Gate: `npm run validate` passes ✅
+- [x] C-fix 2: Recreate 5 app-dev instructions (debt #16)
   - `typescript`, `nextjs`, `react-components`, `testing`, `api-routes`
-  - Gate: `npm run lint:instruction-frontmatter` passes
-- [ ] C-fix 3: Fix `next lint` — ESLint 10 circular ref (debt #17)
+  - Gate: `npm run lint:instruction-frontmatter` passes ✅
+- [x] C-fix 3: Fix `next lint` — ESLint 10 circular ref (debt #17)
   - Pin ESLint to v9, or switch to native flat config
-  - Gate: `npx next lint` exits 0
-- [ ] C-fix 4: Recreate app issue templates (debt #18)
+  - Gate: `npx next lint` exits 0 ✅
+- [x] C-fix 4: Recreate app issue templates (debt #18)
   - `app-feature.yml`, `app-bug.yml`
-- [ ] C-fix 5: Recreate `validate-business-rules.mjs` + register in package.json (debt #19)
-  - Gate: `npm run validate:business-rules` exits 0
-- [ ] C-fix 6: Correct tracker phantom checkboxes (debt #20)
-  - Uncheck C3–C6 items that were never committed, re-check after recreation
+- [x] C-fix 5: Recreate `validate-business-rules.mjs` + register in package.json (debt #19)
+  - Gate: `npm run validate:business-rules` exits 0 ✅
+- [x] C-fix 6: Correct tracker phantom checkboxes (debt #20)
+  - Uncheck C3–C6 items that were never committed, re-check after recreation ✅
 
 - [ ] Run app-04-api-scoring → rubric/submission/review routes
   - Gate: `tsc --noEmit` + endpoint tests pass
@@ -413,6 +415,14 @@ so agents 12–15 have the skills/instructions they were designed to use.
 |     |            |            | checks), fixed ESLint  |                     |          |
 |     |            |            | 10 native flat config; |                     |          |
 |     |            |            | all validators pass    |                     |          |
+| 23  | 2026-02-27 | E / app-04 | Confirmed C-fix done;  | Write rubric/       | User     |
+|     |            |            | created branch         | submission/score    | paused   |
+|     |            |            | feature/app-04-scoring | route handlers,     | session  |
+|     |            |            | from main; created 3   | then tests;         |          |
+|     |            |            | Zod schemas (rubric,   | tsc + lint gates    |          |
+|     |            |            | submission, score);    |                     |          |
+|     |            |            | created route dirs;    |                     |          |
+|     |            |            | route files empty      |                     |          |
 
 ---
 

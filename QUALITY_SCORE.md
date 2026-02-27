@@ -2,16 +2,16 @@
 
 > Project health at a glance. Updated by the doc-gardening workflow and manual review.
 
-| Domain              | Grade | Gap Summary                                                     | Next Action                                                                                 |
-| ------------------- | ----- | --------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
-| **Agents**          | A     | 16 agents + 11 subagents; all pass validation                   | Maintain as agents are added                                                                |
-| **Skills**          | C     | 15 committed pass GA; 5 app-dev skills never committed          | Recreate hackops-domain, nextjs-patterns, cosmos-db-sdk, shadcn-ui-patterns, zod-validation |
-| **Instructions**    | B     | 23 on disk; 5 app-dev instructions never committed              | Recreate typescript, nextjs, react-components, testing, api-routes instructions             |
-| **Infrastructure**  | B+    | Core Bicep modules + deployment artifacts complete              | Finish open Phase 4 items (#147, #148)                                                      |
-| **Application**     | B     | Auth + hackathon/team/join API complete; 60 tests; lint broken  | Fix `next lint` (ESLint 10 + Next 16 compat); complete remaining 7 app prompts              |
-| **Documentation**   | A-    | Docs mostly fresh; session tracker has phantom completions      | Correct Phase C checkmarks in session tracker                                               |
-| **CI / Validation** | A-    | 14 validators pass; `next lint` broken (ESLint 10 circular ref) | Fix ESLint config or pin eslint-config-next                                                 |
-| **Backlog**         | A     | Issue hygiene maintained; all tech debt resolved                | Continue closure cadence by milestone                                                       |
+| Domain              | Grade | Gap Summary                                                  | Next Action                                            |
+| ------------------- | ----- | ------------------------------------------------------------ | ------------------------------------------------------ |
+| **Agents**          | A     | 16 agents + 11 subagents; all pass validation                | Maintain as agents are added                           |
+| **Skills**          | A     | 20/20 skills committed and pass GA format validation         | Maintain as new skills are added                       |
+| **Instructions**    | A     | 28 on disk; 2 non-blocking applyTo warnings (cosmetic only)  | Maintain; warnings are cosmetic and non-blocking       |
+| **Infrastructure**  | B+    | Core Bicep modules + deployment artifacts complete           | Finish open Phase 4 items (#147, #148)                 |
+| **Application**     | B+    | Auth + hackathon/team/join API; 60 tests; lint clean         | Complete remaining 7 app prompts; expand test coverage |
+| **Documentation**   | A     | Docs fresh; skill count in README fixed; all counts accurate | Run doc-gardening after each bulk addition             |
+| **CI / Validation** | A     | 15 validators pass; ESLint flat config clean; all CI green   | Maintain; add validators as new domains arrive         |
+| **Backlog**         | A     | Issue hygiene maintained; all tech debt resolved             | Continue closure cadence by milestone                  |
 
 ## Grading Scale
 
@@ -27,6 +27,12 @@
 
 | Date       | Domain         | Change                                                                                  |
 | ---------- | -------------- | --------------------------------------------------------------------------------------- |
+| 2026-02-27 | Documentation  | doc-gardening: fixed skill count 15→20 in docs/README.md; added 5 app-dev skills        |
+| 2026-02-27 | Skills         | Grade C→A: all 20 skills committed and passing GA validation                            |
+| 2026-02-27 | Instructions   | Grade B→A: all 28 committed; 2 cosmetic-only warnings (non-blocking)                    |
+| 2026-02-27 | CI/Validation  | Grade A-→A: ESLint flat config clean; all 15 validators pass                            |
+| 2026-02-27 | Application    | Grade B→B+: lint clean; auth + hackathon CRUD + join + teams; 60 tests                  |
+| 2026-02-27 | Documentation  | Grade A-→A: phantom completions resolved; all doc counts accurate                       |
 | 2026-02-27 | Application    | New domain at B: auth + hackathon CRUD + join + teams; 60 tests; lint broken            |
 | 2026-02-27 | Skills         | Grade A→C: 5 app-dev skills never committed (hackops-domain + 4 others); debt #15       |
 | 2026-02-27 | Instructions   | Grade A→B: 5 app-dev instructions never committed; debt #16                             |
