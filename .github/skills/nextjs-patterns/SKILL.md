@@ -1,11 +1,6 @@
 ---
 name: nextjs-patterns
-description: >-
-  Next.js 15+ App Router patterns for the HackOps platform. Covers
-  route handlers, server/client components, middleware, layouts, and
-  data fetching. Use when building pages, API routes, or debugging
-  Next.js behavior. Keywords: Next.js, App Router, route handler,
-  server component, client component, middleware, layout, RSC.
+description: Next.js 15+ App Router patterns for the HackOps platform. Covers route handlers, server/client components, middleware, layouts, and data fetching. Use when building pages, API routes, or debugging Next.js behavior. Keywords: Next.js, App Router, route handler, server component, client component, middleware, layout, RSC.
 ---
 
 # Next.js Patterns

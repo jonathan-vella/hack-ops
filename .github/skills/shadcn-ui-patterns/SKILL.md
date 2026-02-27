@@ -1,11 +1,6 @@
 ---
 name: shadcn-ui-patterns
-description: >-
-  shadcn/ui component patterns and Tailwind CSS v4 styling rules for
-  the HackOps platform. Covers component usage, composition, theming,
-  and accessibility. Use when building pages, layouts, or UI
-  components. Keywords: shadcn, shadcn/ui, Tailwind, component, UI,
-  dialog, form, table, card, button.
+description: shadcn/ui component patterns and Tailwind CSS v4 styling rules for the HackOps platform. Covers component usage, composition, theming, and accessibility. Use when building pages, layouts, or UI components. Keywords: shadcn, shadcn/ui, Tailwind, component, UI, dialog, form, table, card, button.
 ---
 
 # shadcn/ui Patterns

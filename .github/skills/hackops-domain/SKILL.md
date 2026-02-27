@@ -1,11 +1,6 @@
 ---
 name: hackops-domain
-description: >-
-  HackOps platform business rules, role matrix, lifecycle states, and
-  scoring invariants. Use when building API routes, writing tests,
-  or validating business logic for the HackOps hackathon management
-  platform. Keywords: hackathon, team, coach, hacker, admin, rubric,
-  scoring, leaderboard, event code, progression.
+description: HackOps platform business rules, role matrix, lifecycle states, and scoring invariants. Use when building API routes, writing tests, or validating business logic for the HackOps hackathon management platform. Keywords: hackathon, team, coach, hacker, admin, rubric, scoring, leaderboard, event code, progression.
 ---
 
 # HackOps Domain Knowledge

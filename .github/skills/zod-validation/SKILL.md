@@ -1,11 +1,6 @@
 ---
 name: zod-validation
-description: >-
-  Zod 4 schema patterns for the HackOps platform. Covers schema
-  definition, API request/response validation, form integration, and
-  shared type extraction. Use when writing API route handlers or form
-  schemas. Keywords: Zod, validation, schema, parse, safeParse, z.object,
-  z.enum, z.string, z.infer.
+description: Zod 4 schema patterns for the HackOps platform. Covers schema definition, API request/response validation, form integration, and shared type extraction. Use when writing API route handlers or form schemas. Keywords: Zod, validation, schema, parse, safeParse, z.object, z.enum, z.string, z.infer.
 ---
 
 # Zod Validation Patterns

@@ -1,11 +1,6 @@
 ---
 name: cosmos-db-sdk
-description: >-
-  Azure Cosmos DB for NoSQL SDK patterns for the HackOps platform.
-  Covers container operations, parameterized queries, bulk ops, and
-  error handling with @azure/cosmos v4. Use when building API route
-  handlers that read/write Cosmos DB data. Keywords: Cosmos DB,
-  @azure/cosmos, container, query, upsert, bulk, partition key.
+description: Azure Cosmos DB for NoSQL SDK patterns for the HackOps platform. Covers container operations, parameterized queries, bulk ops, and error handling with @azure/cosmos v4. Use when building API route handlers that read/write Cosmos DB data. Keywords: Cosmos DB, @azure/cosmos, container, query, upsert, bulk, partition key.
 ---
 
 # Cosmos DB SDK Patterns
@@ -92,11 +87,9 @@ const { resource } = await container.items.upsert<Hackathon>(document);
 ### Replace with Optimistic Concurrency
 
 ```typescript
-const { resource } = await container
-  .item(id, pk)
-  .replace<Hackathon>(updated, {
-    accessCondition: { type: "IfMatch", condition: etag },
-  });
+const { resource } = await container.item(id, pk).replace<Hackathon>(updated, {
+  accessCondition: { type: "IfMatch", condition: etag },
+});
 ```
 
 ## Bulk Operations
