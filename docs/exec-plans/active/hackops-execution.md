@@ -45,9 +45,9 @@
 <!-- Update this at the START of each session -->
 
 **Phase**: H (Hardening) — Phase 12
-**Step**: H1 — Re-run governance discovery
+**Step**: H6 — Final Deployment Validation
 **Branch**: `feature/phase-12-hardening`
-**Goal**: Production hardening — governance re-run, Bicep cross-ref, what-if, security baseline.
+**Goal**: Deploy with staging slot, swap, health check, smoke test; then H7 artifact updates and close.
 **Detailed plan**: `docs/exec-plans/active/phase12-production-hardening.md`
 
 ---
@@ -512,12 +512,18 @@ so agents 12–15 have the skills/instructions they were designed to use.
 |     |            |            | only main remains.       |                     |          |
 |     |            |            | Open: #27/#153/#154      |                     |          |
 |     |            |            | (Phase 12, blocked)      |                     |          |
-| 32  | 2026-02-27 | Phase 12   | Created Phase 12 exec    | H1: az login +     | az login |
+| 32  | 2026-02-27 | Phase 12   | Created Phase 12 exec    | H1: az login +      | az login |
 |     |            | planning   | plan with 7 steps        | governance re-run   | required |
 |     |            |            | (H1-H7); reviewed        |                     |          |
 |     |            |            | issues #27/#153/#154;    |                     |          |
 |     |            |            | reverted upload-         |                     |          |
 |     |            |            | artifact to v4           |                     |          |
+| 33  | 2026-02-27 | H1         | Re-ran governance        | H2: Cross-ref       | None     |
+|     |            |            | discovery; policies      | Bicep templates     |          |
+|     |            |            | unchanged (21 policies,  |                     |          |
+|     |            |            | 9 tags, Cosmos RBAC-     |                     |          |
+|     |            |            | only); no file updates   |                     |          |
+|     |            |            | needed                   |                     |          |
 
 ---
 
