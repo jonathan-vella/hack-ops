@@ -1,7 +1,7 @@
 ---
 description: "Create a safe conventional commit, push current branch, and optionally open a PR to main."
 agent: "agent"
-model: "GPT-5 mini"
+model: "Claude Haiku 4.5"
 argument-hint: "Provide a commit subject or leave blank to auto-generate from staged changes."
 tools:
   - execute/runInTerminal
