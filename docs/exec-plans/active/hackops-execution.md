@@ -402,6 +402,17 @@ so agents 12–15 have the skills/instructions they were designed to use.
 |     |            |            | guard; 3 Zod schemas;  |                     |          |
 |     |            |            | 60 tests pass;         |                     |          |
 |     |            |            | commit 5e90170         |                     |          |
+| 22  | 2026-02-28 | E / C-fix  | Remediated debt #15-   | Continue app-04-    | None     |
+|     |            |            | #20: created 5 skills  | api-scoring         |          |
+|     |            |            | (hackops-domain etc),  |                     |          |
+|     |            |            | 5 instructions (TS,    |                     |          |
+|     |            |            | Next.js, React, test,  |                     |          |
+|     |            |            | API routes), 2 issue   |                     |          |
+|     |            |            | templates, business    |                     |          |
+|     |            |            | rules validator (28    |                     |          |
+|     |            |            | checks), fixed ESLint  |                     |          |
+|     |            |            | 10 native flat config; |                     |          |
+|     |            |            | all validators pass    |                     |          |
 
 ---
 

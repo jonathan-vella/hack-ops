@@ -6,36 +6,18 @@ Updated by the doc-gardening workflow and referenced by `QUALITY_SCORE.md`.
 
 ## Active Debt Items
 
-| ID  | Category     | Description                                                    | Severity | Added      |
-| --- | ------------ | -------------------------------------------------------------- | -------- | ---------- |
-| 15  | Skills       | 5 app-dev skills never committed: hackops-domain,              | High     | 2026-02-27 |
-|     |              | nextjs-patterns, cosmos-db-sdk, shadcn-ui-patterns,            |          |            |
-|     |              | zod-validation. Referenced by 3 agents + 10 prompts.           |          |            |
-|     |              | **Plan**: C-fix 1 in execution tracker.                        |          |            |
-| 16  | Instructions | 5 app-dev instructions never committed: typescript,            | High     | 2026-02-27 |
-|     |              | nextjs, react-components, testing, api-routes.                 |          |            |
-|     |              | Session 8 tracker says created but git log empty.              |          |            |
-|     |              | **Plan**: C-fix 2 in execution tracker.                        |          |            |
-| 17  | CI/Lint      | `next lint` broken: ESLint 10 + eslint-config-next             | Medium   | 2026-02-27 |
-|     |              | circular structure error. `npx next lint` exits 1.             |          |            |
-|     |              | Root cause: FlatCompat + ESLint 10 incompatibility.            |          |            |
-|     |              | **Plan**: C-fix 3 in execution tracker.                        |          |            |
-| 18  | Templates    | Phase C5 app issue templates missing: `app-feature.yml`        | Low      | 2026-02-27 |
-|     |              | and `app-bug.yml` never committed. Only infra templates exist. |          |            |
-|     |              | **Plan**: C-fix 4 in execution tracker.                        |          |            |
-| 19  | Validation   | `scripts/validate-business-rules.mjs` never committed.         | Medium   | 2026-02-27 |
-|     |              | Phase C6 tracker says created + registered in package.json     |          |            |
-|     |              | but neither file nor script entry exists.                      |          |            |
-|     |              | **Plan**: C-fix 5 in execution tracker.                        |          |            |
-| 20  | Tracker      | Session tracker Phase C checkboxes marked done for artifacts   | Medium   | 2026-02-27 |
-|     |              | that were never committed. Phantom completions for C3-C6       |          |            |
-|     |              | items need correction after recreation.                        |          |            |
-|     |              | **Plan**: C-fix 6 in execution tracker.                        |          |            |
+No active debt items.
 
 ## Resolved Items
 
 | ID  | Category      | Description                                                         | Resolved   | Resolution                                           |
 | --- | ------------- | ------------------------------------------------------------------- | ---------- | ---------------------------------------------------- |
+| 20  | Tracker       | Phantom completions for C3-C6 items — checkboxes checked but files absent | 2026-02-28 | Artifacts recreated; checkboxes now reflect reality |
+| 19  | Validation    | `scripts/validate-business-rules.mjs` never committed               | 2026-02-28 | Created validator with 28 checks + registered in package.json |
+| 18  | Templates     | App issue templates (`app-feature.yml`, `app-bug.yml`) missing      | 2026-02-28 | Created both templates in `.github/ISSUE_TEMPLATE/` |
+| 17  | CI/Lint       | `next lint` broken: ESLint 10 + FlatCompat circular structure       | 2026-02-28 | Replaced FlatCompat with native flat config; `eslint src/` passes clean |
+| 16  | Instructions  | 5 app-dev instructions never committed                              | 2026-02-28 | Created typescript, nextjs, react-components, testing, api-routes |
+| 15  | Skills        | 5 app-dev skills never committed                                    | 2026-02-28 | Created hackops-domain, nextjs-patterns, cosmos-db-sdk, shadcn-ui-patterns, zod-validation |
 | 13  | CI/CD         | Phase 11 workflows missing (`hackops-ci.yml`, `hackops-deploy.yml`) | 2026-02-27 | Created both workflows with OIDC + path triggers     |
 | 9   | Instructions  | 5 applyTo warnings (wildcards) — cosmetic, not blocking             | 2026-02-27 | Fixed globHasMatch to expand braces and strip `**/`  |
 | 7   | Documentation | AGENTS.md missing app-dev workflow table (only infra 7-step shown)  | 2026-02-27 | Added App-Dev Workflow table to AGENTS.md            |

@@ -1,0 +1,95 @@
+name: App Feature Request
+description: Request a new feature or enhancement for the HackOps web application
+title: "[App Feature]: "
+labels: ["enhancement", "app"]
+assignees: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## App Feature Request
+
+        Request a new feature or enhancement for the HackOps Next.js application.
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Feature Area
+      description: Which part of the application does this feature affect?
+      options:
+        - API Routes (apps/web/src/app/api/)
+        - Pages / UI (apps/web/src/app/)
+        - Components (apps/web/src/components/)
+        - Shared Types (packages/shared/)
+        - Authentication / Authorization
+        - Scoring / Judging
+        - Team Management
+        - Hackathon Lifecycle
+        - CI/CD / Deployment
+        - Other
+    validations:
+      required: true
+
+  - type: dropdown
+    id: user-role
+    attributes:
+      label: Target User Role
+      description: Which user role primarily benefits from this feature?
+      options:
+        - Admin
+        - Judge
+        - Participant
+        - All roles
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Feature Description
+      description: Describe the feature and the problem it solves.
+      placeholder: |
+        **As a** [role], **I want to** [action] **so that** [benefit].
+
+        Detailed description of the feature...
+    validations:
+      required: true
+
+  - type: textarea
+    id: acceptance-criteria
+    attributes:
+      label: Acceptance Criteria
+      description: What conditions must be met for this feature to be complete?
+      placeholder: |
+        - [ ] API endpoint exists at POST /api/...
+        - [ ] Request body validated with Zod schema
+        - [ ] Role guard restricts access to admin only
+        - [ ] Audit log entry created on success
+        - [ ] Unit tests cover happy path and error cases
+    validations:
+      required: false
+
+  - type: textarea
+    id: api-contract
+    attributes:
+      label: API Contract Impact
+      description: Does this require changes to api-contract.ts? Describe any new types, schemas, or endpoints.
+      placeholder: |
+        New schema: CreateChallengeSchema
+        New type: Challenge
+        New endpoint: POST /api/hackathons/[id]/challenges
+    validations:
+      required: false
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      description: How important is this feature?
+      options:
+        - P0 — Blocks launch
+        - P1 — Required for MVP
+        - P2 — Nice to have
+        - P3 — Future consideration
+    validations:
+      required: true

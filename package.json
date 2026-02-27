@@ -36,7 +36,8 @@
     "test:1109": "npm run validate:vscode && npm run validate:agents && echo '✅ VS Code 1.109 validation passed'",
     "fetch:deprecations": "node scripts/fetch-azure-deprecations.mjs",
     "validate": "npm run validate:all",
-    "validate:all": "npm run lint:md && npm run lint:links:docs && npm run lint:artifact-templates && npm run lint:h2-sync && npm run lint:version-sync && npm run lint:deprecated-refs && npm run lint:mcp-config && npm run lint:agent-frontmatter && npm run lint:skills-format && npm run lint:instruction-frontmatter && npm run lint:governance-refs && npm run validate:instruction-refs && npm run lint:json && npm run lint:python && echo '✅ All validations passed'",
+    "validate:business-rules": "node scripts/validate-business-rules.mjs",
+    "validate:all": "npm run lint:md && npm run lint:links:docs && npm run lint:artifact-templates && npm run lint:h2-sync && npm run lint:version-sync && npm run lint:deprecated-refs && npm run lint:mcp-config && npm run lint:agent-frontmatter && npm run lint:skills-format && npm run lint:instruction-frontmatter && npm run lint:governance-refs && npm run validate:instruction-refs && npm run validate:business-rules && npm run lint:json && npm run lint:python && echo '✅ All validations passed'",
     "build": "turbo run build",
     "type-check": "turbo run type-check",
     "test": "turbo run test"

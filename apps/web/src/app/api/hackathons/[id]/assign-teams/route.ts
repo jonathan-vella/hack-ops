@@ -103,7 +103,6 @@ export const POST = requireRole("admin")(async (request, context, auth) => {
   }
 
   const teamsContainer = getContainer("teams");
-  const now = new Date().toISOString();
   let hackersAssigned = 0;
 
   // Count existing teams to offset name index
