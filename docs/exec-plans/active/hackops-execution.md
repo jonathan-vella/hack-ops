@@ -45,11 +45,11 @@
 <!-- Update this at the START of each session -->
 
 **Phase**: E — Application Build
-**Step**: Run app-02-auth → auth middleware + role guards
-**Branch**: `feature/prompts`
-**Goal**: Run the app-02-auth prompt to implement auth
-middleware, Easy Auth parsing, and role guards.
-Gate: role guard unit tests pass + security review.
+**Step**: Run app-03-api-hackathons → hackathon/team/join routes
+**Branch**: `feature/app-02-auth`
+**Goal**: Run the app-03-api-hackathons prompt to implement
+hackathon CRUD, team management, and join endpoints.
+Gate: tsc --noEmit + endpoint tests pass + contract conformance.
 
 ---
 
@@ -164,7 +164,7 @@ Gate: role guard unit tests pass + security review.
 - [x] E1: Create all 10 app prompts (`app-01` through `app-10`)
 - [x] Run app-01-scaffold → Turborepo + Next.js scaffold
   - Gate: `npm run build` succeeds ✅
-- [ ] Run app-02-auth → auth middleware + role guards
+- [x] Run app-02-auth → auth middleware + role guards
   - Gate: role guard unit tests pass
   - Gate: `app-security-challenger-subagent` (focus: `auth`) — no critical/high findings
 - [ ] Run app-03-api-hackathons → hackathon/team/join routes
@@ -358,6 +358,15 @@ Gate: role guard unit tests pass + security review.
 |     |            |            | endpoint, seed script; |                     |          |
 |     |            |            | npm build + tsc pass;  |                     |          |
 |     |            |            | commit 63dd892         |                     |          |
+| 20  | 2026-02-27 | E / app-02 | Auth middleware: Easy   | Run app-03-api-     | None     |
+|     |            |            | Auth parsing, role     | hackathons          |          |
+|     |            |            | resolution, guards,    | (hackathon/team/    |          |
+|     |            |            | rate limiter (100/5    | join routes)        |          |
+|     |            |            | per min), Zod          |                     |          |
+|     |            |            | validation, audit      |                     |          |
+|     |            |            | logger, CORS, Next.js  |                     |          |
+|     |            |            | middleware; 35 tests   |                     |          |
+|     |            |            | pass; commit 9476766   |                     |          |
 
 ---
 
@@ -408,3 +417,4 @@ have enough context for the current step.
 | 2026-02-26 | 9 tags required on RG (not 4 baseline) — lowercase keys     | Deny policy JV-Enforce RG Tags v3 requires 9 tags                 |
 | 2026-02-26 | Cosmos DB uses Entra ID RBAC only (no connection strings)   | Modify policy auto-disables local auth; comply rather than exempt |
 | 2026-02-26 | Tag keys use lowercase (not PascalCase from azure-defaults) | Policy checks `tags['environment']`, not `tags['Environment']`    |
+| 2026-02-27 | Next.js 16 middleware file convention still used (deprecated) | "proxy" rename is cosmetic; middleware works and migration can wait |
