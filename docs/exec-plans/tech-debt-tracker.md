@@ -12,6 +12,7 @@ No active debt items.
 
 | ID  | Category      | Description                                                               | Resolved   | Resolution                                                                                 |
 | --- | ------------- | ------------------------------------------------------------------------- | ---------- | ------------------------------------------------------------------------------------------ |
+| 21  | Documentation | docs/README.md instruction count stale (21 vs 28 on disk)                 | 2026-02-27 | Fixed count in directory tree: 21→28                                                       |
 | 20  | Tracker       | Phantom completions for C3-C6 items — checkboxes checked but files absent | 2026-02-28 | Artifacts recreated; checkboxes now reflect reality                                        |
 | 19  | Validation    | `scripts/validate-business-rules.mjs` never committed                     | 2026-02-28 | Created validator with 28 checks + registered in package.json                              |
 | 18  | Templates     | App issue templates (`app-feature.yml`, `app-bug.yml`) missing            | 2026-02-28 | Created both templates in `.github/ISSUE_TEMPLATE/`                                        |

@@ -28,10 +28,7 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
-      "@hackops/shared": path.resolve(
-        __dirname,
-        "../../packages/shared/types",
-      ),
+      "@hackops/shared": path.resolve(__dirname, "../../packages/shared/types"),
     },
   },
 });

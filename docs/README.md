@@ -195,7 +195,7 @@ azure-agentic-infraops/
 ├── .github/
 │   ├── agents/           # 16 agent definitions + 11 subagents
 │   ├── skills/           # 20 skill definitions (incl. golden-principles)
-│   └── instructions/     # 21 file-type rules (consolidated)
+│   └── instructions/     # 28 file-type rules (consolidated)
 ├── agent-output/         # Generated artifacts
 ├── infra/bicep/          # Bicep templates
 ├── docs/

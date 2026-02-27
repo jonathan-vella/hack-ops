@@ -77,7 +77,10 @@ describe("GET /api/me", () => {
     mockGetAuth.mockReturnValue(fakePrincipal);
     vi.stubEnv("NODE_ENV", "production");
     mockQuery.mockReturnValue(
-      emptyFetchAll([{ hackathonId: "h1", role: "hacker" }, { hackathonId: "h2", role: "coach" }]),
+      emptyFetchAll([
+        { hackathonId: "h1", role: "hacker" },
+        { hackathonId: "h2", role: "coach" },
+      ]),
     );
 
     const { GET } = await import("../me/route");

@@ -30,9 +30,7 @@ describe("checkChallengeGate", () => {
 
   it("returns allowed:true when challenge order <= currentChallenge", async () => {
     challengeQuery.mockReturnValue(emptyFetchAll([{ order: 1 }]));
-    progressionQuery.mockReturnValue(
-      emptyFetchAll([{ currentChallenge: 2 }]),
-    );
+    progressionQuery.mockReturnValue(emptyFetchAll([{ currentChallenge: 2 }]));
 
     const result = await checkChallengeGate("team-1", "h1", "ch-1");
 
@@ -42,9 +40,7 @@ describe("checkChallengeGate", () => {
 
   it("returns allowed:false when challenge is locked", async () => {
     challengeQuery.mockReturnValue(emptyFetchAll([{ order: 3 }]));
-    progressionQuery.mockReturnValue(
-      emptyFetchAll([{ currentChallenge: 2 }]),
-    );
+    progressionQuery.mockReturnValue(emptyFetchAll([{ currentChallenge: 2 }]));
 
     const result = await checkChallengeGate("team-1", "h1", "ch-3");
 
@@ -73,9 +69,7 @@ describe("checkChallengeGate", () => {
 
   it("allows current challenge (order === currentChallenge)", async () => {
     challengeQuery.mockReturnValue(emptyFetchAll([{ order: 2 }]));
-    progressionQuery.mockReturnValue(
-      emptyFetchAll([{ currentChallenge: 2 }]),
-    );
+    progressionQuery.mockReturnValue(emptyFetchAll([{ currentChallenge: 2 }]));
 
     const result = await checkChallengeGate("team-1", "h1", "ch-2");
 
@@ -89,12 +83,16 @@ describe("advanceProgression", () => {
   it("advances when approved challenge matches currentChallenge", async () => {
     challengeQuery.mockReturnValue(emptyFetchAll([{ order: 2 }]));
     progressionQuery.mockReturnValue(
-      emptyFetchAll([{
-        id: "prog-1",
-        currentChallenge: 2,
-        unlockedChallenges: [{ challengeId: "ch-1", unlockedAt: "2025-01-01T00:00:00Z" }],
-        _etag: "etag-1",
-      }]),
+      emptyFetchAll([
+        {
+          id: "prog-1",
+          currentChallenge: 2,
+          unlockedChallenges: [
+            { challengeId: "ch-1", unlockedAt: "2025-01-01T00:00:00Z" },
+          ],
+          _etag: "etag-1",
+        },
+      ]),
     );
     progressionReplace.mockResolvedValue({ resource: {} });
 
@@ -110,12 +108,14 @@ describe("advanceProgression", () => {
   it("does not advance when challenge order !== currentChallenge", async () => {
     challengeQuery.mockReturnValue(emptyFetchAll([{ order: 1 }]));
     progressionQuery.mockReturnValue(
-      emptyFetchAll([{
-        id: "prog-1",
-        currentChallenge: 2,
-        unlockedChallenges: [],
-        _etag: "etag-1",
-      }]),
+      emptyFetchAll([
+        {
+          id: "prog-1",
+          currentChallenge: 2,
+          unlockedChallenges: [],
+          _etag: "etag-1",
+        },
+      ]),
     );
 
     await advanceProgression("team-1", "h1", "ch-1");

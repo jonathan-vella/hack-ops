@@ -4,7 +4,12 @@ vi.mock("../cosmos", () => ({
   getContainer: vi.fn(),
 }));
 
-import { resolveRole, isPrimaryAdmin, getDevRole, isGlobalAdmin } from "../roles";
+import {
+  resolveRole,
+  isPrimaryAdmin,
+  getDevRole,
+  isGlobalAdmin,
+} from "../roles";
 import { getContainer } from "../cosmos";
 
 const mockGetContainer = vi.mocked(getContainer);

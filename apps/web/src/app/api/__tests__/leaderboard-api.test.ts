@@ -41,7 +41,9 @@ describe("GET /api/leaderboard/:hackathonId", () => {
 
     const { GET } = await import("../leaderboard/[hackathonId]/route");
     const req = createRequest("http://localhost/api/leaderboard/h1");
-    const res = await GET(req, { params: Promise.resolve({ hackathonId: "h1" }) });
+    const res = await GET(req, {
+      params: Promise.resolve({ hackathonId: "h1" }),
+    });
 
     expect(res.status).toBe(401);
   });
@@ -58,7 +60,9 @@ describe("GET /api/leaderboard/:hackathonId", () => {
 
     const { GET } = await import("../leaderboard/[hackathonId]/route");
     const req = createRequest("http://localhost/api/leaderboard/h1");
-    const res = await GET(req, { params: Promise.resolve({ hackathonId: "h1" }) });
+    const res = await GET(req, {
+      params: Promise.resolve({ hackathonId: "h1" }),
+    });
     const body = await res.json();
 
     expect(res.status).toBe(200);
@@ -74,7 +78,9 @@ describe("GET /api/leaderboard/:hackathonId", () => {
 
     const { GET } = await import("../leaderboard/[hackathonId]/route");
     const req = createRequest("http://localhost/api/leaderboard/nonexistent");
-    const res = await GET(req, { params: Promise.resolve({ hackathonId: "nonexistent" }) });
+    const res = await GET(req, {
+      params: Promise.resolve({ hackathonId: "nonexistent" }),
+    });
     const body = await res.json();
 
     expect(res.status).toBe(404);

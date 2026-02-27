@@ -20,8 +20,20 @@ function emptyFetchAll(resources: unknown[] = []) {
 }
 
 const sampleChallenges = [
-  { id: "ch-1", hackathonId: "h1", title: "Challenge 1", maxScore: 50, order: 1 },
-  { id: "ch-2", hackathonId: "h1", title: "Challenge 2", maxScore: 50, order: 2 },
+  {
+    id: "ch-1",
+    hackathonId: "h1",
+    title: "Challenge 1",
+    maxScore: 50,
+    order: 1,
+  },
+  {
+    id: "ch-2",
+    hackathonId: "h1",
+    title: "Challenge 2",
+    maxScore: 50,
+    order: 2,
+  },
 ];
 
 const sampleTeams = [
@@ -65,8 +77,20 @@ describe("buildLeaderboard", () => {
     });
 
     const scores = [
-      { id: "s1", teamId: "team-a", challengeId: "ch-1", total: 30, approvedAt: "2025-01-01T10:00:00Z" },
-      { id: "s2", teamId: "team-b", challengeId: "ch-1", total: 45, approvedAt: "2025-01-01T11:00:00Z" },
+      {
+        id: "s1",
+        teamId: "team-a",
+        challengeId: "ch-1",
+        total: 30,
+        approvedAt: "2025-01-01T10:00:00Z",
+      },
+      {
+        id: "s2",
+        teamId: "team-b",
+        challengeId: "ch-1",
+        total: 45,
+        approvedAt: "2025-01-01T11:00:00Z",
+      },
     ];
 
     mockQuery
@@ -91,8 +115,20 @@ describe("buildLeaderboard", () => {
     });
 
     const scores = [
-      { id: "s1", teamId: "team-a", challengeId: "ch-1", total: 40, approvedAt: "2025-01-01T12:00:00Z" },
-      { id: "s2", teamId: "team-b", challengeId: "ch-1", total: 40, approvedAt: "2025-01-01T10:00:00Z" },
+      {
+        id: "s1",
+        teamId: "team-a",
+        challengeId: "ch-1",
+        total: 40,
+        approvedAt: "2025-01-01T12:00:00Z",
+      },
+      {
+        id: "s2",
+        teamId: "team-b",
+        challengeId: "ch-1",
+        total: 40,
+        approvedAt: "2025-01-01T10:00:00Z",
+      },
     ];
 
     mockQuery
@@ -127,10 +163,34 @@ describe("buildLeaderboard", () => {
 
     // A: 95% → A, B: 80% → B, C: 65% → C, D: 40% → D
     const scores = [
-      { id: "s1", teamId: "t-a", challengeId: "ch-1", total: 95, approvedAt: "2025-01-01T10:00:00Z" },
-      { id: "s2", teamId: "t-b", challengeId: "ch-1", total: 80, approvedAt: "2025-01-01T10:00:00Z" },
-      { id: "s3", teamId: "t-c", challengeId: "ch-1", total: 65, approvedAt: "2025-01-01T10:00:00Z" },
-      { id: "s4", teamId: "t-d", challengeId: "ch-1", total: 40, approvedAt: "2025-01-01T10:00:00Z" },
+      {
+        id: "s1",
+        teamId: "t-a",
+        challengeId: "ch-1",
+        total: 95,
+        approvedAt: "2025-01-01T10:00:00Z",
+      },
+      {
+        id: "s2",
+        teamId: "t-b",
+        challengeId: "ch-1",
+        total: 80,
+        approvedAt: "2025-01-01T10:00:00Z",
+      },
+      {
+        id: "s3",
+        teamId: "t-c",
+        challengeId: "ch-1",
+        total: 65,
+        approvedAt: "2025-01-01T10:00:00Z",
+      },
+      {
+        id: "s4",
+        teamId: "t-d",
+        challengeId: "ch-1",
+        total: 40,
+        approvedAt: "2025-01-01T10:00:00Z",
+      },
     ];
 
     mockQuery
@@ -140,7 +200,10 @@ describe("buildLeaderboard", () => {
 
     const result = await buildLeaderboard("h1");
 
-    const grades = result!.entries.map((e) => ({ name: e.teamName, grade: e.gradeBadge }));
+    const grades = result!.entries.map((e) => ({
+      name: e.teamName,
+      grade: e.gradeBadge,
+    }));
     expect(grades).toContainEqual({ name: "A-Team", grade: "A" });
     expect(grades).toContainEqual({ name: "B-Team", grade: "B" });
     expect(grades).toContainEqual({ name: "C-Team", grade: "C" });
@@ -154,11 +217,35 @@ describe("buildLeaderboard", () => {
 
     const scores = [
       // Team A completes both, last approval at 12:00
-      { id: "s1", teamId: "team-a", challengeId: "ch-1", total: 30, approvedAt: "2025-01-01T10:00:00Z" },
-      { id: "s2", teamId: "team-a", challengeId: "ch-2", total: 40, approvedAt: "2025-01-01T12:00:00Z" },
+      {
+        id: "s1",
+        teamId: "team-a",
+        challengeId: "ch-1",
+        total: 30,
+        approvedAt: "2025-01-01T10:00:00Z",
+      },
+      {
+        id: "s2",
+        teamId: "team-a",
+        challengeId: "ch-2",
+        total: 40,
+        approvedAt: "2025-01-01T12:00:00Z",
+      },
       // Team B completes both, last approval at 11:00 (faster)
-      { id: "s3", teamId: "team-b", challengeId: "ch-1", total: 25, approvedAt: "2025-01-01T09:00:00Z" },
-      { id: "s4", teamId: "team-b", challengeId: "ch-2", total: 35, approvedAt: "2025-01-01T11:00:00Z" },
+      {
+        id: "s3",
+        teamId: "team-b",
+        challengeId: "ch-1",
+        total: 25,
+        approvedAt: "2025-01-01T09:00:00Z",
+      },
+      {
+        id: "s4",
+        teamId: "team-b",
+        challengeId: "ch-2",
+        total: 35,
+        approvedAt: "2025-01-01T11:00:00Z",
+      },
     ];
 
     mockQuery
@@ -182,8 +269,20 @@ describe("buildLeaderboard", () => {
 
     const scores = [
       // Team A gets perfect on ch-1 (maxScore=50)
-      { id: "s1", teamId: "team-a", challengeId: "ch-1", total: 50, approvedAt: "2025-01-01T10:00:00Z" },
-      { id: "s2", teamId: "team-b", challengeId: "ch-1", total: 30, approvedAt: "2025-01-01T10:00:00Z" },
+      {
+        id: "s1",
+        teamId: "team-a",
+        challengeId: "ch-1",
+        total: 50,
+        approvedAt: "2025-01-01T10:00:00Z",
+      },
+      {
+        id: "s2",
+        teamId: "team-b",
+        challengeId: "ch-1",
+        total: 30,
+        approvedAt: "2025-01-01T10:00:00Z",
+      },
     ];
 
     mockQuery
@@ -207,11 +306,35 @@ describe("buildLeaderboard", () => {
 
     const scores = [
       // ch-1: team-a=40, team-b=30 → team-a wins
-      { id: "s1", teamId: "team-a", challengeId: "ch-1", total: 40, approvedAt: "2025-01-01T10:00:00Z" },
-      { id: "s2", teamId: "team-b", challengeId: "ch-1", total: 30, approvedAt: "2025-01-01T10:00:00Z" },
+      {
+        id: "s1",
+        teamId: "team-a",
+        challengeId: "ch-1",
+        total: 40,
+        approvedAt: "2025-01-01T10:00:00Z",
+      },
+      {
+        id: "s2",
+        teamId: "team-b",
+        challengeId: "ch-1",
+        total: 30,
+        approvedAt: "2025-01-01T10:00:00Z",
+      },
       // ch-2: tied at 35 → no award
-      { id: "s3", teamId: "team-a", challengeId: "ch-2", total: 35, approvedAt: "2025-01-01T11:00:00Z" },
-      { id: "s4", teamId: "team-b", challengeId: "ch-2", total: 35, approvedAt: "2025-01-01T11:00:00Z" },
+      {
+        id: "s3",
+        teamId: "team-a",
+        challengeId: "ch-2",
+        total: 35,
+        approvedAt: "2025-01-01T11:00:00Z",
+      },
+      {
+        id: "s4",
+        teamId: "team-b",
+        challengeId: "ch-2",
+        total: 35,
+        approvedAt: "2025-01-01T11:00:00Z",
+      },
     ];
 
     mockQuery
@@ -233,7 +356,13 @@ describe("buildLeaderboard", () => {
     });
 
     const scores = [
-      { id: "s1", teamId: "team-a", challengeId: "ch-1", total: 40, approvedAt: "2025-01-01T10:00:00Z" },
+      {
+        id: "s1",
+        teamId: "team-a",
+        challengeId: "ch-1",
+        total: 40,
+        approvedAt: "2025-01-01T10:00:00Z",
+      },
     ];
 
     mockQuery
@@ -269,8 +398,20 @@ describe("buildLeaderboard", () => {
 
     // Score exists for team not in teams list
     const scores = [
-      { id: "s1", teamId: "orphan-team", challengeId: "ch-1", total: 30, approvedAt: "2025-01-01T10:00:00Z" },
-      { id: "s2", teamId: "team-a", challengeId: "ch-1", total: 40, approvedAt: "2025-01-01T10:00:00Z" },
+      {
+        id: "s1",
+        teamId: "orphan-team",
+        challengeId: "ch-1",
+        total: 30,
+        approvedAt: "2025-01-01T10:00:00Z",
+      },
+      {
+        id: "s2",
+        teamId: "team-a",
+        challengeId: "ch-1",
+        total: 40,
+        approvedAt: "2025-01-01T10:00:00Z",
+      },
     ];
 
     mockQuery
@@ -318,8 +459,20 @@ describe("buildLeaderboard", () => {
 
     // Only ch-1 scores, not ch-2
     const scores = [
-      { id: "s1", teamId: "team-a", challengeId: "ch-1", total: 30, approvedAt: "2025-01-01T10:00:00Z" },
-      { id: "s2", teamId: "team-b", challengeId: "ch-1", total: 25, approvedAt: "2025-01-01T10:00:00Z" },
+      {
+        id: "s1",
+        teamId: "team-a",
+        challengeId: "ch-1",
+        total: 30,
+        approvedAt: "2025-01-01T10:00:00Z",
+      },
+      {
+        id: "s2",
+        teamId: "team-b",
+        challengeId: "ch-1",
+        total: 25,
+        approvedAt: "2025-01-01T10:00:00Z",
+      },
     ];
 
     mockQuery
@@ -374,7 +527,13 @@ describe("buildLeaderboard", () => {
       { id: "ch-1", hackathonId: "h1", title: "C1", maxScore: 100, order: 1 },
     ];
     const scores = [
-      { id: "s1", teamId: "team-a", challengeId: "ch-1", total: 90, approvedAt: "2025-01-01T10:00:00Z" },
+      {
+        id: "s1",
+        teamId: "team-a",
+        challengeId: "ch-1",
+        total: 90,
+        approvedAt: "2025-01-01T10:00:00Z",
+      },
     ];
 
     mockQuery
@@ -396,7 +555,13 @@ describe("buildLeaderboard", () => {
       { id: "ch-1", hackathonId: "h1", title: "C1", maxScore: 100, order: 1 },
     ];
     const scores = [
-      { id: "s1", teamId: "team-a", challengeId: "ch-1", total: 75, approvedAt: "2025-01-01T10:00:00Z" },
+      {
+        id: "s1",
+        teamId: "team-a",
+        challengeId: "ch-1",
+        total: 75,
+        approvedAt: "2025-01-01T10:00:00Z",
+      },
     ];
 
     mockQuery
@@ -418,7 +583,13 @@ describe("buildLeaderboard", () => {
       { id: "ch-1", hackathonId: "h1", title: "C1", maxScore: 100, order: 1 },
     ];
     const scores = [
-      { id: "s1", teamId: "team-a", challengeId: "ch-1", total: 60, approvedAt: "2025-01-01T10:00:00Z" },
+      {
+        id: "s1",
+        teamId: "team-a",
+        challengeId: "ch-1",
+        total: 60,
+        approvedAt: "2025-01-01T10:00:00Z",
+      },
     ];
 
     mockQuery
