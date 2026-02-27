@@ -8,6 +8,7 @@ declare module "lucide-react" {
   export const ChevronUpIcon: Icon;
   export const CheckIcon: Icon;
   export const ChevronRightIcon: Icon;
+  export const RefreshCwIcon: Icon;
   export const CircleIcon: Icon;
   export const DotIcon: Icon;
 }
