@@ -45,10 +45,11 @@
 <!-- Update this at the START of each session -->
 
 **Phase**: E — Application Build
-**Step**: Run app-01-scaffold → Turborepo + Next.js scaffold
+**Step**: Run app-02-auth → auth middleware + role guards
 **Branch**: `feature/prompts`
-**Goal**: Run the app-01-scaffold prompt to set up the
-Turborepo + Next.js 15 monorepo. Gate: `npm run build` succeeds.
+**Goal**: Run the app-02-auth prompt to implement auth
+middleware, Easy Auth parsing, and role guards.
+Gate: role guard unit tests pass + security review.
 
 ---
 
@@ -161,8 +162,8 @@ Turborepo + Next.js 15 monorepo. Gate: `npm run build` succeeds.
 **Orchestrator**: 16-App Conductor
 
 - [x] E1: Create all 10 app prompts (`app-01` through `app-10`)
-- [ ] Run app-01-scaffold → Turborepo + Next.js scaffold
-  - Gate: `npm run build` succeeds
+- [x] Run app-01-scaffold → Turborepo + Next.js scaffold
+  - Gate: `npm run build` succeeds ✅
 - [ ] Run app-02-auth → auth middleware + role guards
   - Gate: role guard unit tests pass
   - Gate: `app-security-challenger-subagent` (focus: `auth`) — no critical/high findings
@@ -349,6 +350,14 @@ Turborepo + Next.js 15 monorepo. Gate: `npm run build` succeeds.
 |     |            |            | through app-10;        | + Next.js 15        |          |
 |     |            |            | lint:md passes (0      | monorepo            |          |
 |     |            |            | errors)                |                     |          |
+| 19  | 2026-02-27 | E / app-01 | Scaffolded Turborepo   | Run app-02-auth     | None     |
+|     |            |            | + Next.js 15 monorepo; | (auth middleware +   |          |
+|     |            |            | 10 shared types, 10    | role guards)        |          |
+|     |            |            | shadcn/ui components,  |                     |          |
+|     |            |            | Cosmos client, health  |                     |          |
+|     |            |            | endpoint, seed script; |                     |          |
+|     |            |            | npm build + tsc pass;  |                     |          |
+|     |            |            | commit 63dd892         |                     |          |
 
 ---
 
