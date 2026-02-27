@@ -53,7 +53,7 @@ For each issue in the mapping table marked `Closed` in the
 tracker but still open on GitHub:
 
 1. Close the issue with a comment:
-   ```
+   ```markdown
    Completed in session — step checked off in tracker.
    See `docs/exec-plans/active/hackops-execution.md`.
    ```
