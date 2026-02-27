@@ -18,7 +18,10 @@ export const DELETE = requireRole("admin")(async (_request, context, auth) => {
 
   if (resources.length === 0) {
     return NextResponse.json(
-      { error: "Role record not found", ok: false } satisfies ApiResponse<never>,
+      {
+        error: "Role record not found",
+        ok: false,
+      } satisfies ApiResponse<never>,
       { status: 404 },
     );
   }
@@ -28,7 +31,10 @@ export const DELETE = requireRole("admin")(async (_request, context, auth) => {
   // Primary admin cannot be demoted
   if (roleDoc.isPrimaryAdmin) {
     return NextResponse.json(
-      { error: "Cannot remove the primary admin", ok: false } satisfies ApiResponse<never>,
+      {
+        error: "Cannot remove the primary admin",
+        ok: false,
+      } satisfies ApiResponse<never>,
       { status: 403 },
     );
   }

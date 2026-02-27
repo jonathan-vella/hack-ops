@@ -35,4 +35,3 @@ export const GET = requireAuth(async (_request, _context, auth) => {
   };
   return NextResponse.json(response);
 });
-

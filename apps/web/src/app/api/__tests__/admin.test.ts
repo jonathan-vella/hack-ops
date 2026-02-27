@@ -366,10 +366,7 @@ describe("GET /api/audit/:hackathonId", () => {
     mockGetAuth.mockReturnValue(null);
 
     const { GET } = await import("../audit/[hackathonId]/route");
-    const req = createRequest(
-      "GET",
-      "http://localhost/api/audit/hack-1",
-    );
+    const req = createRequest("GET", "http://localhost/api/audit/hack-1");
     const res = await GET(req, {
       params: Promise.resolve({ hackathonId: "hack-1" }),
     });
@@ -399,10 +396,7 @@ describe("GET /api/audit/:hackathonId", () => {
     });
 
     const { GET } = await import("../audit/[hackathonId]/route");
-    const req = createRequest(
-      "GET",
-      "http://localhost/api/audit/hack-1",
-    );
+    const req = createRequest("GET", "http://localhost/api/audit/hack-1");
     const res = await GET(req, {
       params: Promise.resolve({ hackathonId: "hack-1" }),
     });

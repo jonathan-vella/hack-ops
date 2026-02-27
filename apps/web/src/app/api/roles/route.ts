@@ -30,7 +30,8 @@ export const GET = requireRole("admin")(async (
   const container = getContainer("roles");
 
   const querySpec = {
-    query: "SELECT * FROM c WHERE c.hackathonId = @hid ORDER BY c.assignedAt DESC",
+    query:
+      "SELECT * FROM c WHERE c.hackathonId = @hid ORDER BY c.assignedAt DESC",
     parameters: [{ name: "@hid", value: hackathonId }],
   };
 

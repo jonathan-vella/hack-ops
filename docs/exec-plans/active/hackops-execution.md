@@ -425,7 +425,7 @@ so agents 12–15 have the skills/instructions they were designed to use.
 |     |            |            | & gating: 4 CRUD       | app-06-api-admin    |          |
 |     |            |            | routes (challenges),   |                     |          |
 |     |            |            | 1 progression route,   |                     |          |
-|     |            |            | gate middleware,        |                     |          |
+|     |            |            | gate middleware,       |                     |          |
 |     |            |            | auto-unlock trigger,   |                     |          |
 |     |            |            | progression init on    |                     |          |
 |     |            |            | launch, ETag writes;   |                     |          |
@@ -435,7 +435,7 @@ so agents 12–15 have the skills/instructions they were designed to use.
 | 25  | 2026-02-27 | E / app-06 | Admin/roles/audit/     | Run app-07-         | None     |
 |     |            |            | config routes: POST    | leaderboard (SSR    |          |
 |     |            |            | invite, GET list,      | aggregation page)   |          |
-|     |            |            | DELETE (primary admin   |                     |          |
+|     |            |            | DELETE (primary admin  |                     |          |
 |     |            |            | protected), GET audit  |                     |          |
 |     |            |            | trail with filters,    |                     |          |
 |     |            |            | GET/PATCH config       |                     |          |

@@ -43,10 +43,13 @@ export const GET = requireRole("admin")(async (
   query += " ORDER BY c.performedAt DESC";
 
   const { resources, continuationToken: nextToken } = await container.items
-    .query<AuditAPI.AuditEntry>({ query, parameters }, {
-      maxItemCount: pageSize,
-      continuationToken: continuationToken ?? undefined,
-    })
+    .query<AuditAPI.AuditEntry>(
+      { query, parameters },
+      {
+        maxItemCount: pageSize,
+        continuationToken: continuationToken ?? undefined,
+      },
+    )
     .fetchNext();
 
   const items: AuditAPI.AuditEntry[] = resources.map((r) => ({
