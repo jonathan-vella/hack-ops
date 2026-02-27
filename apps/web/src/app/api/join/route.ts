@@ -8,8 +8,7 @@ import { joinSchema } from "@/lib/validation/join";
 
 export const POST = requireAuth(async (request, _context, auth) => {
   const ip =
-    request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ??
-    "unknown";
+    request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
   const rl = checkRateLimit(`${ip}:join`, 5);
   if (!rl.allowed) {
     return NextResponse.json(

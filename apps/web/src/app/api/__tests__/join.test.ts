@@ -88,9 +88,7 @@ describe("POST /api/join", () => {
         queryCount++;
         if (queryCount === 1) {
           return Promise.resolve({
-            resources: [
-              { id: "hack-1", name: "Test Hack", status: "active" },
-            ],
+            resources: [{ id: "hack-1", name: "Test Hack", status: "active" }],
           });
         }
         return Promise.resolve({ resources: [] });
@@ -156,9 +154,7 @@ describe("POST /api/join", () => {
         queryCount++;
         if (queryCount === 1) {
           return Promise.resolve({
-            resources: [
-              { id: "hack-1", name: "Test Hack", status: "active" },
-            ],
+            resources: [{ id: "hack-1", name: "Test Hack", status: "active" }],
           });
         }
         return Promise.resolve({

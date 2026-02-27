@@ -81,11 +81,41 @@ describe("POST /api/hackathons/:id/assign-teams", () => {
         if (queryCount === 1) {
           return Promise.resolve({
             resources: [
-              { id: "hkr-1", hackathonId: "h1", githubLogin: "a", displayName: "A", teamId: null },
-              { id: "hkr-2", hackathonId: "h1", githubLogin: "b", displayName: "B", teamId: null },
-              { id: "hkr-3", hackathonId: "h1", githubLogin: "c", displayName: "C", teamId: null },
-              { id: "hkr-4", hackathonId: "h1", githubLogin: "d", displayName: "D", teamId: null },
-              { id: "hkr-5", hackathonId: "h1", githubLogin: "e", displayName: "E", teamId: null },
+              {
+                id: "hkr-1",
+                hackathonId: "h1",
+                githubLogin: "a",
+                displayName: "A",
+                teamId: null,
+              },
+              {
+                id: "hkr-2",
+                hackathonId: "h1",
+                githubLogin: "b",
+                displayName: "B",
+                teamId: null,
+              },
+              {
+                id: "hkr-3",
+                hackathonId: "h1",
+                githubLogin: "c",
+                displayName: "C",
+                teamId: null,
+              },
+              {
+                id: "hkr-4",
+                hackathonId: "h1",
+                githubLogin: "d",
+                displayName: "D",
+                teamId: null,
+              },
+              {
+                id: "hkr-5",
+                hackathonId: "h1",
+                githubLogin: "e",
+                displayName: "E",
+                teamId: null,
+              },
             ],
           });
         }

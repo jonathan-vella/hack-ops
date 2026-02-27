@@ -106,7 +106,9 @@ export const POST = requireAuth(async (request, _context, auth) => {
 
 export const GET = requireAuth(async (request, _context, _auth) => {
   const container = getContainer("hackathons");
-  const status = request.nextUrl.searchParams.get("status") as HackathonStatus | null;
+  const status = request.nextUrl.searchParams.get(
+    "status",
+  ) as HackathonStatus | null;
   const pageSize = Math.min(
     Number(request.nextUrl.searchParams.get("pageSize")) || 20,
     100,

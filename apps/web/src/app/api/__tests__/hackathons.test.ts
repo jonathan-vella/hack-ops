@@ -66,7 +66,9 @@ describe("POST /api/hackathons", () => {
     vi.clearAllMocks();
     mockQuery.mockReturnValue({
       fetchAll: vi.fn().mockResolvedValue({ resources: [] }),
-      fetchNext: vi.fn().mockResolvedValue({ resources: [], continuationToken: null }),
+      fetchNext: vi
+        .fn()
+        .mockResolvedValue({ resources: [], continuationToken: null }),
     });
     mockCreate.mockResolvedValue({ resource: {} });
   });
@@ -126,7 +128,9 @@ describe("POST /api/hackathons", () => {
         }
         return Promise.resolve({ resources: [] });
       }),
-      fetchNext: vi.fn().mockResolvedValue({ resources: [], continuationToken: null }),
+      fetchNext: vi
+        .fn()
+        .mockResolvedValue({ resources: [], continuationToken: null }),
     });
     mockCreate.mockResolvedValue({ resource: {} });
 
@@ -196,10 +200,7 @@ describe("GET /api/hackathons/:id", () => {
     });
 
     const { GET } = await import("../hackathons/[id]/route");
-    const req = createRequest(
-      "GET",
-      "http://localhost/api/hackathons/h1",
-    );
+    const req = createRequest("GET", "http://localhost/api/hackathons/h1");
     const res = await GET(req, {
       params: Promise.resolve({ id: "h1" }),
     });
@@ -220,15 +221,18 @@ describe("PATCH /api/hackathons/:id", () => {
       resource: { id: "h1", name: "Test", status: "draft", _type: "hackathon" },
     });
     mockReplace.mockResolvedValue({
-      resource: { id: "h1", name: "Test", status: "active", _type: "hackathon" },
+      resource: {
+        id: "h1",
+        name: "Test",
+        status: "active",
+        _type: "hackathon",
+      },
     });
 
     const { PATCH } = await import("../hackathons/[id]/route");
-    const req = createRequest(
-      "PATCH",
-      "http://localhost/api/hackathons/h1",
-      { status: "active" },
-    );
+    const req = createRequest("PATCH", "http://localhost/api/hackathons/h1", {
+      status: "active",
+    });
     const res = await PATCH(req, {
       params: Promise.resolve({ id: "h1" }),
     });
@@ -244,11 +248,9 @@ describe("PATCH /api/hackathons/:id", () => {
     });
 
     const { PATCH } = await import("../hackathons/[id]/route");
-    const req = createRequest(
-      "PATCH",
-      "http://localhost/api/hackathons/h1",
-      { status: "archived" },
-    );
+    const req = createRequest("PATCH", "http://localhost/api/hackathons/h1", {
+      status: "archived",
+    });
     const res = await PATCH(req, {
       params: Promise.resolve({ id: "h1" }),
     });
@@ -262,15 +264,18 @@ describe("PATCH /api/hackathons/:id", () => {
     mockGetAuth.mockReturnValue(fakePrincipal);
     mockResolveRole.mockResolvedValue("admin");
     mockRead.mockResolvedValue({
-      resource: { id: "h1", name: "Test", status: "archived", _type: "hackathon" },
+      resource: {
+        id: "h1",
+        name: "Test",
+        status: "archived",
+        _type: "hackathon",
+      },
     });
 
     const { PATCH } = await import("../hackathons/[id]/route");
-    const req = createRequest(
-      "PATCH",
-      "http://localhost/api/hackathons/h1",
-      { status: "active" },
-    );
+    const req = createRequest("PATCH", "http://localhost/api/hackathons/h1", {
+      status: "active",
+    });
     const res = await PATCH(req, {
       params: Promise.resolve({ id: "h1" }),
     });
@@ -283,11 +288,9 @@ describe("PATCH /api/hackathons/:id", () => {
     mockResolveRole.mockResolvedValue("hacker");
 
     const { PATCH } = await import("../hackathons/[id]/route");
-    const req = createRequest(
-      "PATCH",
-      "http://localhost/api/hackathons/h1",
-      { name: "Updated" },
-    );
+    const req = createRequest("PATCH", "http://localhost/api/hackathons/h1", {
+      name: "Updated",
+    });
     const res = await PATCH(req, {
       params: Promise.resolve({ id: "h1" }),
     });
