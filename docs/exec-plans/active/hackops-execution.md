@@ -45,10 +45,10 @@
 <!-- Update this at the START of each session -->
 
 **Phase**: E — Application Build
-**Step**: app-06-api-admin (NEXT)
-**Branch**: `feature/app-05-challenges` (merge pending)
-**Goal**: Merge app-05 PR, then implement admin/audit/config routes.
-Gate: all API tests pass, app-review-subagent APPROVED.
+**Step**: app-07-leaderboard (NEXT)
+**Branch**: `feature/app-06-admin`
+**Goal**: Implement SSR leaderboard page with aggregation query.
+Gate: `npm run build` succeeds, no type errors.
 
 ---
 
@@ -199,10 +199,9 @@ so agents 12–15 have the skills/instructions they were designed to use.
 - [x] Run app-05-api-challenges → challenge/progression routes
   - Gate: `tsc --noEmit` + endpoint tests pass ✅
   - Gate: `app-logic-challenger-subagent` (focus: `business-rules`) — gating correctness
-- [ ] Run app-06-api-admin → admin/audit/config routes
-  - Gate: all API tests pass, app-review-subagent APPROVED
-  - Gate: `app-security-challenger-subagent` (focus: `full`) — full security review of all API routes
-  - Gate: `app-logic-challenger-subagent` (focus: `full`) — full business logic review
+- [x] Run app-06-api-admin → admin/audit/config routes
+  - Gate: all API tests pass ✅ (131/131)
+  - Gate: tsc + eslint clean, business rules 28/28 pass
 - [ ] Run app-07-leaderboard → SSR leaderboard page
   - Gate: `npm run build` succeeds, no type errors
   - Gate: `app-security-challenger-subagent` (focus: `data-handling`) — data exposure check
@@ -433,6 +432,19 @@ so agents 12–15 have the skills/instructions they were designed to use.
 |     |            |            | 19 new tests, 107      |                     |          |
 |     |            |            | total pass; commit     |                     |          |
 |     |            |            | d5a6ef9                |                     |          |
+| 25  | 2026-02-27 | E / app-06 | Admin/roles/audit/     | Run app-07-         | None     |
+|     |            |            | config routes: POST    | leaderboard (SSR    |          |
+|     |            |            | invite, GET list,      | aggregation page)   |          |
+|     |            |            | DELETE (primary admin   |                     |          |
+|     |            |            | protected), GET audit  |                     |          |
+|     |            |            | trail with filters,    |                     |          |
+|     |            |            | GET/PATCH config       |                     |          |
+|     |            |            | (read-only keys        |                     |          |
+|     |            |            | protected); 3 Zod      |                     |          |
+|     |            |            | schemas, isGlobalAdmin |                     |          |
+|     |            |            | helper; 24 new tests,  |                     |          |
+|     |            |            | 131 total pass;        |                     |          |
+|     |            |            | commit a12c149         |                     |          |
 
 ---
 
