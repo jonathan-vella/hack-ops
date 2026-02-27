@@ -1,6 +1,19 @@
 # HackOps Deploy Workflow
-# Deploys the HackOps Next.js application to Azure App Service
-# Requires AZURE_WEBAPP_NAME and Azure OIDC credentials configured as secrets
+# Deploys the HackOps Next.js application to Azure App Service.
+# - dev: auto-deploys on push to main (staging slot swap)
+# - prod: manual dispatch with approval gate
+#
+# Prerequisites:
+#   1. Azure AD app registration with federated credential for this repo
+#   2. GitHub environments "dev" and "prod" configured with OIDC secrets
+#   3. "prod" environment has required-reviewers protection rule
+#
+# OIDC setup (per environment):
+#   AZURE_CLIENT_ID       — App registration client ID
+#   AZURE_TENANT_ID       — Azure AD tenant ID
+#   AZURE_SUBSCRIPTION_ID — Target subscription ID
+#   AZURE_RESOURCE_GROUP  — Target resource group (e.g. rg-hackops-us-dev)
+#   AZURE_WEBAPP_NAME     — App Service name (e.g. app-hackops-dev)
 
 name: HackOps Deploy
 
@@ -10,28 +23,34 @@ on:
     branches: [main]
     types: [completed]
   workflow_dispatch:
+    inputs:
+      environment:
+        description: "Target environment"
+        required: true
+        type: choice
+        options:
+          - dev
+          - prod
+        default: dev
 
 permissions:
   id-token: write
   contents: read
 
 concurrency:
-  group: hackops-deploy-production
+  group: hackops-deploy-${{ github.event.inputs.environment || 'dev' }}
   cancel-in-progress: false
 
 env:
-  AZURE_WEBAPP_NAME: ${{ vars.AZURE_WEBAPP_NAME || 'app-hackops-prod' }}
   NODE_VERSION: "22"
 
 jobs:
-  deploy:
-    name: Deploy to Azure App Service
+  build-and-test:
+    name: Build & Test
     runs-on: ubuntu-latest
-    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
-    environment:
-      name: production
-      url: https://${{ env.AZURE_WEBAPP_NAME }}.azurewebsites.net
-
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      github.event.workflow_run.conclusion == 'success'
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
@@ -45,10 +64,40 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Run tests
+        run: npm run test
+
       - name: Build application
         run: npm run build
         env:
           NEXT_TELEMETRY_DISABLED: 1
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: hackops-deploy-bundle
+          path: apps/web/.next/standalone/
+          retention-days: 3
+
+  deploy-dev:
+    name: Deploy to Dev
+    runs-on: ubuntu-latest
+    needs: build-and-test
+    if: >-
+      (github.event_name == 'workflow_run') ||
+      (github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'dev')
+    environment:
+      name: dev
+      url: https://${{ vars.AZURE_WEBAPP_NAME || 'app-hackops-dev' }}.azurewebsites.net
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Download build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: hackops-deploy-bundle
+          path: deploy-package
 
       - name: Login to Azure (OIDC)
         uses: azure/login@v2
@@ -57,8 +106,108 @@ jobs:
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-      - name: Deploy to Azure App Service
+      - name: Deploy IaC (Bicep)
+        run: |
+          az deployment group create \
+            --resource-group "${{ vars.AZURE_RESOURCE_GROUP || 'rg-hackops-us-dev' }}" \
+            --template-file infra/bicep/hackops/main.bicep \
+            --parameters environment=dev projectName=hackops \
+            --mode Incremental \
+            --no-wait
+
+      - name: Deploy to staging slot
         uses: azure/webapps-deploy@v3
         with:
-          app-name: ${{ env.AZURE_WEBAPP_NAME }}
-          package: apps/web/.next/standalone
+          app-name: ${{ vars.AZURE_WEBAPP_NAME || 'app-hackops-dev' }}
+          slot-name: staging
+          package: deploy-package
+
+      - name: Swap staging to production slot
+        run: |
+          az webapp deployment slot swap \
+            --resource-group "${{ vars.AZURE_RESOURCE_GROUP || 'rg-hackops-us-dev' }}" \
+            --name "${{ vars.AZURE_WEBAPP_NAME || 'app-hackops-dev' }}" \
+            --slot staging \
+            --target-slot production
+
+      - name: Verify deployment health
+        run: |
+          HEALTH_URL="https://${{ vars.AZURE_WEBAPP_NAME || 'app-hackops-dev' }}.azurewebsites.net/api/health"
+          echo "Checking health at $HEALTH_URL ..."
+          for i in 1 2 3 4 5; do
+            STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$HEALTH_URL" || echo "000")
+            if [ "$STATUS" = "200" ]; then
+              echo "Health check passed (attempt $i)"
+              exit 0
+            fi
+            echo "Attempt $i: status $STATUS — retrying in 15s..."
+            sleep 15
+          done
+          echo "Health check failed after 5 attempts"
+          exit 1
+
+  deploy-prod:
+    name: Deploy to Prod
+    runs-on: ubuntu-latest
+    needs: build-and-test
+    if: >-
+      github.event_name == 'workflow_dispatch' &&
+      github.event.inputs.environment == 'prod'
+    environment:
+      name: prod
+      url: https://${{ vars.AZURE_WEBAPP_NAME || 'app-hackops-prod' }}.azurewebsites.net
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Download build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: hackops-deploy-bundle
+          path: deploy-package
+
+      - name: Login to Azure (OIDC)
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Deploy IaC (Bicep)
+        run: |
+          az deployment group create \
+            --resource-group "${{ vars.AZURE_RESOURCE_GROUP }}" \
+            --template-file infra/bicep/hackops/main.bicep \
+            --parameters environment=prod projectName=hackops \
+            --mode Incremental
+
+      - name: Deploy to staging slot
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: ${{ vars.AZURE_WEBAPP_NAME }}
+          slot-name: staging
+          package: deploy-package
+
+      - name: Swap staging to production slot
+        run: |
+          az webapp deployment slot swap \
+            --resource-group "${{ vars.AZURE_RESOURCE_GROUP }}" \
+            --name "${{ vars.AZURE_WEBAPP_NAME }}" \
+            --slot staging \
+            --target-slot production
+
+      - name: Verify deployment health
+        run: |
+          HEALTH_URL="https://${{ vars.AZURE_WEBAPP_NAME }}.azurewebsites.net/api/health"
+          echo "Checking health at $HEALTH_URL ..."
+          for i in 1 2 3 4 5; do
+            STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$HEALTH_URL" || echo "000")
+            if [ "$STATUS" = "200" ]; then
+              echo "Health check passed (attempt $i)"
+              exit 0
+            fi
+            echo "Attempt $i: status $STATUS — retrying in 15s..."
+            sleep 15
+          done
+          echo "Health check failed after 5 attempts"
+          exit 1
