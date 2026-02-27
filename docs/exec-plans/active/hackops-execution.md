@@ -45,10 +45,10 @@
 <!-- Update this at the START of each session -->
 
 **Phase**: E — Application Build
-**Step**: app-09-tests (NEXT)
+**Step**: app-10-ci-cd (NEXT)
 **Branch**: `feature/app-06-admin`
-**Goal**: Write comprehensive test suite.
-Gate: coverage >80%, all tests pass.
+**Goal**: Create CI/CD workflows (lint, type-check, test, deploy).
+Gate: workflows pass dry-run validation.
 
 ---
 
@@ -207,8 +207,8 @@ so agents 12–15 have the skills/instructions they were designed to use.
   - Gate: `app-security-challenger-subagent` (focus: `data-handling`) — data exposure check
 - [x] Run app-08-dashboard → admin/hacker/coach dashboards
   - Gate: `npm run build` succeeds ✅, tsc clean, 131/131 tests pass
-- [ ] Run app-09-tests → full test suite
-  - Gate: coverage >80%, all tests pass
+- [x] Run app-09-tests → full test suite
+  - Gate: coverage >80%, all tests pass ✅ (178/178, lines 93%, branches 86%)
   - Gate: `app-logic-challenger-subagent` (focus: `test-coverage`) — test gap analysis
 - [ ] Run app-10-ci-cd → CI/CD workflows
   - Gate: workflows pass dry-run validation
@@ -470,6 +470,18 @@ so agents 12–15 have the skills/instructions they were designed to use.
 |     |            |            | hooks; build + tsc      |                     |          |
 |     |            |            | clean; 131 tests pass;  |                     |          |
 |     |            |            | commit ea65645          |                     |          |
+| 28  | 2026-02-27 | E / app-09 | Full test suite: 7 new  | Run app-10-ci-cd    | None     |
+|     |            |            | test files + 1 extended |                     |          |
+|     |            |            | (leaderboard 17 tests,  |                     |          |
+|     |            |            | challenge-gate 9, me 7, |                     |          |
+|     |            |            | audit 2, utils 4,       |                     |          |
+|     |            |            | health 1, leaderboard   |                     |          |
+|     |            |            | API 3, isGlobalAdmin    |                     |          |
+|     |            |            | 4); @vitest/coverage-v8 |                     |          |
+|     |            |            | configured; 178 tests   |                     |          |
+|     |            |            | pass; lines 93%,        |                     |          |
+|     |            |            | branches 86%;           |                     |          |
+|     |            |            | commit 1a92ad3          |                     |          |
 
 ---
 
