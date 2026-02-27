@@ -125,7 +125,12 @@ function emptyFetchAll(resources: unknown[] = []) {
 }
 
 const sampleCategories = [
-  { id: "cat-1", name: "Innovation", description: "How creative", maxScore: 10 },
+  {
+    id: "cat-1",
+    name: "Innovation",
+    description: "How creative",
+    maxScore: 10,
+  },
   { id: "cat-2", name: "Execution", description: "How polished", maxScore: 10 },
 ];
 
@@ -615,9 +620,7 @@ describe("PATCH /api/submissions/:id", () => {
     mockResolveRole.mockResolvedValue("admin");
 
     // Find submission by cross-partition query
-    submissionQuery.mockReturnValue(
-      emptyFetchAll([pendingSubmission]),
-    );
+    submissionQuery.mockReturnValue(emptyFetchAll([pendingSubmission]));
     submissionReplace.mockResolvedValue({ resource: {} });
 
     // Pointer → active rubric
@@ -676,9 +679,7 @@ describe("PATCH /api/submissions/:id", () => {
     mockGetAuth.mockReturnValue(adminPrincipal);
     mockResolveRole.mockResolvedValue("admin");
 
-    submissionQuery.mockReturnValue(
-      emptyFetchAll([pendingSubmission]),
-    );
+    submissionQuery.mockReturnValue(emptyFetchAll([pendingSubmission]));
     submissionReplace.mockResolvedValue({ resource: {} });
 
     const { PATCH } = await import("../submissions/[id]/route");
@@ -758,9 +759,7 @@ describe("PATCH /api/submissions/:id", () => {
     mockGetAuth.mockReturnValue(adminPrincipal);
     mockResolveRole.mockResolvedValue("admin");
 
-    submissionQuery.mockReturnValue(
-      emptyFetchAll([pendingSubmission]),
-    );
+    submissionQuery.mockReturnValue(emptyFetchAll([pendingSubmission]));
 
     const { PATCH } = await import("../submissions/[id]/route");
     const req = createRequest(
@@ -783,9 +782,7 @@ describe("PATCH /api/submissions/:id", () => {
     mockGetAuth.mockReturnValue(adminPrincipal);
     mockResolveRole.mockResolvedValue("admin");
 
-    submissionQuery.mockReturnValue(
-      emptyFetchAll([pendingSubmission]),
-    );
+    submissionQuery.mockReturnValue(emptyFetchAll([pendingSubmission]));
 
     // Active rubric with maxScore of 10
     rubricRead

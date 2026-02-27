@@ -51,7 +51,10 @@ export const PATCH = requireRole("admin")(async (
 
   if (scores.length === 0) {
     return NextResponse.json(
-      { error: "Score record not found", ok: false } satisfies ApiResponse<never>,
+      {
+        error: "Score record not found",
+        ok: false,
+      } satisfies ApiResponse<never>,
       { status: 404 },
     );
   }
@@ -76,9 +79,7 @@ export const PATCH = requireRole("admin")(async (
         maxScore: number;
       }>;
       for (const scoreEntry of body.categoryScores) {
-        const category = categories.find(
-          (c) => c.id === scoreEntry.categoryId,
-        );
+        const category = categories.find((c) => c.id === scoreEntry.categoryId);
         if (!category) {
           return NextResponse.json(
             {

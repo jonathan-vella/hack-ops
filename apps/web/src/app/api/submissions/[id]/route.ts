@@ -73,12 +73,13 @@ export const PATCH = requireRole(
   }
 
   // Coaches can only review submissions for their assigned hackathon
-  if (
-    auth.role === "coach" &&
-    submission.hackathonId !== auth.hackathonId
-  ) {
+  if (auth.role === "coach" && submission.hackathonId !== auth.hackathonId) {
     return NextResponse.json(
-      { error: "Coaches can only review submissions for their assigned hackathon", ok: false },
+      {
+        error:
+          "Coaches can only review submissions for their assigned hackathon",
+        ok: false,
+      },
       { status: 403 },
     );
   }
@@ -154,9 +155,7 @@ export const PATCH = requireRole(
       reviewedAt: now,
       reviewReason: body.reason,
     };
-    await container
-      .item(id, submission.teamId)
-      .replace(updatedSubmission);
+    await container.item(id, submission.teamId).replace(updatedSubmission);
 
     // Create immutable score record in scores container
     const scoresContainer = getContainer("scores");
@@ -228,9 +227,7 @@ export const PATCH = requireRole(
     reviewedAt: now,
     reviewReason: body.reason,
   };
-  await container
-    .item(id, submission.teamId)
-    .replace(updatedSubmission);
+  await container.item(id, submission.teamId).replace(updatedSubmission);
 
   await auditLog({
     hackathonId: submission.hackathonId,

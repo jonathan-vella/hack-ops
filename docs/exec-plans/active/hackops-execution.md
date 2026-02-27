@@ -412,7 +412,7 @@ so agents 12–15 have the skills/instructions they were designed to use.
 |     |            |            | 10 native flat config; |                     |          |
 |     |            |            | all validators pass    |                     |          |
 | 23  | 2026-02-27 | E / app-04 | Completed app-04:      | Merge PR, start     | None     |
-|     |            |            | 3 Zod schemas, 6      | app-05-api-         |          |
+|     |            |            | 3 Zod schemas, 6       | app-05-api-         |          |
 |     |            |            | route handlers         | challenges          |          |
 |     |            |            | (rubrics CRUD +        |                     |          |
 |     |            |            | pointer swap,          |                     |          |

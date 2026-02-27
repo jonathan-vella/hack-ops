@@ -14,117 +14,122 @@ import {
   listSubmissionsSchema,
 } from "@/lib/validation/submission";
 
-export const POST = requireAuth(async (request: NextRequest, _context, auth) => {
-  let raw: unknown;
-  try {
-    raw = await request.json();
-  } catch {
-    return NextResponse.json(
-      { error: "Invalid JSON body", ok: false },
-      { status: 400 },
+export const POST = requireAuth(
+  async (request: NextRequest, _context, auth) => {
+    let raw: unknown;
+    try {
+      raw = await request.json();
+    } catch {
+      return NextResponse.json(
+        { error: "Invalid JSON body", ok: false },
+        { status: 400 },
+      );
+    }
+
+    const result = createSubmissionSchema.safeParse(raw);
+    if (!result.success) {
+      return NextResponse.json(
+        {
+          error: "Validation failed",
+          issues: result.error.issues.map((i) => ({
+            path: i.path,
+            message: i.message,
+          })),
+          ok: false,
+        },
+        { status: 400 },
+      );
+    }
+
+    const body = result.data;
+
+    // Look up the hacker record to get their team and hackathon
+    const hackersContainer = getContainer("hackers");
+    const { resources: hackerRecords } = await hackersContainer.items
+      .query({
+        query:
+          "SELECT * FROM c WHERE c._type = 'hacker' AND c.githubUserId = @uid",
+        parameters: [{ name: "@uid", value: auth.principal.userId }],
+      })
+      .fetchAll();
+
+    if (hackerRecords.length === 0) {
+      return NextResponse.json(
+        {
+          error: "You are not registered as a hacker in any hackathon",
+          ok: false,
+        },
+        { status: 403 },
+      );
+    }
+
+    // Find a hacker record that has a team assignment
+    const hacker = hackerRecords.find(
+      (h: Record<string, unknown>) => h.teamId != null,
     );
-  }
+    if (!hacker) {
+      return NextResponse.json(
+        { error: "You are not assigned to a team yet", ok: false },
+        { status: 403 },
+      );
+    }
 
-  const result = createSubmissionSchema.safeParse(raw);
-  if (!result.success) {
-    return NextResponse.json(
-      {
-        error: "Validation failed",
-        issues: result.error.issues.map((i) => ({
-          path: i.path,
-          message: i.message,
-        })),
-        ok: false,
-      },
-      { status: 400 },
-    );
-  }
+    const teamId = hacker.teamId as string;
+    const hackathonId = hacker.hackathonId as string;
 
-  const body = result.data;
+    // Verify the hackathon is active
+    const hackathonsContainer = getContainer("hackathons");
+    const { resource: hackathon } = await hackathonsContainer
+      .item(hackathonId, hackathonId)
+      .read();
 
-  // Look up the hacker record to get their team and hackathon
-  const hackersContainer = getContainer("hackers");
-  const { resources: hackerRecords } = await hackersContainer.items
-    .query({
-      query:
-        "SELECT * FROM c WHERE c._type = 'hacker' AND c.githubUserId = @uid",
-      parameters: [{ name: "@uid", value: auth.principal.userId }],
-    })
-    .fetchAll();
+    if (!hackathon || hackathon.status !== "active") {
+      return NextResponse.json(
+        { error: "Hackathon is not active", ok: false },
+        { status: 422 },
+      );
+    }
 
-  if (hackerRecords.length === 0) {
-    return NextResponse.json(
-      { error: "You are not registered as a hacker in any hackathon", ok: false },
-      { status: 403 },
-    );
-  }
+    const container = getContainer("submissions");
+    const now = new Date().toISOString();
 
-  // Find a hacker record that has a team assignment
-  const hacker = hackerRecords.find(
-    (h: Record<string, unknown>) => h.teamId != null,
-  );
-  if (!hacker) {
-    return NextResponse.json(
-      { error: "You are not assigned to a team yet", ok: false },
-      { status: 403 },
-    );
-  }
+    const record: SubmissionsAPI.SubmissionRecord = {
+      id: crypto.randomUUID(),
+      teamId,
+      hackathonId,
+      challengeId: body.challengeId,
+      state: "pending",
+      description: body.description,
+      attachments: body.attachments ?? [],
+      submittedBy: auth.principal.userId,
+      submittedAt: now,
+      scores: null,
+      reviewedBy: null,
+      reviewedAt: null,
+      reviewReason: null,
+    };
 
-  const teamId = hacker.teamId as string;
-  const hackathonId = hacker.hackathonId as string;
+    await container.items.create({
+      ...record,
+      _type: "submission",
+    });
 
-  // Verify the hackathon is active
-  const hackathonsContainer = getContainer("hackathons");
-  const { resource: hackathon } = await hackathonsContainer
-    .item(hackathonId, hackathonId)
-    .read();
+    await auditLog({
+      hackathonId,
+      action: "submission.create",
+      targetType: "submission",
+      targetId: record.id,
+      performedBy: auth.principal.userId,
+      details: { challengeId: body.challengeId, teamId },
+    });
 
-  if (!hackathon || hackathon.status !== "active") {
-    return NextResponse.json(
-      { error: "Hackathon is not active", ok: false },
-      { status: 422 },
-    );
-  }
-
-  const container = getContainer("submissions");
-  const now = new Date().toISOString();
-
-  const record: SubmissionsAPI.SubmissionRecord = {
-    id: crypto.randomUUID(),
-    teamId,
-    hackathonId,
-    challengeId: body.challengeId,
-    state: "pending",
-    description: body.description,
-    attachments: body.attachments ?? [],
-    submittedBy: auth.principal.userId,
-    submittedAt: now,
-    scores: null,
-    reviewedBy: null,
-    reviewedAt: null,
-    reviewReason: null,
-  };
-
-  await container.items.create({
-    ...record,
-    _type: "submission",
-  });
-
-  await auditLog({
-    hackathonId,
-    action: "submission.create",
-    targetType: "submission",
-    targetId: record.id,
-    performedBy: auth.principal.userId,
-    details: { challengeId: body.challengeId, teamId },
-  });
-
-  const response: ApiResponse<SubmissionsAPI.SubmissionRecord> = {
-    data: record,
-    ok: true,
-  };
-  return NextResponse.json(response, { status: 201 });
-});
+    const response: ApiResponse<SubmissionsAPI.SubmissionRecord> = {
+      data: record,
+      ok: true,
+    };
+    return NextResponse.json(response, { status: 201 });
+  },
+);
 
 export const GET = requireRole(
   "admin",
@@ -147,13 +152,20 @@ export const GET = requireRole(
     );
   }
 
-  const { hackathonId, status, teamId, pageSize: rawPageSize } =
-    parseResult.data;
+  const {
+    hackathonId,
+    status,
+    teamId,
+    pageSize: rawPageSize,
+  } = parseResult.data;
 
   // Coaches only see submissions for their assigned hackathon
   if (auth.role === "coach" && hackathonId !== auth.hackathonId) {
     return NextResponse.json(
-      { error: "Coaches can only view submissions for their assigned hackathon", ok: false },
+      {
+        error: "Coaches can only view submissions for their assigned hackathon",
+        ok: false,
+      },
       { status: 403 },
     );
   }

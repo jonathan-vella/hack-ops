@@ -1,10 +1,6 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import type {
-  RubricsAPI,
-  ApiResponse,
-  PageResponse,
-} from "@hackops/shared";
+import type { RubricsAPI, ApiResponse, PageResponse } from "@hackops/shared";
 import { requireRole } from "@/lib/guards";
 import { getContainer } from "@/lib/cosmos";
 import { auditLog } from "@/lib/audit";
