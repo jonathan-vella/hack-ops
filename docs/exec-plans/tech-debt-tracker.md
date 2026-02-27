@@ -6,7 +6,25 @@ Updated by the doc-gardening workflow and referenced by `QUALITY_SCORE.md`.
 
 ## Active Debt Items
 
-_No active debt items._
+| ID  | Category     | Description                                                    | Severity | Added      |
+| --- | ------------ | -------------------------------------------------------------- | -------- | ---------- |
+| 15  | Skills       | 5 app-dev skills never committed: hackops-domain,              | High     | 2026-02-27 |
+|     |              | nextjs-patterns, cosmos-db-sdk, shadcn-ui-patterns,            |          |            |
+|     |              | zod-validation. Referenced by 3 agents + 10 prompts.           |          |            |
+| 16  | Instructions | 5 app-dev instructions never committed: typescript,            | High     | 2026-02-27 |
+|     |              | nextjs, react-components, testing, api-routes.                 |          |            |
+|     |              | Session 8 tracker says created but git log empty.              |          |            |
+| 17  | CI/Lint      | `next lint` broken: ESLint 10 + eslint-config-next             | Medium   | 2026-02-27 |
+|     |              | circular structure error. `npx next lint` exits 1.             |          |            |
+|     |              | Root cause: FlatCompat + ESLint 10 incompatibility.            |          |            |
+| 18  | Templates    | Phase C5 app issue templates missing: `app-feature.yml`        | Low      | 2026-02-27 |
+|     |              | and `app-bug.yml` never committed. Only infra templates exist. |          |            |
+| 19  | Validation   | `scripts/validate-business-rules.mjs` never committed.         | Medium   | 2026-02-27 |
+|     |              | Phase C6 tracker says created + registered in package.json     |          |            |
+|     |              | but neither file nor script entry exists.                      |          |            |
+| 20  | Tracker      | Session tracker Phase C checkboxes marked done for artifacts   | Medium   | 2026-02-27 |
+|     |              | that were never committed. Phantom completions for C3-C6       |          |            |
+|     |              | items need correction after recreation.                        |          |            |
 
 ## Resolved Items
 

@@ -2,15 +2,16 @@
 
 > Project health at a glance. Updated by the doc-gardening workflow and manual review.
 
-| Domain              | Grade | Gap Summary                                         | Next Action                              |
-| ------------------- | ----- | --------------------------------------------------- | ---------------------------------------- |
-| **Agents**          | A     | 16 agents + 11 subagents; all pass validation       | Maintain as agents are added             |
-| **Skills**          | A     | All 15 skills pass GA format; full coverage         | Maintain as new skills are added         |
-| **Instructions**    | A     | 21 instructions; 0 errors, 0 warnings               | Maintain as instructions are added       |
-| **Infrastructure**  | B+    | Core Bicep modules + deployment artifacts complete  | Finish open Phase 4 items (#147, #148)   |
-| **Documentation**   | A     | All docs fresh; counts correct; app-dev table added | Keep in sync after agent/skill additions |
-| **CI / Validation** | A     | 14 validators; all pass; CI/CD workflows complete   | Maintain as new validators are added     |
-| **Backlog**         | A     | Issue hygiene maintained; all tech debt resolved    | Continue closure cadence by milestone    |
+| Domain              | Grade | Gap Summary                                                     | Next Action                                                                                 |
+| ------------------- | ----- | --------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
+| **Agents**          | A     | 16 agents + 11 subagents; all pass validation                   | Maintain as agents are added                                                                |
+| **Skills**          | C     | 15 committed pass GA; 5 app-dev skills never committed          | Recreate hackops-domain, nextjs-patterns, cosmos-db-sdk, shadcn-ui-patterns, zod-validation |
+| **Instructions**    | B     | 23 on disk; 5 app-dev instructions never committed              | Recreate typescript, nextjs, react-components, testing, api-routes instructions             |
+| **Infrastructure**  | B+    | Core Bicep modules + deployment artifacts complete              | Finish open Phase 4 items (#147, #148)                                                      |
+| **Application**     | B     | Auth + hackathon/team/join API complete; 60 tests; lint broken  | Fix `next lint` (ESLint 10 + Next 16 compat); complete remaining 7 app prompts              |
+| **Documentation**   | A-    | Docs mostly fresh; session tracker has phantom completions      | Correct Phase C checkmarks in session tracker                                               |
+| **CI / Validation** | A-    | 14 validators pass; `next lint` broken (ESLint 10 circular ref) | Fix ESLint config or pin eslint-config-next                                                 |
+| **Backlog**         | A     | Issue hygiene maintained; all tech debt resolved                | Continue closure cadence by milestone                                                       |
 
 ## Grading Scale
 
@@ -26,6 +27,11 @@
 
 | Date       | Domain         | Change                                                                                  |
 | ---------- | -------------- | --------------------------------------------------------------------------------------- |
+| 2026-02-27 | Application    | New domain at B: auth + hackathon CRUD + join + teams; 60 tests; lint broken            |
+| 2026-02-27 | Skills         | Grade A→C: 5 app-dev skills never committed (hackops-domain + 4 others); debt #15       |
+| 2026-02-27 | Instructions   | Grade A→B: 5 app-dev instructions never committed; debt #16                             |
+| 2026-02-27 | CI/Validation  | Grade A→A-: `next lint` broken (ESLint 10 circular ref with Next 16); debt #17          |
+| 2026-02-27 | Documentation  | Grade A→A-: Phase C items marked complete in tracker but artifacts missing; debt #18    |
 | 2026-02-27 | Agents         | Grade A-→A: conductor warning no longer reproduces; all 16 agents pass                  |
 | 2026-02-27 | Instructions   | Grade A-→A: fixed globHasMatch brace expansion + `**/` stripping; 0 warnings            |
 | 2026-02-27 | Documentation  | Grade A-→A: added app-dev workflow table to AGENTS.md; counts correct                   |
