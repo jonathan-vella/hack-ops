@@ -38,8 +38,9 @@ For general GitHub Actions best practices, rely on
 
 | Action                      | Version |
 | --------------------------- | ------- |
-| `actions/checkout`          | `@v4`   |
-| `actions/setup-node`        | `@v4`   |
+| `actions/checkout`          | `@v6`   |
+| `actions/setup-node`        | `@v6`   |
+| `actions/github-script`     | `@v8`   |
 | `actions/upload-artifact`   | `@v4`   |
 | `actions/download-artifact` | `@v4`   |
 | `actions/cache`             | `@v4`   |
