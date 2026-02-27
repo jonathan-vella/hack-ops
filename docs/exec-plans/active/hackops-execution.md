@@ -45,11 +45,11 @@
 <!-- Update this at the START of each session -->
 
 **Phase**: E — Application Build
-**Step**: Run app-03-api-hackathons → hackathon/team/join routes
+**Step**: Run app-04-api-scoring → rubric/submission/review routes
 **Branch**: `feature/app-02-auth`
-**Goal**: Run the app-03-api-hackathons prompt to implement
-hackathon CRUD, team management, and join endpoints.
-Gate: tsc --noEmit + endpoint tests pass + contract conformance.
+**Goal**: Run the app-04-api-scoring prompt to implement
+rubric CRUD, submission evidence, and coach review endpoints.
+Gate: tsc --noEmit + endpoint tests pass + scoring correctness.
 
 ---
 
@@ -167,8 +167,8 @@ Gate: tsc --noEmit + endpoint tests pass + contract conformance.
 - [x] Run app-02-auth → auth middleware + role guards
   - Gate: role guard unit tests pass
   - Gate: `app-security-challenger-subagent` (focus: `auth`) — no critical/high findings
-- [ ] Run app-03-api-hackathons → hackathon/team/join routes
-  - Gate: `tsc --noEmit` + endpoint tests pass
+- [x] Run app-03-api-hackathons → hackathon/team/join routes
+  - Gate: `tsc --noEmit` + endpoint tests pass ✅
   - Gate: `app-logic-challenger-subagent` (focus: `api-contract`) — contract conformance
 - [ ] Run app-04-api-scoring → rubric/submission/review routes
   - Gate: `tsc --noEmit` + endpoint tests pass
@@ -367,6 +367,16 @@ Gate: tsc --noEmit + endpoint tests pass + contract conformance.
 |     |            |            | logger, CORS, Next.js  |                     |          |
 |     |            |            | middleware; 35 tests   |                     |          |
 |     |            |            | pass; commit 9476766   |                     |          |
+| 21  | 2026-02-27 | E / app-03 | Hackathon CRUD (POST,  | Run app-04-api-     | None     |
+|     |            |            | GET, PATCH), join      | scoring (rubric/    |          |
+|     |            |            | endpoint (event code   | submission/review   |          |
+|     |            |            | + rate limit), team    | routes)             |          |
+|     |            |            | assign (Fisher-Yates), |                     |          |
+|     |            |            | team list + reassign;  |                     |          |
+|     |            |            | added requireAuth      |                     |          |
+|     |            |            | guard; 3 Zod schemas;  |                     |          |
+|     |            |            | 60 tests pass;         |                     |          |
+|     |            |            | commit 5e90170         |                     |          |
 
 ---
 
