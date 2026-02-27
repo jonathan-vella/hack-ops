@@ -54,3 +54,23 @@ export function getDevRole(): UserRole | null {
   if (role === "admin" || role === "coach" || role === "hacker") return role;
   return null;
 }
+
+/**
+ * Check if a user holds admin role in any hackathon.
+ * Used for app-wide endpoints (config, global audit) that have no hackathonId scope.
+ */
+export async function isGlobalAdmin(githubUserId: string): Promise<boolean> {
+  const devRole = getDevRole();
+  if (devRole === "admin") return true;
+
+  const container = getContainer("roles");
+  const { resources } = await container.items
+    .query<RoleDocument>({
+      query:
+        "SELECT TOP 1 * FROM c WHERE c.githubUserId = @userId AND c.role = 'admin'",
+      parameters: [{ name: "@userId", value: githubUserId }],
+    })
+    .fetchAll();
+
+  return resources.length > 0;
+}

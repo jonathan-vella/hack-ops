@@ -4,7 +4,12 @@ vi.mock("../cosmos", () => ({
   getContainer: vi.fn(),
 }));
 
-import { resolveRole, isPrimaryAdmin, getDevRole } from "../roles";
+import {
+  resolveRole,
+  isPrimaryAdmin,
+  getDevRole,
+  isGlobalAdmin,
+} from "../roles";
 import { getContainer } from "../cosmos";
 
 const mockGetContainer = vi.mocked(getContainer);
@@ -72,5 +77,34 @@ describe("getDevRole", () => {
     vi.stubEnv("NODE_ENV", "development");
     delete process.env.DEV_USER_ROLE;
     expect(getDevRole()).toBeNull();
+  });
+});
+
+describe("isGlobalAdmin", () => {
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
+
+  it("returns true when user has admin role in any hackathon", async () => {
+    mockQuery([{ role: "admin" }]);
+    expect(await isGlobalAdmin("user-1")).toBe(true);
+  });
+
+  it("returns false when user has no admin role", async () => {
+    mockQuery([]);
+    expect(await isGlobalAdmin("user-2")).toBe(false);
+  });
+
+  it("returns true via dev role bypass in development", async () => {
+    vi.stubEnv("NODE_ENV", "development");
+    vi.stubEnv("DEV_USER_ROLE", "admin");
+    expect(await isGlobalAdmin("any-user")).toBe(true);
+  });
+
+  it("does not bypass in development when dev role is not admin", async () => {
+    vi.stubEnv("NODE_ENV", "development");
+    vi.stubEnv("DEV_USER_ROLE", "coach");
+    mockQuery([]);
+    expect(await isGlobalAdmin("user-3")).toBe(false);
   });
 });
