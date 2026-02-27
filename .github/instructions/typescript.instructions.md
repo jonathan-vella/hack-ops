@@ -27,12 +27,12 @@ and makes dependency boundaries clear.
 
 ## No `any`
 
-| Pattern              | Use Instead                              |
-| -------------------- | ---------------------------------------- |
-| `any`                | `unknown` + type narrowing               |
-| `as any`             | Type assertion to specific type          |
-| `// @ts-ignore`      | `// @ts-expect-error` with explanation   |
-| Untyped 3rd-party    | Write a `.d.ts` declaration file         |
+| Pattern           | Use Instead                            |
+| ----------------- | -------------------------------------- |
+| `any`             | `unknown` + type narrowing             |
+| `as any`          | Type assertion to specific type        |
+| `// @ts-ignore`   | `// @ts-expect-error` with explanation |
+| Untyped 3rd-party | Write a `.d.ts` declaration file       |
 
 ## Shared Types
 
@@ -44,14 +44,14 @@ All domain types live in `packages/shared/types/api-contract.ts`.
 
 ## Naming
 
-| Construct      | Convention        | Example                    |
-| -------------- | ----------------- | -------------------------- |
-| Type / Interface | PascalCase      | `HackathonResponse`        |
-| Variable       | camelCase         | `hackathonId`              |
-| Constant       | UPPER_SNAKE_CASE  | `MAX_TEAM_SIZE`            |
-| Enum member    | snake_case string | `"under_review"`           |
-| File           | kebab-case        | `assign-teams.ts`          |
-| Component file | PascalCase        | `HackathonCard.tsx`        |
+| Construct        | Convention        | Example             |
+| ---------------- | ----------------- | ------------------- |
+| Type / Interface | PascalCase        | `HackathonResponse` |
+| Variable         | camelCase         | `hackathonId`       |
+| Constant         | UPPER_SNAKE_CASE  | `MAX_TEAM_SIZE`     |
+| Enum member      | snake_case string | `"under_review"`    |
+| File             | kebab-case        | `assign-teams.ts`   |
+| Component file   | PascalCase        | `HackathonCard.tsx` |
 
 ## Interfaces vs Types
 

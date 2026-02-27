@@ -24,7 +24,11 @@ Never define domain types or Zod schemas inside route files.
 
 ```typescript
 import { NextResponse } from "next/server";
-import { CreateHackathonSchema, type ApiResponse, type Hackathon } from "@hackops/shared";
+import {
+  CreateHackathonSchema,
+  type ApiResponse,
+  type Hackathon,
+} from "@hackops/shared";
 import { requireAuth, requireRole } from "@/lib/auth";
 import { getContainer } from "@/lib/cosmos";
 import { auditLog } from "@/lib/audit";
@@ -72,12 +76,12 @@ export async function POST(request: Request) {
 
 ## Validation Rules
 
-| Rule                              | Enforcement                               |
-| --------------------------------- | ----------------------------------------- |
-| Always use `safeParse`            | Never `parse` — APIs must not throw       |
-| Return 400 on validation failure  | Include `error.issues` in response        |
-| Validate at route entry           | Before any business logic or DB calls     |
-| Use `z.coerce` for query params   | URL search params are always strings      |
+| Rule                             | Enforcement                           |
+| -------------------------------- | ------------------------------------- |
+| Always use `safeParse`           | Never `parse` — APIs must not throw   |
+| Return 400 on validation failure | Include `error.issues` in response    |
+| Validate at route entry          | Before any business logic or DB calls |
+| Use `z.coerce` for query params  | URL search params are always strings  |
 
 ## Auth Guard Pattern
 
@@ -123,11 +127,11 @@ Every mutation (POST, PUT, PATCH, DELETE) writes an audit entry:
 
 ```typescript
 await auditLog({
-  action: "hackathon.created",  // domain.verb
+  action: "hackathon.created", // domain.verb
   actorId: user.id,
   resourceId: resource.id,
-  hackathonId: hackathonId,     // partition key for Cosmos DB
-  metadata: {},                 // optional extra context
+  hackathonId: hackathonId, // partition key for Cosmos DB
+  metadata: {}, // optional extra context
 });
 ```
 

@@ -13,11 +13,11 @@ applyTo: "**/*.test.ts, **/*.spec.ts"
 
 ## File Naming
 
-| Type        | Pattern              | Location                      |
-| ----------- | -------------------- | ----------------------------- |
-| Unit        | `*.test.ts`          | Colocated with source file    |
+| Type        | Pattern                 | Location                   |
+| ----------- | ----------------------- | -------------------------- |
+| Unit        | `*.test.ts`             | Colocated with source file |
 | Integration | `*.integration.test.ts` | `__tests__/` directory     |
-| E2E stub    | `*.e2e.test.ts`      | `e2e/` directory              |
+| E2E stub    | `*.e2e.test.ts`         | `e2e/` directory           |
 
 ## Test Structure
 
@@ -121,11 +121,11 @@ export function createMockHackathon(
 
 ## What to Test
 
-| Always test                          | Skip                              |
-| ------------------------------------ | --------------------------------- |
-| Business logic and calculations      | shadcn/ui primitives              |
-| API route handlers (request → response) | Third-party library internals  |
-| Zod schema validation                | Tailwind class application        |
-| State machine transitions            | Next.js framework internals       |
-| Error handling paths                 | Environment-specific setup        |
-| Role-based access control            | —                                 |
+| Always test                             | Skip                          |
+| --------------------------------------- | ----------------------------- |
+| Business logic and calculations         | shadcn/ui primitives          |
+| API route handlers (request → response) | Third-party library internals |
+| Zod schema validation                   | Tailwind class application    |
+| State machine transitions               | Next.js framework internals   |
+| Error handling paths                    | Environment-specific setup    |
+| Role-based access control               | —                             |

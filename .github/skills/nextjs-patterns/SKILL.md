@@ -22,14 +22,14 @@ The app runs on Next.js 16 with `output: "standalone"`.
 
 ## App Router File Conventions
 
-| File          | Purpose                          | Runs on        |
-| ------------- | -------------------------------- | -------------- |
-| `page.tsx`    | Route page component             | Server (RSC)   |
-| `layout.tsx`  | Shared layout wrapping children  | Server (RSC)   |
-| `route.ts`    | API route handler (no UI)        | Server          |
-| `loading.tsx` | Suspense fallback                | Server (RSC)   |
-| `error.tsx`   | Error boundary                   | Client          |
-| `not-found.tsx` | 404 fallback                   | Server (RSC)   |
+| File            | Purpose                         | Runs on      |
+| --------------- | ------------------------------- | ------------ |
+| `page.tsx`      | Route page component            | Server (RSC) |
+| `layout.tsx`    | Shared layout wrapping children | Server (RSC) |
+| `route.ts`      | API route handler (no UI)       | Server       |
+| `loading.tsx`   | Suspense fallback               | Server (RSC) |
+| `error.tsx`     | Error boundary                  | Client       |
+| `not-found.tsx` | 404 fallback                    | Server (RSC) |
 
 ## Route Handler Pattern
 
@@ -56,11 +56,11 @@ export async function GET(
 
 ## Server vs Client Components
 
-| Pattern          | Directive       | Use when                                |
-| ---------------- | --------------- | --------------------------------------- |
-| Server Component | (default)       | Data fetching, no interactivity needed  |
-| Client Component | `'use client'`  | Event handlers, state, browser APIs     |
-| Server Action    | `'use server'`  | Form submissions, mutations             |
+| Pattern          | Directive      | Use when                               |
+| ---------------- | -------------- | -------------------------------------- |
+| Server Component | (default)      | Data fetching, no interactivity needed |
+| Client Component | `'use client'` | Event handlers, state, browser APIs    |
+| Server Action    | `'use server'` | Form submissions, mutations            |
 
 ### Rules
 
@@ -95,10 +95,10 @@ export const config = {
 
 ## Path Aliases
 
-| Alias             | Resolves to                           |
-| ----------------- | ------------------------------------- |
-| `@/*`             | `apps/web/src/*`                      |
-| `@hackops/shared` | `packages/shared/types`               |
+| Alias             | Resolves to             |
+| ----------------- | ----------------------- |
+| `@/*`             | `apps/web/src/*`        |
+| `@hackops/shared` | `packages/shared/types` |
 
 ## Error Handling
 

@@ -45,14 +45,14 @@ export function getContainer(name: string): Container {
 
 ## Container Layout
 
-| Container      | Partition Key   | Purpose                              |
-| -------------- | --------------- | ------------------------------------ |
-| `hackathons`   | `/id`           | Hackathon lifecycle documents        |
-| `teams`        | `/hackathonId`  | Team registrations, members          |
-| `submissions`  | `/hackathonId`  | Challenge submissions                |
-| `scores`       | `/hackathonId`  | Scoring records, grades              |
-| `users`        | `/id`           | User profiles, roles                 |
-| `audit`        | `/hackathonId`  | Audit trail entries                  |
+| Container     | Partition Key  | Purpose                       |
+| ------------- | -------------- | ----------------------------- |
+| `hackathons`  | `/id`          | Hackathon lifecycle documents |
+| `teams`       | `/hackathonId` | Team registrations, members   |
+| `submissions` | `/hackathonId` | Challenge submissions         |
+| `scores`      | `/hackathonId` | Scoring records, grades       |
+| `users`       | `/id`          | User profiles, roles          |
+| `audit`       | `/hackathonId` | Audit trail entries           |
 
 ## Query Patterns
 
@@ -92,10 +92,11 @@ const { resource } = await container.items.upsert<Hackathon>(document);
 ### Replace with Optimistic Concurrency
 
 ```typescript
-const { resource } = await container.item(id, pk).replace<Hackathon>(
-  updated,
-  { accessCondition: { type: "IfMatch", condition: etag } },
-);
+const { resource } = await container
+  .item(id, pk)
+  .replace<Hackathon>(updated, {
+    accessCondition: { type: "IfMatch", condition: etag },
+  });
 ```
 
 ## Bulk Operations

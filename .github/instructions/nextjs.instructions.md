@@ -7,14 +7,14 @@ applyTo: "**/apps/web/**"
 
 ## App Router File Structure
 
-| File            | Purpose                      | Directive     |
-| --------------- | ---------------------------- | ------------- |
-| `page.tsx`      | Route page (Server Component)| —             |
-| `layout.tsx`    | Shared layout                | —             |
-| `route.ts`      | API route handler            | —             |
-| `loading.tsx`   | Suspense fallback            | —             |
-| `error.tsx`     | Error boundary               | `'use client'`|
-| `not-found.tsx` | 404 fallback                 | —             |
+| File            | Purpose                       | Directive      |
+| --------------- | ----------------------------- | -------------- |
+| `page.tsx`      | Route page (Server Component) | —              |
+| `layout.tsx`    | Shared layout                 | —              |
+| `route.ts`      | API route handler             | —              |
+| `loading.tsx`   | Suspense fallback             | —              |
+| `error.tsx`     | Error boundary                | `'use client'` |
+| `not-found.tsx` | 404 fallback                  | —              |
 
 - `route.ts` and `page.tsx` must NOT coexist in the same directory
 - API routes go under `src/app/api/`
@@ -31,11 +31,11 @@ export default function Page() { ... }
 export function InteractiveWidget() { ... }
 ```
 
-| Use Server Component when          | Use Client Component when               |
-| ---------------------------------- | --------------------------------------- |
-| Fetching data                      | Event handlers (`onClick`, `onChange`)   |
-| Accessing backend resources        | `useState`, `useEffect`, `useRef`       |
-| Rendering static/dynamic content   | Browser APIs (`localStorage`, `window`) |
+| Use Server Component when        | Use Client Component when               |
+| -------------------------------- | --------------------------------------- |
+| Fetching data                    | Event handlers (`onClick`, `onChange`)  |
+| Accessing backend resources      | `useState`, `useEffect`, `useRef`       |
+| Rendering static/dynamic content | Browser APIs (`localStorage`, `window`) |
 
 - Default to Server Components — add `'use client'` only when needed
 - Never pass functions as props from Server → Client boundary
@@ -71,10 +71,10 @@ export async function GET(
 
 ## Path Aliases
 
-| Alias             | Resolves to              |
-| ----------------- | ------------------------ |
-| `@/*`             | `apps/web/src/*`         |
-| `@hackops/shared` | `packages/shared/types`  |
+| Alias             | Resolves to             |
+| ----------------- | ----------------------- |
+| `@/*`             | `apps/web/src/*`        |
+| `@hackops/shared` | `packages/shared/types` |
 
 ## Configuration
 

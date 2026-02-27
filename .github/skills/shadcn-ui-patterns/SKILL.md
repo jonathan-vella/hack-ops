@@ -25,21 +25,21 @@ theming.
 
 Core components installed via `npx shadcn@latest add <name>`:
 
-| Component   | Use case                                         |
-| ----------- | ------------------------------------------------ |
-| `Button`    | Actions, form submits, navigation triggers       |
+| Component   | Use case                                          |
+| ----------- | ------------------------------------------------- |
+| `Button`    | Actions, form submits, navigation triggers        |
 | `Card`      | Content containers — hackathon cards, score cards |
-| `Dialog`    | Modal forms — create hackathon, invite team      |
-| `Form`      | React Hook Form wrapper with Zod validation      |
-| `Input`     | Text fields                                      |
-| `Label`     | Form field labels                                |
-| `Select`    | Dropdown selectors — role, status, category      |
-| `Table`     | Data display — teams, scores, submissions        |
-| `Tabs`      | Section switching — dashboard views              |
-| `Badge`     | Status indicators — hackathon state, grade       |
-| `Separator` | Visual dividers                                  |
-| `Skeleton`  | Loading placeholders                             |
-| `Sonner`    | Toast notifications                              |
+| `Dialog`    | Modal forms — create hackathon, invite team       |
+| `Form`      | React Hook Form wrapper with Zod validation       |
+| `Input`     | Text fields                                       |
+| `Label`     | Form field labels                                 |
+| `Select`    | Dropdown selectors — role, status, category       |
+| `Table`     | Data display — teams, scores, submissions         |
+| `Tabs`      | Section switching — dashboard views               |
+| `Badge`     | Status indicators — hackathon state, grade        |
+| `Separator` | Visual dividers                                   |
+| `Skeleton`  | Loading placeholders                              |
+| `Sonner`    | Toast notifications                               |
 
 ## Component Location
 
@@ -85,9 +85,7 @@ export function HackathonCard({ hackathon }: HackathonCardProps) {
         </div>
       </CardHeader>
       <CardContent>
-        <p className="text-sm text-muted-foreground">
-          {hackathon.description}
-        </p>
+        <p className="text-sm text-muted-foreground">{hackathon.description}</p>
       </CardContent>
     </Card>
   );

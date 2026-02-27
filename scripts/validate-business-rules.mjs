@@ -32,8 +32,7 @@ let warnings = 0;
 let checks = 0;
 
 function log(level, msg) {
-  const prefix =
-    level === "error" ? "❌" : level === "warn" ? "⚠️ " : "✅";
+  const prefix = level === "error" ? "❌" : level === "warn" ? "⚠️ " : "✅";
   console.log(`${prefix} ${msg}`);
   if (level === "error") errors++;
   if (level === "warn") warnings++;

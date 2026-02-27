@@ -22,11 +22,11 @@ Source of truth: `packages/shared/types/api-contract.ts` + `docs/prd.md`.
 
 ## Role Matrix
 
-| Role      | Scope          | Can create hackathons | Can score | Can submit evidence | Can manage teams |
-| --------- | -------------- | --------------------- | --------- | ------------------- | ---------------- |
-| `admin`   | Per-hackathon  | Yes                   | No        | No                  | Yes              |
-| `coach`   | Per-hackathon  | No                    | Yes       | No                  | No               |
-| `hacker`  | Per-hackathon  | No                    | No        | Yes                 | No               |
+| Role     | Scope         | Can create hackathons | Can score | Can submit evidence | Can manage teams |
+| -------- | ------------- | --------------------- | --------- | ------------------- | ---------------- |
+| `admin`  | Per-hackathon | Yes                   | No        | No                  | Yes              |
+| `coach`  | Per-hackathon | No                    | Yes       | No                  | No               |
+| `hacker` | Per-hackathon | No                    | No        | Yes                 | No               |
 
 - Roles are **hackathon-scoped** — a user can be admin in one event and hacker in another
 - The hackathon creator is automatically the **primary admin** (`isPrimaryAdmin: true`)
@@ -41,9 +41,9 @@ draft → active → archived
 
 | Transition        | Who can trigger | Side effects                                   |
 | ----------------- | --------------- | ---------------------------------------------- |
-| draft → active    | admin           | Sets `launchedAt`; enables join via event code  |
-| active → archived | admin           | Sets `archivedAt`; freezes leaderboard          |
-| (no other)        | —               | Return 422 for invalid transitions              |
+| draft → active    | admin           | Sets `launchedAt`; enables join via event code |
+| active → archived | admin           | Sets `archivedAt`; freezes leaderboard         |
+| (no other)        | —               | Return 422 for invalid transitions             |
 
 - Event codes are **4-digit numeric strings** (`/^\d{4}$/`)
 - Event codes must be **unique across all active hackathons**
@@ -74,12 +74,12 @@ timestamp wins. This rewards faster completion.
 
 ### Grade Badges
 
-| Badge | Criteria                     |
-| ----- | ---------------------------- |
-| A     | Top 25% of total scores      |
-| B     | 50th–75th percentile         |
-| C     | 25th–50th percentile         |
-| D     | Bottom 25%                   |
+| Badge | Criteria                |
+| ----- | ----------------------- |
+| A     | Top 25% of total scores |
+| B     | 50th–75th percentile    |
+| C     | 25th–50th percentile    |
+| D     | Bottom 25%              |
 
 ## Challenge Progression
 

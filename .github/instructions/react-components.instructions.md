@@ -25,13 +25,13 @@ export function HackathonCard({ hackathon, onSelect }: HackathonCardProps) {
 
 ## Directory Structure
 
-| Directory             | Contents                                  |
-| --------------------- | ----------------------------------------- |
-| `components/ui/`     | shadcn/ui primitives — never edit directly |
-| `components/hackathon/` | Hackathon domain components              |
-| `components/scoring/`  | Score display, grade badges              |
-| `components/team/`     | Team management components               |
-| `components/layout/`   | Nav, sidebar, footer                     |
+| Directory               | Contents                                   |
+| ----------------------- | ------------------------------------------ |
+| `components/ui/`        | shadcn/ui primitives — never edit directly |
+| `components/hackathon/` | Hackathon domain components                |
+| `components/scoring/`   | Score display, grade badges                |
+| `components/team/`      | Team management components                 |
+| `components/layout/`    | Nav, sidebar, footer                       |
 
 ## Composition
 
@@ -66,13 +66,13 @@ export function HackathonCard({ hackathon }: HackathonCardProps) {
 
 ## Accessibility
 
-| Requirement           | Implementation                          |
-| --------------------- | --------------------------------------- |
-| Form labels           | Every input has a `<Label>` component   |
-| Icon buttons          | Add `aria-label` attribute              |
-| Color contrast        | WCAG AA minimum (4.5:1)                 |
-| Keyboard navigation   | Focusable elements use `tabIndex`       |
-| Screen readers        | Use semantic HTML (`<nav>`, `<main>`)   |
+| Requirement         | Implementation                        |
+| ------------------- | ------------------------------------- |
+| Form labels         | Every input has a `<Label>` component |
+| Icon buttons        | Add `aria-label` attribute            |
+| Color contrast      | WCAG AA minimum (4.5:1)               |
+| Keyboard navigation | Focusable elements use `tabIndex`     |
+| Screen readers      | Use semantic HTML (`<nav>`, `<main>`) |
 
 ## Client Components
 

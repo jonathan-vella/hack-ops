@@ -184,12 +184,12 @@ export const env = EnvSchema.parse(process.env);
 
 ## Common Mistakes
 
-| Mistake                                 | Fix                                    |
-| --------------------------------------- | -------------------------------------- |
-| Using `parse` in route handler          | Use `safeParse` — never throw in APIs  |
-| String interpolation in error messages  | Return `result.error.issues` directly  |
-| Forgetting `z.coerce` for query params  | Query params are always strings        |
-| Using `z.date()` for JSON bodies        | Use `z.iso.datetime()` — JSON has no Date type |
+| Mistake                                | Fix                                            |
+| -------------------------------------- | ---------------------------------------------- |
+| Using `parse` in route handler         | Use `safeParse` — never throw in APIs          |
+| String interpolation in error messages | Return `result.error.issues` directly          |
+| Forgetting `z.coerce` for query params | Query params are always strings                |
+| Using `z.date()` for JSON bodies       | Use `z.iso.datetime()` — JSON has no Date type |
 
 ## References
 
