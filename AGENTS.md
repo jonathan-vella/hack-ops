@@ -47,11 +47,15 @@ Agent definitions: `.github/agents/*.agent.md`
 
 ### Adversarial Subagents
 
-| Subagent                         | Parent Agents                           | Purpose                                               |
-| -------------------------------- | --------------------------------------- | ----------------------------------------------------- |
-| infra-challenger-subagent        | Requirements, Architect, Bicep Plan     | Challenges infra plans for governance/WAF/feasibility |
-| app-security-challenger-subagent | API Builder, Test Writer, App Conductor | Challenges app code for auth bypass, IDOR, injection  |
-| app-logic-challenger-subagent    | Test Writer, App Conductor              | Challenges business rules, contract drift, edge cases |
+Each adversarial subagent runs **3 focused review passes** per invocation.
+Parent agents make a single call; the subagent returns aggregated findings across all passes.
+Findings are written to `agent-output/{project}/challenges/`.
+
+| Subagent                         | Parent Agents                           | Passes                                   | Purpose                                               |
+| -------------------------------- | --------------------------------------- | ---------------------------------------- | ----------------------------------------------------- |
+| infra-challenger-subagent        | Requirements, Architect, Bicep Plan     | security, waf, governance                | Challenges infra plans for governance/WAF/feasibility |
+| app-security-challenger-subagent | API Builder, Test Writer, App Conductor | auth, api-routes, data-handling          | Challenges app code for auth bypass, IDOR, injection  |
+| app-logic-challenger-subagent    | Test Writer, App Conductor              | api-contract, business-rules, data-model | Challenges business rules, contract drift, edge cases |
 
 ### Other Subagents
 

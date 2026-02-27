@@ -90,7 +90,7 @@ function parseFrontmatter(content) {
       currentKey = keyMatch[1].toLowerCase();
       const rawValue = keyMatch[2].trim();
 
-      // Check for array start
+      // Check for array start (flow-style or block-style)
       if (rawValue === "[" || rawValue.startsWith("[")) {
         inArray = true;
         currentValue = [];
@@ -105,6 +105,13 @@ function parseFrontmatter(content) {
           inArray = false;
           currentKey = null;
         }
+        continue;
+      }
+
+      // Empty value may start a block-sequence array (YAML `key:\n  - val`)
+      if (rawValue === "") {
+        inArray = true;
+        currentValue = [];
         continue;
       }
 

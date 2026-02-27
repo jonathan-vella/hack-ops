@@ -320,9 +320,10 @@ After generating the implementation plan, invoke `infra-challenger-subagent` via
 
 1. Provide: `artifact_path` = `agent-output/{project}/04-implementation-plan.md`,
    `project_name` = `{project}`, `artifact_type` = `implementation-plan`
-2. Review the returned findings JSON
-3. Include a summary of `must_fix` and `should_fix` items in the approval gate below
-4. The user decides whether to revise or proceed — this is advisory, not blocking
+2. Do NOT set `review_focus` — the subagent runs all 3 passes internally (security, waf, governance)
+3. Review the returned findings JSON (contains `passes[]` array with 3 entries)
+4. Include per-pass summary of `must_fix` and `should_fix` items in the approval gate below
+5. The user decides whether to revise or proceed — this is advisory, not blocking
 
 ### Phase 5: Approval Gate
 
@@ -340,10 +341,12 @@ Est. Implementation: {time}
 If Challenger found issues, append:
 
 ```text
-⚠️ Challenger Review: {risk_level} risk
-  must_fix: {count} | should_fix: {count} | suggestions: {count}
-  Key concerns: {top 2-3 must_fix titles}
-  Full findings: agent-output/{project}/challenge-findings.json
+⚠️ Challenger Review (3-pass):
+  Security:   must_fix: {n} | should_fix: {n} | risk: {level}
+  WAF:        must_fix: {n} | should_fix: {n} | risk: {level}
+  Governance: must_fix: {n} | should_fix: {n} | risk: {level}
+  Key concerns: {top 2-3 must_fix titles from any pass}
+  Findings: agent-output/{project}/challenges/infra-challenge.json
 ```
 
 ```text

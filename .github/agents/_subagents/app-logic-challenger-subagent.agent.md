@@ -29,6 +29,26 @@ The caller provides:
 - `project_name`: Name of the project (required)
 - `review_focus`: One of `api-contract`, `business-rules`, `data-model`, `test-coverage`, `full` (required)
 
+## Multi-Pass Behavior
+
+Each invocation runs **3 focused review passes** to ensure comprehensive coverage without overlap:
+
+| Pass | `review_focus`   | Checklist Subset                                      |
+| ---- | ---------------- | ----------------------------------------------------- |
+| 1    | `api-contract`   | API Contract Conformance                              |
+| 2    | `business-rules` | Business Rule Correctness + Edge Cases & Boundaries   |
+| 3    | `data-model`     | Data Model Integrity                                  |
+
+Optional 4th pass: `test-coverage` (Test Coverage Gaps) — included
+automatically when test files exist in `scope_paths`.
+
+- **Default (`full`)**: Run all 3 passes (+ optional 4th) internally
+  in sequence. Return aggregated `passes[]` array.
+- **Single focus**: When set to a specific value, run only that pass.
+  Return a single-element `passes[]` array.
+- **No overlap**: Each pass uses ONLY its assigned checklist sections.
+- **Independent severity**: Each pass has its own `risk_level`. The top-level `risk_level` is the highest across all passes.
+
 ## Business Logic Attack Surfaces
 
 ### API Contract Conformance
@@ -109,33 +129,49 @@ Output ONLY valid JSON (no markdown wrapper):
 ```json
 {
   "challenged_scope": ["path/to/reviewed/files"],
-  "review_focus": "api-contract | business-rules | data-model | test-coverage | full",
-  "challenge_summary": "Brief summary of logic risks found",
-  "risk_level": "high | medium | low",
-  "must_fix_count": 0,
-  "should_fix_count": 0,
-  "suggestion_count": 0,
-  "issues": [
+  "challenge_summary": "Aggregated summary across all passes",
+  "risk_level": "highest risk_level from any pass",
+  "total_must_fix": 0,
+  "total_should_fix": 0,
+  "total_suggestion": 0,
+  "passes": [
     {
-      "severity": "must_fix | should_fix | suggestion",
-      "category": "contract_drift | business_rule_violation | data_integrity | edge_case | test_gap | orphan_risk",
-      "title": "Brief title (max 100 chars)",
-      "file": "path/to/affected/file.ts",
-      "line_range": "L10-L25",
-      "description": "What the issue is and why it matters",
-      "failure_scenario": "Concrete scenario: 'Coach approves Challenge 1, but Challenge 2 remains locked because...'",
-      "prd_reference": "Which PRD section/user story this relates to (if applicable)",
-      "suggested_fix": "Specific fix recommendation"
+      "review_focus": "api-contract | business-rules | data-model | test-coverage",
+      "pass_summary": "Summary for this pass",
+      "risk_level": "high | medium | low",
+      "must_fix_count": 0,
+      "should_fix_count": 0,
+      "suggestion_count": 0,
+      "issues": [
+        {
+          "severity": "must_fix | should_fix | suggestion",
+          "category": "contract_drift | business_rule_violation | data_integrity | edge_case | test_gap | orphan_risk",
+          "title": "Brief title (max 100 chars)",
+          "file": "path/to/affected/file.ts",
+          "line_range": "L10-L25",
+          "description": "What the issue is and why it matters",
+          "failure_scenario": "Concrete scenario: 'Coach approves Challenge 1, but Challenge 2 remains locked because...'",
+          "prd_reference": "Which PRD section/user story this relates to (if applicable)",
+          "suggested_fix": "Specific fix recommendation"
+        }
+      ]
     }
   ]
 }
 ```
 
+When invoked with a single `review_focus`, output contains a single-element `passes[]` array (consistent structure).
+
 ## Output Persistence
 
-Write findings to `agent-output/{project}/app-logic-findings.json`.
+Write findings to `agent-output/{project}/challenges/app-logic-challenge.json`.
 
+Create the `challenges/` subdirectory if it does not exist.
 Each invocation OVERWRITES the file with the latest findings.
+
+> [!NOTE]
+> Resolution fields (`resolved`, `resolution`, `resolution_date`) are NOT part of subagent
+> output — they are appended by the parent agent or manually after triage.
 
 ## Rules
 

@@ -24,6 +24,23 @@ The caller provides:
 - `project_name`: Name of the project (required)
 - `review_focus`: One of `auth`, `api-routes`, `data-handling`, `full` (required)
 
+## Multi-Pass Behavior
+
+Each invocation runs **3 focused review passes** to ensure comprehensive coverage without overlap:
+
+| Pass | `review_focus`  | Checklist Subset                                          |
+| ---- | --------------- | --------------------------------------------------------- |
+| 1    | `auth`          | Authentication & Session + RBAC                           |
+| 2    | `api-routes`    | API Route Security + IDOR                                 |
+| 3    | `data-handling` | Data Exposure + Injection & XSS + Missing Security Controls |
+
+- **Default (`full`)**: Run all 3 passes internally in sequence
+  (auth → api-routes → data-handling). Return aggregated `passes[]` array.
+- **Single focus**: When set to `auth`, `api-routes`, or `data-handling`,
+  run only that pass. Return a single-element `passes[]` array.
+- **No overlap**: Each pass uses ONLY its assigned checklist sections.
+- **Independent severity**: Each pass has its own `risk_level`. The top-level `risk_level` is the highest across all passes.
+
 ## Security Attack Surfaces
 
 ### Authentication & Session
@@ -105,33 +122,50 @@ Output ONLY valid JSON (no markdown wrapper):
 ```json
 {
   "challenged_scope": ["path/to/reviewed/files"],
-  "review_focus": "auth | api-routes | data-handling | full",
-  "challenge_summary": "Brief summary of security risks found",
-  "risk_level": "critical | high | medium | low",
-  "critical_count": 0,
-  "high_count": 0,
-  "medium_count": 0,
-  "low_count": 0,
-  "issues": [
+  "challenge_summary": "Aggregated summary across all passes",
+  "risk_level": "highest risk_level from any pass",
+  "total_critical": 0,
+  "total_high": 0,
+  "total_medium": 0,
+  "total_low": 0,
+  "passes": [
     {
-      "severity": "critical | high | medium | low",
-      "category": "auth_bypass | rbac_gap | idor | injection | data_exposure | missing_control | xss | csrf",
-      "title": "Brief title (max 100 chars)",
-      "file": "path/to/affected/file.ts",
-      "line_range": "L10-L25",
-      "description": "What the vulnerability is",
-      "attack_scenario": "Step-by-step: how an attacker exploits this",
-      "suggested_fix": "Specific code-level fix recommendation"
+      "review_focus": "auth | api-routes | data-handling",
+      "pass_summary": "Summary for this pass",
+      "risk_level": "critical | high | medium | low",
+      "critical_count": 0,
+      "high_count": 0,
+      "medium_count": 0,
+      "low_count": 0,
+      "issues": [
+        {
+          "severity": "critical | high | medium | low",
+          "category": "auth_bypass | rbac_gap | idor | injection | data_exposure | missing_control | xss | csrf",
+          "title": "Brief title (max 100 chars)",
+          "file": "path/to/affected/file.ts",
+          "line_range": "L10-L25",
+          "description": "What the vulnerability is",
+          "attack_scenario": "Step-by-step: how an attacker exploits this",
+          "suggested_fix": "Specific code-level fix recommendation"
+        }
+      ]
     }
   ]
 }
 ```
 
+When invoked with a single `review_focus`, output contains a single-element `passes[]` array (consistent structure).
+
 ## Output Persistence
 
-Write findings to `agent-output/{project}/app-security-findings.json`.
+Write findings to `agent-output/{project}/challenges/app-security-challenge.json`.
 
+Create the `challenges/` subdirectory if it does not exist.
 Each invocation OVERWRITES the file with the latest findings.
+
+> [!NOTE]
+> Resolution fields (`resolved`, `resolution`, `resolution_date`) are NOT part of subagent
+> output — they are appended by the parent agent or manually after triage.
 
 ## Rules
 

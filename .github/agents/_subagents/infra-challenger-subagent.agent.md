@@ -33,6 +33,34 @@ The caller provides:
 - `artifact_path`: Path to the artifact file being challenged (required)
 - `project_name`: Name of the project being challenged (required)
 - `artifact_type`: One of `requirements`, `architecture`, `implementation-plan` (required)
+- `review_focus`: One of `security`, `waf`, `governance` (optional — omit to run all 3 passes)
+
+## Review Passes
+
+Each invocation runs **3 focused review passes** to ensure comprehensive coverage without overlap:
+
+| Pass | `review_focus` | Checklist Subset |
+| ---- | -------------- | ---------------- |
+| 1 | `security` | Governance & Compliance (security) + Architecture & WAF (identity/access) + Missing Pieces (PE, diagnostics) |
+| 2 | `waf` | Architecture & WAF (all 5 pillars) + Missing Pieces (monitoring, rollback) + Requirements-Specific |
+| 3 | `governance` | Governance & Compliance (policy/tags/naming) + Implementation Feasibility (AVM, SKUs, regions) |
+
+**Key questions per pass:**
+
+- **security**: TLS 1.2? Managed identity over keys? Public access disabled? Private endpoints?
+- **waf**: All 5 pillars balanced? SLA/RTO/RPO achievable? Cost realistic? Monitoring defined?
+- **governance**: CAF naming? Tags dynamic or hardcoded? Azure Policy mapped? AVM verified?
+
+## Multi-Pass Behavior
+
+- **Default (no `review_focus`)**: Run all 3 passes internally in sequence
+  (security → waf → governance). Return aggregated `passes[]` array.
+- **Single focus**: When `review_focus` is set, run only that pass.
+  Return a single-element `passes[]` array. Use for targeted re-challenge.
+- **No overlap**: Each pass uses ONLY its assigned checklist subset.
+  Findings are categorized under the pass that owns them.
+- **Independent severity**: Each pass has its own `risk_level`.
+  The top-level `risk_level` is the highest across all passes.
 
 ## Azure Infrastructure Skepticism Surfaces
 
@@ -131,35 +159,51 @@ Output ONLY valid JSON (no markdown wrapper, no explanation outside JSON):
 {
   "challenged_artifact": "agent-output/{project}/{artifact-file}",
   "artifact_type": "requirements | architecture | implementation-plan",
-  "challenge_summary": "Brief summary of key risks and concerns found",
-  "risk_level": "high | medium | low",
-  "must_fix_count": 0,
-  "should_fix_count": 0,
-  "suggestion_count": 0,
-  "issues": [
+  "challenge_summary": "Aggregated summary across all passes",
+  "risk_level": "highest risk_level from any pass",
+  "total_must_fix": 0,
+  "total_should_fix": 0,
+  "total_suggestion": 0,
+  "passes": [
     {
-      "severity": "must_fix | should_fix | suggestion",
-      "category": "untested_assumption | missing_failure_mode | hidden_dependency | scope_risk | architectural_weakness | governance_gap | waf_blind_spot",
-      "title": "Brief title (max 100 chars)",
-      "description": "Detailed explanation of the risk or weakness",
-      "failure_scenario": "Specific scenario where this could cause the plan to fail",
-      "artifact_section": "Which H2/H3 section of the artifact has this issue",
-      "suggested_mitigation": "Specific, actionable way to address this risk"
+      "review_focus": "security | waf | governance",
+      "pass_summary": "Summary for this pass",
+      "risk_level": "high | medium | low",
+      "must_fix_count": 0,
+      "should_fix_count": 0,
+      "suggestion_count": 0,
+      "issues": [
+        {
+          "severity": "must_fix | should_fix | suggestion",
+          "category": "untested_assumption | missing_failure_mode | hidden_dependency | scope_risk | architectural_weakness | governance_gap | waf_blind_spot",
+          "title": "Brief title (max 100 chars)",
+          "description": "Detailed explanation of the risk or weakness",
+          "failure_scenario": "Specific scenario where this could cause the plan to fail",
+          "artifact_section": "Which H2/H3 section of the artifact has this issue",
+          "suggested_mitigation": "Specific, actionable way to address this risk"
+        }
+      ]
     }
   ]
 }
 ```
 
+When invoked with a single `review_focus`, output contains a single-element `passes[]` array (consistent structure).
+
 ## Output Persistence
 
-Write the findings JSON to `agent-output/{project}/challenge-findings.json` as your FINAL action.
+Write the findings JSON to `agent-output/{project}/challenges/infra-challenge.json` as your FINAL action.
 Also output the JSON as your response.
+
+Create the `challenges/` subdirectory if it does not exist.
 
 > [!NOTE]
 > This is a **single cumulative file**. Each invocation OVERWRITES the file
 > with the latest findings. Prior findings are superseded because the artifact has evolved.
+> Resolution fields (`resolved`, `resolution`, `resolution_date`) are NOT part of subagent
+> output — they are appended by the parent agent or manually after triage.
 
-If no significant risks are found, return an empty `issues` array with a `challenge_summary`
+If no significant risks are found, return empty `issues` arrays in each pass with a `challenge_summary`
 explaining why the artifact is robust, and `risk_level: "low"`.
 
 ## Rules

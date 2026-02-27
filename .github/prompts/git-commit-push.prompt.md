@@ -1,38 +1,38 @@
 ---
-agent: agent
+description: "Create a safe conventional commit, push current branch, and optionally open a PR to main."
+agent: "agent"
 model: "GPT-5 mini"
-description: "Stage changes, create a conventional commit, push to the current branch, and optionally open a pull request to main using the GitHub MCP server."
-argument-hint: "Provide a commit message or leave blank to auto-generate from the diff."
+argument-hint: "Provide a commit subject or leave blank to auto-generate from staged changes."
 tools:
   - execute/runInTerminal
   - read
   - search/codebase
   - vscode/askQuestions
-  - github/get_file_contents
   - github/search_pull_requests
   - github/create_pull_request
 ---
 
 # Git Commit, Push & PR
 
-Stage changes, create a conventional commit, push to the current branch,
-and optionally open a pull request to `main` using the GitHub MCP server.
+Create one conventional commit for HackOps, push the current branch,
+and optionally open a pull request to `main`.
 
 ## Scope & Preconditions
 
 - Workspace must be a git repository with a configured `origin` remote.
-- GitHub MCP tools must be available in the current session (no `gh auth` needed).
-- The `git-commit` skill at `.github/skills/git-commit/SKILL.md` defines the
-  conventional commit format used in this repo.
-- This prompt targets `GPT-5 mini`. Keep each step explicit and self-contained.
+- Use MCP-first GitHub operations for PR creation and search.
+- Do not run `gh auth` commands in this workflow.
+- Follow the conventional commit rules from `commitlint.config.js` and `.github/skills/git-commit/SKILL.md`.
+- Respect repository safety: do not commit directly to `main`, do not force-push.
 
 ## Inputs
 
 | Variable    | Source                                    | Default                          |
 | ----------- | ----------------------------------------- | -------------------------------- |
-| `message`   | argument-hint or user reply               | Auto-generated from diff         |
+| `message`   | argument-hint or user reply               | Auto-generated from staged diff  |
 | `branch`    | detected from `git branch --show-current` | Current branch                   |
 | `staging`   | user choice                               | All changed files                |
+| `run_check` | user choice                               | Run lightweight checks           |
 | `create_pr` | user choice                               | No                               |
 | `pr_base`   | user choice                               | `main`                           |
 | `pr_title`  | user choice or auto-generated             | Derived from commit message      |
@@ -54,12 +54,15 @@ git log --oneline origin/$(git branch --show-current)..HEAD 2>/dev/null || git l
 If `git status --short` returns nothing, stop and tell the user there is nothing
 to commit.
 
+If the current branch is `main`, stop and ask the user to switch to a feature branch
+before committing.
+
 ### Step 2 — Show a change summary
 
 Run:
 
 ```bash
-git diff --stat HEAD
+git diff --stat
 ```
 
 Display the file count, insertions, and deletions as a brief summary.
@@ -87,7 +90,7 @@ Read `.github/skills/git-commit/SKILL.md` to load the conventional commit
 format rules for this repository.
 
 If the user provided a message via the argument-hint, use it as the subject
-line (wrapping it in the conventional format if needed).
+line (wrap it in conventional format if needed).
 
 Otherwise, run:
 
@@ -105,6 +108,13 @@ Use the output to generate a conventional commit message following the format:
 - <bullet summarising change 2>
 ```
 
+Message constraints for this repo:
+
+- Allowed types: `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`,
+  `build`, `ci`, `chore`, `revert`
+- Header max length: 100
+- Subject must not end with `.`
+
 Present the proposed message to the user and ask:
 
 > **Commit message — does this look right?**
@@ -114,12 +124,24 @@ Present the proposed message to the user and ask:
 
 Wait for confirmation before continuing.
 
-### Step 5 — Commit
+### Step 5 — Optional local checks
+
+Ask:
+
+> **Run local checks before commit?**
+>
+> A) Yes — run `npm run lint:md` (recommended)
+> B) Yes — run `npm run validate`
+> C) No — rely on git hooks only
+
+If checks fail, show output and stop for user decision.
+
+### Step 6 — Commit
 
 Run:
 
 ```bash
-git commit -m "<confirmed message>"
+git commit -m "<confirmed subject>" [-m "<optional body>"]
 ```
 
 If the pre-commit hook fails, show the full error output and stop.
@@ -127,7 +149,7 @@ Ask the user to fix the issue and re-run the prompt.
 
 Show the resulting commit hash and subject line.
 
-### Step 6 — Push
+### Step 7 — Push
 
 Ask:
 
@@ -144,7 +166,7 @@ git push origin $(git branch --show-current)
 
 Show the push result. If the push fails, display the error and stop.
 
-### Step 7 — Pull request (optional)
+### Step 8 — Pull request (optional)
 
 Ask:
 
@@ -200,6 +222,7 @@ At the end of the workflow, print a summary table:
 ## Error Handling
 
 - **Nothing to commit**: Stop at Step 1 and say "Working tree is clean."
+- **On `main` branch**: Stop at Step 1 and require branch switch.
 - **Pre-commit hook failure**: Display full hook output. Do not retry automatically.
 - **Push rejected**: Show the error. Suggest `git pull --rebase` if behind.
 - **MCP PR creation fails**: Display the error. Provide the compare URL as fallback:
@@ -211,4 +234,4 @@ At the end of the workflow, print a summary table:
 - Never commit directly to `main` — warn and stop if the current branch is `main`.
 - Always show the commit hash after a successful commit.
 - Always show the PR URL after a successful PR creation.
-- Do not skip user confirmation at Steps 3, 4, 6, or 7.
+- Do not skip user confirmation at Steps 3, 4, 7, or 8.
