@@ -30,6 +30,7 @@ const containers: ContainerDef[] = [
   { id: "roles", partitionKey: "/hackathonId" },
   { id: "challenges", partitionKey: "/hackathonId" },
   { id: "progression", partitionKey: "/teamId" },
+  { id: "audit", partitionKey: "/hackathonId" },
 ];
 
 const sampleDocs: Record<string, object[]> = {
@@ -99,6 +100,69 @@ const sampleDocs: Record<string, object[]> = {
       createdAt: "2026-02-18T10:00:00Z",
     },
   ],
+  scores: [
+    {
+      id: "score-team-alpha-ch-001",
+      _type: "score",
+      teamId: "team-alpha-4821",
+      hackathonId: "hack-2026-swedenai",
+      challengeId: "ch-001-setup",
+      rubricId: "rubric-setup-v1",
+      totalScore: 25,
+      maxScore: 30,
+      scoredBy: "github|11111111",
+      scoredAt: "2026-02-21T14:00:00Z",
+      breakdown: [
+        { criterionId: "c1", label: "Environment configured", score: 10, maxScore: 10 },
+        { criterionId: "c2", label: "API key working", score: 8, maxScore: 10 },
+        { criterionId: "c3", label: "Documentation quality", score: 7, maxScore: 10 },
+      ],
+    },
+  ],
+  submissions: [
+    {
+      id: "sub-team-alpha-ch-001",
+      _type: "submission",
+      teamId: "team-alpha-4821",
+      hackathonId: "hack-2026-swedenai",
+      challengeId: "ch-001-setup",
+      evidenceUrl: "https://github.com/team-alpha/evidence/blob/main/challenge-1.md",
+      submittedBy: "github|87654321",
+      submittedAt: "2026-02-21T12:00:00Z",
+      status: "reviewed",
+      reviewedBy: "github|11111111",
+      reviewedAt: "2026-02-21T14:00:00Z",
+    },
+  ],
+  rubrics: [
+    {
+      id: "rubric-setup-v1",
+      _type: "rubric",
+      hackathonId: "hack-2026-swedenai",
+      challengeId: "ch-001-setup",
+      version: 1,
+      isActive: true,
+      criteria: [
+        { id: "c1", label: "Environment configured", maxScore: 10, description: "Dev env is fully set up" },
+        { id: "c2", label: "API key working", maxScore: 10, description: "Azure OpenAI key validated" },
+        { id: "c3", label: "Documentation quality", maxScore: 10, description: "Clear setup instructions" },
+      ],
+      createdBy: "github|12345678",
+      createdAt: "2026-02-18T10:30:00Z",
+    },
+  ],
+  progression: [
+    {
+      id: "prog-team-alpha-4821",
+      _type: "progression",
+      teamId: "team-alpha-4821",
+      hackathonId: "hack-2026-swedenai",
+      challenges: [
+        { challengeId: "ch-001-setup", status: "approved", unlockedAt: "2026-02-20T08:00:00Z", approvedAt: "2026-02-21T14:00:00Z" },
+      ],
+      _etag: undefined,
+    },
+  ],
   roles: [
     {
       id: "role-12345678-hack-2026-swedenai",
@@ -110,6 +174,30 @@ const sampleDocs: Record<string, object[]> = {
       isPrimaryAdmin: true,
       assignedBy: "system",
       assignedAt: "2026-02-15T09:00:00Z",
+    },
+    {
+      id: "role-11111111-hack-2026-swedenai",
+      _type: "role",
+      hackathonId: "hack-2026-swedenai",
+      githubUserId: "github|11111111",
+      githubLogin: "coach-sarah",
+      role: "coach",
+      isPrimaryAdmin: false,
+      assignedBy: "github|12345678",
+      assignedAt: "2026-02-16T10:00:00Z",
+    },
+  ],
+  audit: [
+    {
+      id: "audit-seed-001",
+      _type: "audit",
+      hackathonId: "hack-2026-swedenai",
+      action: "hackathon.launch",
+      targetType: "hackathon",
+      targetId: "hack-2026-swedenai",
+      performedBy: "github|12345678",
+      timestamp: "2026-02-20T08:00:00Z",
+      details: { previousStatus: "draft", newStatus: "active" },
     },
   ],
 };
