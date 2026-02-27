@@ -55,6 +55,14 @@ See `docs/hackops-user-guide.md` for the full walkthrough.
 - Only use `gh` for operations that have no equivalent MCP write tool in the current environment.
 - In devcontainers, do not run `gh auth` commands unless the user explicitly asks for CLI authentication troubleshooting.
 
+## Key Docs
+
+| Doc                          | Purpose                               |
+| ---------------------------- | ------------------------------------- |
+| `docs/testing-strategy.md`   | Test pyramid, tools, coverage targets |
+| `docs/security-checklist.md` | Security invariants consolidated      |
+| `docs/local-dev-guide.md`    | Step-by-step local setup              |
+
 ## Validation
 
 ```bash
