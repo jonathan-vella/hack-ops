@@ -9,6 +9,7 @@ import type {
 import { requireRole } from "@/lib/guards";
 import { getContainer } from "@/lib/cosmos";
 import { auditLog } from "@/lib/audit";
+import { advanceProgression } from "@/lib/challenge-gate";
 import { reviewSubmissionSchema } from "@/lib/validation/submission";
 
 export const PATCH = requireRole(
@@ -195,6 +196,13 @@ export const PATCH = requireRole(
       reason: body.reason,
       details: { scores: body.scores, total, teamId: submission.teamId },
     });
+
+    // Auto-unlock next challenge on approval
+    await advanceProgression(
+      submission.teamId,
+      submission.hackathonId,
+      submission.challengeId,
+    );
 
     const record: SubmissionsAPI.SubmissionRecord = {
       id: updatedSubmission.id,

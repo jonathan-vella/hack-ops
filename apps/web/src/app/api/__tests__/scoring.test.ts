@@ -34,6 +34,13 @@ const hackathonQuery = vi.fn();
 const hackathonRead = vi.fn();
 const hackathonItem = vi.fn(() => ({ read: hackathonRead }));
 
+const challengeQuery = vi.fn();
+const challengeItem = vi.fn(() => ({ read: vi.fn() }));
+
+const progressionQuery = vi.fn();
+const progressionReplace = vi.fn();
+const progressionItem = vi.fn(() => ({ read: vi.fn(), replace: progressionReplace }));
+
 vi.mock("@/lib/cosmos", () => ({
   getContainer: vi.fn((name: string) => {
     const map: Record<string, unknown> = {
@@ -56,6 +63,14 @@ vi.mock("@/lib/cosmos", () => ({
       hackathons: {
         items: { query: hackathonQuery },
         item: hackathonItem,
+      },
+      challenges: {
+        items: { query: challengeQuery },
+        item: challengeItem,
+      },
+      progression: {
+        items: { query: progressionQuery },
+        item: progressionItem,
       },
     };
     return map[name];
@@ -425,6 +440,23 @@ describe("POST /api/submissions", () => {
       resource: { id: "h1", status: "active" },
     });
 
+    // Challenge gate: challenge exists with order 1, team progression allows it
+    challengeQuery.mockReturnValue(emptyFetchAll([{ order: 1 }]));
+    progressionQuery.mockReturnValue(
+      emptyFetchAll([
+        {
+          id: "prog-team-1",
+          _type: "progression",
+          teamId: "team-1",
+          hackathonId: "h1",
+          currentChallenge: 1,
+          unlockedChallenges: [
+            { challengeId: "challenge-1", unlockedAt: "2026-01-01T00:00:00Z" },
+          ],
+        },
+      ]),
+    );
+
     submissionCreate.mockResolvedValue({ resource: {} });
 
     const { POST } = await import("../submissions/route");
@@ -631,6 +663,10 @@ describe("PATCH /api/submissions/:id", () => {
       .mockResolvedValueOnce({ resource: activeRubricDoc });
 
     scoreCreate.mockResolvedValue({ resource: {} });
+
+    // Auto-unlock: challenge lookup + progression (no match → no advance)
+    challengeQuery.mockReturnValue(emptyFetchAll([{ order: 1 }]));
+    progressionQuery.mockReturnValue(emptyFetchAll([]));
 
     const validScores = [
       { categoryId: "cat-1", score: 8 },

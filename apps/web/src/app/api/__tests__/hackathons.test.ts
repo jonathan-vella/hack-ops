@@ -228,6 +228,10 @@ describe("PATCH /api/hackathons/:id", () => {
         _type: "hackathon",
       },
     });
+    // Progression init queries: teams, challenges — return empty for simplicity
+    mockQuery.mockReturnValue({
+      fetchAll: vi.fn().mockResolvedValue({ resources: [] }),
+    });
 
     const { PATCH } = await import("../hackathons/[id]/route");
     const req = createRequest("PATCH", "http://localhost/api/hackathons/h1", {

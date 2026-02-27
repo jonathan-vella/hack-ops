@@ -107,6 +107,48 @@ export const PATCH = requireRole("admin")(async (
 
   const { resource: replaced } = await container.item(id, id).replace(updated);
 
+  // Initialize progression records when hackathon launches
+  if (body.status === "active") {
+    const teamsContainer = getContainer("teams");
+    const { resources: teams } = await teamsContainer.items
+      .query({
+        query:
+          "SELECT * FROM c WHERE c._type = 'team' AND c.hackathonId = @hid",
+        parameters: [{ name: "@hid", value: id }],
+      })
+      .fetchAll();
+
+    // Find the first challenge for this hackathon (order = 1)
+    const challengesContainer = getContainer("challenges");
+    const { resources: firstChallenges } = await challengesContainer.items
+      .query({
+        query:
+          "SELECT * FROM c WHERE c._type = 'challenge' AND c.hackathonId = @hid AND c.order = 1",
+        parameters: [{ name: "@hid", value: id }],
+      })
+      .fetchAll();
+
+    if (teams.length > 0 && firstChallenges.length > 0) {
+      const progressionContainer = getContainer("progression");
+      const firstChallenge = firstChallenges[0];
+      for (const team of teams) {
+        await progressionContainer.items.create({
+          id: `prog-${team.id as string}`,
+          _type: "progression",
+          teamId: team.id as string,
+          hackathonId: id,
+          currentChallenge: 1,
+          unlockedChallenges: [
+            {
+              challengeId: firstChallenge.id as string,
+              unlockedAt: now,
+            },
+          ],
+        });
+      }
+    }
+  }
+
   await auditLog({
     hackathonId: id,
     action: "hackathon.update",

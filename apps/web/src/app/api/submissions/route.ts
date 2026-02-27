@@ -9,6 +9,7 @@ import type {
 import { requireAuth, requireRole } from "@/lib/guards";
 import { getContainer } from "@/lib/cosmos";
 import { auditLog } from "@/lib/audit";
+import { checkChallengeGate } from "@/lib/challenge-gate";
 import {
   createSubmissionSchema,
   listSubmissionsSchema,
@@ -87,6 +88,19 @@ export const POST = requireAuth(
       return NextResponse.json(
         { error: "Hackathon is not active", ok: false },
         { status: 422 },
+      );
+    }
+
+    // Gate check: reject submissions for locked challenges
+    const gateResult = await checkChallengeGate(
+      teamId,
+      hackathonId,
+      body.challengeId,
+    );
+    if (!gateResult.allowed) {
+      return NextResponse.json(
+        { error: gateResult.reason ?? "Challenge is locked", ok: false },
+        { status: 403 },
       );
     }
 
