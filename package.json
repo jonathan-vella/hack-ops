@@ -3,6 +3,10 @@
   "version": "0.1.0",
   "description": "HackOps - Hackathon management platform for structured Microsoft Azure learning events.",
   "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
   "scripts": {
     "prepare": "lefthook install",
     "lint:md": "markdownlint-cli2 '**/*.md' '#node_modules'",
@@ -32,7 +36,10 @@
     "test:1109": "npm run validate:vscode && npm run validate:agents && echo '✅ VS Code 1.109 validation passed'",
     "fetch:deprecations": "node scripts/fetch-azure-deprecations.mjs",
     "validate": "npm run validate:all",
-    "validate:all": "npm run lint:md && npm run lint:links:docs && npm run lint:artifact-templates && npm run lint:h2-sync && npm run lint:version-sync && npm run lint:deprecated-refs && npm run lint:mcp-config && npm run lint:agent-frontmatter && npm run lint:skills-format && npm run lint:instruction-frontmatter && npm run lint:governance-refs && npm run validate:instruction-refs && npm run lint:json && npm run lint:python && echo '✅ All validations passed'"
+    "validate:all": "npm run lint:md && npm run lint:links:docs && npm run lint:artifact-templates && npm run lint:h2-sync && npm run lint:version-sync && npm run lint:deprecated-refs && npm run lint:mcp-config && npm run lint:agent-frontmatter && npm run lint:skills-format && npm run lint:instruction-frontmatter && npm run lint:governance-refs && npm run validate:instruction-refs && npm run lint:json && npm run lint:python && echo '✅ All validations passed'",
+    "build": "turbo run build",
+    "type-check": "turbo run type-check",
+    "test": "turbo run test"
   },
   "devDependencies": {
     "@commitlint/cli": "^20.4.1",
@@ -40,7 +47,9 @@
     "fast-xml-parser": "^5.3.6",
     "lefthook": "^2.1.0",
     "markdown-link-check": "^3.12.0",
-    "markdownlint-cli2": "^0.20.0"
+    "markdownlint-cli2": "^0.20.0",
+    "turbo": "^2.5.0",
+    "typescript": "^5.7.0"
   },
   "repository": {
     "type": "git",
@@ -57,5 +66,6 @@
     "bicep"
   ],
   "author": "Jonathan Vella",
-  "license": "MIT"
+  "license": "MIT",
+  "packageManager": "npm@11.8.0"
 }

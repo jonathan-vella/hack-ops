@@ -21,6 +21,7 @@ See the [conductor agent](../.github/agents/01-conductor.agent.md) for orchestra
 
 | Resource                                     | Description                   |
 | -------------------------------------------- | ----------------------------- |
+| [Project Overview](project-overview.md)      | End-to-end project explainer  |
 | [HackOps User Guide](hackops-user-guide.md)  | Step-by-step runbook          |
 | [PRD](prd.md)                                | Product Requirements Document |
 | [API Contract](api-contract.md)              | 26-endpoint REST API spec     |

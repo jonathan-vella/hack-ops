@@ -32,6 +32,12 @@ All outputs → `agent-output/{project}/`.
 | 08-As-Built      | Post-deployment documentation suite                 |
 | 09-Diagnose      | Resource health assessment and troubleshooting      |
 
+### Utility Agents
+
+| Agent                | Purpose                                                       |
+| -------------------- | ------------------------------------------------------------- |
+| 10-Context Optimizer | Audits agent context window usage, recommends hand-off points |
+
 ### App-Dev Agents
 
 | Agent               | Purpose                                              |
@@ -78,6 +84,7 @@ Subagent definitions: `.github/agents/_subagents/`
 | What                      | Where                                    |
 | ------------------------- | ---------------------------------------- |
 | Golden principles         | `.github/skills/golden-principles/`      |
+| Context optimization      | `.github/skills/context-optimizer/`      |
 | Domain knowledge (skills) | `.github/skills/*/SKILL.md`              |
 | File-type rules           | `.github/instructions/*.instructions.md` |
 | Azure conventions         | `.github/skills/azure-defaults/`         |

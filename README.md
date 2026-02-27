@@ -171,7 +171,8 @@ agent-output/           # Generated infrastructure artifacts
 docs/                   # Documentation
 ```
 
-See [AGENTS.md](AGENTS.md) for the agent workflow used to generate infrastructure artifacts.
+See [AGENTS.md](AGENTS.md) for the agent workflow map and
+[docs/project-overview.md](docs/project-overview.md) for a full end-to-end explanation of the project.
 
 ---
 
