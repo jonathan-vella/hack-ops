@@ -63,24 +63,59 @@ function collectFiles(dirs, extensions) {
 }
 
 function globHasMatch(pattern) {
-  // Convert simple glob to a find-compatible check
-  // Handle comma-separated patterns: "**/*.bicep, **/*.agent.md"
-  const patterns = pattern.split(",").map((p) => p.trim());
+  // Split on commas outside of braces to preserve {a,b} expressions
+  const patterns = splitOutsideBraces(pattern);
   for (const pat of patterns) {
     if (!pat) continue;
-    try {
-      // Use git ls-files for glob matching (respects .gitignore)
-      const result = execSync(
-        `git ls-files --cached --others --exclude-standard "${pat}" 2>/dev/null | head -1`,
-        { cwd: ROOT, encoding: "utf-8", timeout: 5000 },
-      ).trim();
-      if (result) return true;
-    } catch {
-      // If git ls-files fails, try a simpler check
-      return true;
+    // Expand brace expressions {a,b,c} into separate patterns
+    const expanded = expandBraces(pat);
+    for (const ePat of expanded) {
+      // Strip leading **/ — git ls-files pathspec searches from repo root
+      const cleaned = ePat.replace(/^\*\*\//, "");
+      try {
+        const result = execSync(
+          `git ls-files --cached --others --exclude-standard "${cleaned}" 2>/dev/null | head -1`,
+          { cwd: ROOT, encoding: "utf-8", timeout: 5000 },
+        ).trim();
+        if (result) return true;
+      } catch {
+        return true;
+      }
     }
   }
   return false;
+}
+
+function splitOutsideBraces(str) {
+  const parts = [];
+  let depth = 0;
+  let current = "";
+  for (const ch of str) {
+    if (ch === "{") depth++;
+    if (ch === "}") depth--;
+    if (ch === "," && depth === 0) {
+      parts.push(current.trim());
+      current = "";
+    } else {
+      current += ch;
+    }
+  }
+  if (current.trim()) parts.push(current.trim());
+  return parts;
+}
+
+function expandBraces(pat) {
+  const braceRe = /\{([^{}]+)\}/;
+  const match = pat.match(braceRe);
+  if (!match) return [pat];
+  const prefix = pat.slice(0, match.index);
+  const suffix = pat.slice(match.index + match[0].length);
+  const alternatives = match[1].split(",");
+  const results = [];
+  for (const alt of alternatives) {
+    results.push(...expandBraces(prefix + alt + suffix));
+  }
+  return results;
 }
 
 // --- Rule 1: Instruction file references ---

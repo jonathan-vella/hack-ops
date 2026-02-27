@@ -6,26 +6,25 @@ Updated by the doc-gardening workflow and referenced by `QUALITY_SCORE.md`.
 
 ## Active Debt Items
 
-| ID  | Category      | Description                                                         | Severity | Owner | Target   |
-| --- | ------------- | ------------------------------------------------------------------- | -------- | ----- | -------- |
-| 5   | Agents        | 01-conductor.agent.md 'agents' frontmatter format warning           | Low      | —     | —        |
-| 7   | Documentation | AGENTS.md missing app-dev workflow table (only infra 7-step shown)  | Low      | —     | Phase F  |
-| 9   | Instructions  | 5 applyTo warnings (wildcards) — cosmetic, not blocking             | Low      | —     | —        |
-| 13  | CI/CD         | Phase 11 workflows missing (`hackops-ci.yml`, `hackops-deploy.yml`) | Medium   | —     | Phase 11 |
+_No active debt items._
 
 ## Resolved Items
 
-| ID  | Category      | Description                                          | Resolved   | Resolution                                |
-| --- | ------------- | ---------------------------------------------------- | ---------- | ----------------------------------------- |
-| 12  | Artifact      | Template drift: 01-req, 02-arch, 04-gov (14 warn)    | 2026-02-26 | Updated Step 1–7 artifacts; lint is clean |
-| 11  | CI/Validation | `npm run validate` script missing from package.json  | 2026-02-26 | Added `validate` alias → `validate:all`   |
-| 8   | Documentation | docs/README.md GitHub URLs point to old repo name    | 2026-02-26 | Fixed URLs to `hack-ops`                  |
-| 10  | Validation    | 06-deployment-summary template missing attribution   | 2026-02-26 | Added attribution header to template      |
-| 4   | Validation    | entropy-check.yml CI workflow not yet wired up       | 2026-02-27 | Workflow has schedule + dispatch triggers |
-| 6   | Documentation | Dead links in docs/README.md                         | 2026-02-26 | Replaced with Phase A doc links           |
-| 3   | Documentation | docs.instructions.md prohibited-refs false-positives | 2026-02-26 | Added markers; checker skips prohibitions |
-| 1   | Documentation | docs/README.md agent/skill counts were stale         | 2026-02-26 | Fixed counts: 15+11 agents, 14 skills     |
-| 2   | Instructions  | Instruction consolidation just completed             | 2025-07-15 | Consolidated 28→20; no duplicates remain  |
+| ID  | Category      | Description                                                         | Resolved   | Resolution                                           |
+| --- | ------------- | ------------------------------------------------------------------- | ---------- | ---------------------------------------------------- |
+| 13  | CI/CD         | Phase 11 workflows missing (`hackops-ci.yml`, `hackops-deploy.yml`) | 2026-02-27 | Created both workflows with OIDC + path triggers     |
+| 9   | Instructions  | 5 applyTo warnings (wildcards) — cosmetic, not blocking             | 2026-02-27 | Fixed globHasMatch to expand braces and strip `**/`  |
+| 7   | Documentation | AGENTS.md missing app-dev workflow table (only infra 7-step shown)  | 2026-02-27 | Added App-Dev Workflow table to AGENTS.md            |
+| 5   | Agents        | 01-conductor.agent.md 'agents' frontmatter format warning           | 2026-02-27 | Validator passes clean; warning no longer reproduces |
+| 14  | Documentation | docs/README.md agent count 15→16, skill count 14→15                 | 2026-02-27 | Added context-optimizer agent + skill to docs        |
+| 11  | CI/Validation | `npm run validate` script missing from package.json                 | 2026-02-26 | Added `validate` alias → `validate:all`              |
+| 8   | Documentation | docs/README.md GitHub URLs point to old repo name                   | 2026-02-26 | Fixed URLs to `hack-ops`                             |
+| 10  | Validation    | 06-deployment-summary template missing attribution                  | 2026-02-26 | Added attribution header to template                 |
+| 4   | Validation    | entropy-check.yml CI workflow not yet wired up                      | 2026-02-27 | Workflow has schedule + dispatch triggers            |
+| 6   | Documentation | Dead links in docs/README.md                                        | 2026-02-26 | Replaced with Phase A doc links                      |
+| 3   | Documentation | docs.instructions.md prohibited-refs false-positives                | 2026-02-26 | Added markers; checker skips prohibitions            |
+| 1   | Documentation | docs/README.md agent/skill counts were stale                        | 2026-02-26 | Fixed counts: 15+11 agents, 14 skills                |
+| 2   | Instructions  | Instruction consolidation just completed                            | 2025-07-15 | Consolidated 28→20; no duplicates remain             |
 
 ## Categories
 

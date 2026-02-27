@@ -64,15 +64,13 @@ concurrency:
 
 ## Existing Workflows
 
-| Workflow                        | Purpose                               | Trigger                  |
-| ------------------------------- | ------------------------------------- | ------------------------ |
-| `lint.yml`                      | Markdown lint + code quality          | PR + push to main        |
-| `agent-validation.yml`          | Agent/skill/VS Code config validation | Changes to agents/skills |
-| `docs-freshness.yml`            | Doc count/reference drift detection   | Push to main + weekly    |
-| `link-check.yml`                | Broken link detection                 | Changes to docs/agents   |
-| `create-release.yml`            | Automated release creation            | Manual dispatch          |
-| `avm-version-check.yml`         | Azure Verified Module version checks  | Scheduled                |
-| `azure-deprecation-tracker.yml` | Azure deprecation monitoring          | Scheduled                |
+| Workflow               | Purpose                               | Trigger                      |
+| ---------------------- | ------------------------------------- | ---------------------------- |
+| `lint.yml`             | Markdown lint + code quality          | PR + push to main            |
+| `agent-validation.yml` | Agent/skill/VS Code config validation | Changes to agents/skills     |
+| `entropy-check.yml`    | Doc count/reference drift detection   | Weekly schedule + dispatch   |
+| `hackops-ci.yml`       | App lint, test, build validation      | Changes to apps/ + packages/ |
+| `hackops-deploy.yml`   | Deploy to Azure App Service (OIDC)    | After CI success + dispatch  |
 
 ## Validation Scripts
 

@@ -18,6 +18,19 @@
 
 All outputs → `agent-output/{project}/`.
 
+## App-Dev Workflow
+
+| Step | Agent            | Output                       | Gate     |
+| ---- | ---------------- | ---------------------------- | -------- |
+| A1   | App Scaffolder   | Turborepo + Next.js monorepo | —        |
+| A2-6 | API Builder      | API route handlers + Zod     | Validate |
+| A7   | Frontend Builder | Pages, layouts, shadcn/ui    | Validate |
+| A8   | Test Writer      | Vitest unit + integration    | PASS     |
+| A9   | App Deployer     | CI/CD workflows, App Service | Approval |
+
+App Conductor orchestrates steps A1–A9.
+All app code → `apps/web/`.
+
 ## Agent Roster
 
 | Agent            | Purpose                                             |

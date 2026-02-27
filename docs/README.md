@@ -33,7 +33,7 @@ See the [conductor agent](../.github/agents/01-conductor.agent.md) for orchestra
 
 ---
 
-## Agents (15 + 11 Subagents)
+## Agents (16 + 11 Subagents)
 
 Agents are interactive AI assistants for specific workflow phases. Invoke via `Ctrl+Shift+A`.
 See `AGENTS.md` at the repo root for the lightweight map.
@@ -56,6 +56,12 @@ See `AGENTS.md` at the repo root for the lightweight map.
 | `deploy`               | 🚀 Envoy      | 6     | Azure deployment                   |
 | `as-built`             | 📝 Chronicler | 7     | Post-deployment documentation      |
 | `diagnose`             | 🔍 Sentinel   | —     | Post-deployment diagnostics        |
+
+### Utility Agents (User-Invokable)
+
+| Agent               | Persona    | Phase | Purpose                                             |
+| ------------------- | ---------- | ----- | --------------------------------------------------- |
+| `context-optimizer` | 🔎 Auditor | —     | Audit context window usage, recommend optimizations |
 
 ### App-Dev Agents (User-Invokable)
 
@@ -96,7 +102,7 @@ See `AGENTS.md` at the repo root for the lightweight map.
 
 ---
 
-## Skills (14)
+## Skills (15)
 
 Skills are reusable capabilities that agents invoke or that activate automatically based on prompts.
 
@@ -105,6 +111,12 @@ Skills are reusable capabilities that agents invoke or that activate automatical
 | Skill               | Purpose                                | Triggers                           |
 | ------------------- | -------------------------------------- | ---------------------------------- |
 | `golden-principles` | 10 operating principles for all agents | Always loaded first by every agent |
+
+### Context & Optimization
+
+| Skill               | Purpose                                     | Triggers                                           |
+| ------------------- | ------------------------------------------- | -------------------------------------------------- |
+| `context-optimizer` | Context window auditing and token profiling | "optimize context", "audit tokens", "reduce waste" |
 
 ### Azure Conventions (Category 1)
 

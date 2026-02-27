@@ -2,15 +2,15 @@
 
 > Project health at a glance. Updated by the doc-gardening workflow and manual review.
 
-| Domain              | Grade | Gap Summary                                              | Next Action                              |
-| ------------------- | ----- | -------------------------------------------------------- | ---------------------------------------- |
-| **Agents**          | A-    | 15 agents + 11 subagents; 1 conductor frontmatter warn   | Fix conductor 'agents' array format warn |
-| **Skills**          | A-    | All 14 skills pass GA format; coverage expansion pending | Add planned app-domain skills in Phase C |
-| **Instructions**    | A-    | 21 instructions; 0 errors, 5 applyTo warnings            | Normalize non-blocking wildcard applyTo  |
-| **Infrastructure**  | B+    | Core Bicep modules + deployment artifacts complete       | Finish open Phase 4 items (#147, #148)   |
-| **Documentation**   | A     | All docs fresh; dead links resolved; URLs fixed          | Keep in sync after Phase D/E changes     |
-| **CI / Validation** | A     | 14 validators; all pass; `validate` alias added          | Maintain as new validators are added     |
-| **Backlog**         | A     | Issue hygiene maintained; Phase 4/11 statuses updated    | Continue closure cadence by milestone    |
+| Domain              | Grade | Gap Summary                                         | Next Action                              |
+| ------------------- | ----- | --------------------------------------------------- | ---------------------------------------- |
+| **Agents**          | A     | 16 agents + 11 subagents; all pass validation       | Maintain as agents are added             |
+| **Skills**          | A     | All 15 skills pass GA format; full coverage         | Maintain as new skills are added         |
+| **Instructions**    | A     | 21 instructions; 0 errors, 0 warnings               | Maintain as instructions are added       |
+| **Infrastructure**  | B+    | Core Bicep modules + deployment artifacts complete  | Finish open Phase 4 items (#147, #148)   |
+| **Documentation**   | A     | All docs fresh; counts correct; app-dev table added | Keep in sync after agent/skill additions |
+| **CI / Validation** | A     | 14 validators; all pass; CI/CD workflows complete   | Maintain as new validators are added     |
+| **Backlog**         | A     | Issue hygiene maintained; all tech debt resolved    | Continue closure cadence by milestone    |
 
 ## Grading Scale
 
@@ -26,6 +26,13 @@
 
 | Date       | Domain         | Change                                                                                  |
 | ---------- | -------------- | --------------------------------------------------------------------------------------- |
+| 2026-02-27 | Agents         | Grade A-→A: conductor warning no longer reproduces; all 16 agents pass                  |
+| 2026-02-27 | Instructions   | Grade A-→A: fixed globHasMatch brace expansion + `**/` stripping; 0 warnings            |
+| 2026-02-27 | Documentation  | Grade A-→A: added app-dev workflow table to AGENTS.md; counts correct                   |
+| 2026-02-27 | CI/Validation  | Created hackops-ci.yml + hackops-deploy.yml; resolved debt #13                          |
+| 2026-02-27 | Documentation  | Doc-gardening: fixed agent count 15→16, skill count 14→15 in docs/README.md             |
+| 2026-02-27 | Skills         | Grade A-→A after 15/15 GA skills valid                                                  |
+| 2026-02-27 | Documentation  | Grade A→A- (count drift detected; context-optimizer agent+skill missing from docs)      |
 | 2026-02-26 | All            | Doc-gardening: freshness clean; artifacts lint warning-free; debt #12 resolved          |
 | 2026-02-26 | Skills         | Grade B+→A- after 14/14 GA skills valid and stable                                      |
 | 2026-02-26 | Instructions   | Warning count updated from 7→5 (all non-blocking applyTo notices)                       |
