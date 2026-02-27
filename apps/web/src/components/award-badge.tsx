@@ -19,9 +19,5 @@ interface AwardBadgeProps {
 export function AwardBadge({ label, className }: AwardBadgeProps) {
   const style = AWARD_STYLES[label] ?? DEFAULT_AWARD_STYLE;
 
-  return (
-    <Badge className={cn(style, className)}>
-      {label}
-    </Badge>
-  );
+  return <Badge className={cn(style, className)}>{label}</Badge>;
 }

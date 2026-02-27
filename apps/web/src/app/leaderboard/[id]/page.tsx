@@ -7,7 +7,9 @@ interface PageProps {
   params: Promise<{ id: string }>;
 }
 
-export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: PageProps): Promise<Metadata> {
   const { id } = await params;
   const leaderboard = await buildLeaderboard(id);
 
@@ -41,10 +43,7 @@ export default async function LeaderboardPage({ params }: PageProps) {
         </p>
       </header>
 
-      <LeaderboardTable
-        hackathonId={id}
-        initialData={leaderboard}
-      />
+      <LeaderboardTable hackathonId={id} initialData={leaderboard} />
     </main>
   );
 }

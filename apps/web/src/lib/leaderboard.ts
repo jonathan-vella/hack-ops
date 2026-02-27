@@ -127,7 +127,10 @@ export async function buildLeaderboard(
 
   for (const [teamId, agg] of teamAggMap) {
     if (agg.challengeScores.size === totalChallenges && totalChallenges > 0) {
-      if (!fastestTimestamp || (agg.lastApprovalAt && agg.lastApprovalAt < fastestTimestamp)) {
+      if (
+        !fastestTimestamp ||
+        (agg.lastApprovalAt && agg.lastApprovalAt < fastestTimestamp)
+      ) {
         fastestTeamId = teamId;
         fastestTimestamp = agg.lastApprovalAt;
       }
@@ -177,7 +180,8 @@ export async function buildLeaderboard(
       challengeScores: new Map(),
     };
 
-    const percentage = maxPossible > 0 ? (agg.totalScore / maxPossible) * 100 : 0;
+    const percentage =
+      maxPossible > 0 ? (agg.totalScore / maxPossible) * 100 : 0;
 
     const awardBadges: string[] = [];
     if (fastestTeamId === team.id) awardBadges.push("Fastest to Complete");

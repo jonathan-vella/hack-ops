@@ -82,9 +82,7 @@ export function LeaderboardTable({
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between text-sm text-muted-foreground">
-        <span>
-          Last updated: {formatTimestamp(data.updatedAt)}
-        </span>
+        <span>Last updated: {formatTimestamp(data.updatedAt)}</span>
         <span className="flex items-center gap-2">
           <RefreshCwIcon
             className={`h-3 w-3 ${isRefreshing ? "animate-spin" : ""}`}
@@ -107,7 +105,10 @@ export function LeaderboardTable({
         <TableBody>
           {data.entries.length === 0 && (
             <TableRow>
-              <TableCell colSpan={6} className="text-center text-muted-foreground py-8">
+              <TableCell
+                colSpan={6}
+                className="text-center text-muted-foreground py-8"
+              >
                 No scores recorded yet.
               </TableCell>
             </TableRow>

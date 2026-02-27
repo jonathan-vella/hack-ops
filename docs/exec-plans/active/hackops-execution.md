@@ -231,232 +231,232 @@ so agents 12–15 have the skills/instructions they were designed to use.
 
 <!-- Append one entry per session. Keep entries concise. -->
 
-| #   | Date       | Phase/Step | What was done          | What's next         | Blockers |
-| --- | ---------- | ---------- | ---------------------- | ------------------- | -------- |
-| 0   | 2026-02-24 | Planning   | Created blueprint,     | B0: Bootstrap       | None     |
-|     |            |            | challenged, and        | issues, then start  |          |
-|     |            |            | resolved 14            | Phase A             |          |
-|     |            |            | findings               |                     |          |
-| 1   | 2026-02-25 | A / A0     | Created 3 A0           | B0: Bootstrap       | B0 needs |
-|     |            |            | doc-gen prompts        | issues              | GH_TOKEN |
-| 2   | 2026-02-25 | B0         | Created 12 GitHub      | A1: Run PRD         | None     |
-|     |            |            | issues (#1-#12),       | generator prompt    |          |
-|     |            |            | epic label             |                     |          |
-| 3   | 2026-02-25 | A / A1     | Generated PRD with     | Adversarial review  | None     |
-|     |            |            | 64 user stories,       | of PRD + add        |          |
-|     |            |            | 8 domains, NFRs        | challenger agents   |          |
-| 3b  | 2026-02-25 | Cross      | Created 3 adversarial  | Fix 6 PRD design    | None     |
-|     |            |            | subagents (infra,      | decisions from      |          |
-|     |            |            | app-security,          | adversarial review  |          |
-|     |            |            | app-logic); moved      |                     |          |
-|     |            |            | 10-Challenger to       |                     |          |
-|     |            |            | subagent; merged       |                     |          |
-|     |            |            | PR #14                 |                     |          |
-| 3c  | 2026-02-25 | A / A1     | Fixed 6 PRD design     | A2: Run API         | None     |
-|     |            |            | decisions; aligned     | contract generator  |          |
-|     |            |            | 7 files (15 edits)     |                     |          |
-| 4   | 2026-02-25 | A / A2     | Generated API          | A3: Run data model  | None     |
-|     |            |            | contract: 26           | generator           |          |
-|     |            |            | endpoints, TS          |                     |          |
-|     |            |            | types + MD ref         |                     |          |
-| 5   | 2026-02-25 | A / A3     | Generated data model:  | A4: UI pages        | None     |
-|     |            |            | 10 containers, TS      | inventory           |          |
-|     |            |            | interfaces, samples,   |                     |          |
-|     |            |            | query patterns         |                     |          |
-| 6   | 2026-02-26 | A / A4-A5  | Created ui-pages.md    | Merge branch,       | GH_TOKEN |
-|     |            |            | (10 pages, 11 shared   | close issues #6 #7  | not set  |
-|     |            |            | components) and        |                     |          |
-|     |            |            | environment-config.md  |                     |          |
-|     |            |            | (Easy Auth contract,   |                     |          |
-|     |            |            | Key Vault refs,        |                     |          |
-|     |            |            | .env template)         |                     |          |
-| 7   | 2026-02-26 | A / merge  | Merged                 | Phase C: C1 agent   | GH_TOKEN |
-|     |            | + C / C1   | feature/product-docs   | definitions         | not set  |
-|     |            |            | to main; created 6     |                     | (issues  |
-|     |            |            | top-level agents +     |                     | #1,#5,#6 |
-|     |            |            | 3 subagents; added     |                     | #7 need  |
-|     |            |            | App Conductor handoff  |                     | closing) |
-|     |            |            | to 01-Conductor        |                     |          |
-| 8   | 2026-02-26 | C / C3-C6  | Created 5 skills       | Merge branch →      | GH_TOKEN |
-|     |            |            | (nextjs-patterns,      | main, then start    | not set  |
-|     |            |            | cosmos-db-sdk,         | Phase B             | (issues  |
-|     |            |            | shadcn-ui-patterns,    |                     | #8-#12   |
-|     |            |            | zod-validation,        |                     | need     |
-|     |            |            | hackops-domain);       |                     | closing) |
-|     |            |            | 5 instructions;        |                     |          |
-|     |            |            | 2 issue templates;     |                     |          |
-|     |            |            | business rules         |                     |          |
-|     |            |            | validator;             |                     |          |
-|     |            |            | validate:all passes    |                     |          |
-| 9   | 2026-02-26 | C / merge  | PR #20 created and     | Phase B: B1 label   | None     |
-|     |            | + B / init | merged to main;        | taxonomy, B2        |          |
-|     |            |            | closed issues #1, #2,  | milestones, B3-B4   |          |
-|     |            |            | #6-#12 via MCP;        | prompt files        |          |
-|     |            |            | created branch         |                     |          |
-|     |            |            | feature/prompts;       |                     |          |
-|     |            |            | created Epic #21 +     |                     |          |
-|     |            |            | issues #22-#26 for     |                     |          |
-|     |            |            | Phase B                |                     |          |
-| 10  | 2026-02-26 | B / B1-B5  | Created label script   | Run setup scripts   | GH_TOKEN |
-|     |            |            | (setup-labels.sh),     | + backlog prompt    | not set  |
-|     |            |            | milestone script       | (needs GH auth),    | (issues  |
-|     |            |            | (setup-milestones.sh), | then Phase D        | #22-#26  |
-|     |            |            | generate-backlog       | prompts             | need     |
-|     |            |            | prompt, backlog-triage |                     | closing) |
-|     |            |            | prompt, and backlog    |                     |          |
-|     |            |            | setup docs; lint:md    |                     |          |
-|     |            |            | passes                 |                     |          |
-| 11  | 2026-02-26 | D / D1     | Created all 8 infra    | Run infra-01        | GH_TOKEN |
-|     |            |            | prompt files:          | (offline), then     | not set  |
-|     |            |            | infra-01 through       | infra-02, infra-03  | (Phase B |
-|     |            |            | infra-07 + infra-      | offline; verify     | scripts  |
-|     |            |            | challenge; lint:md     | Azure for D4-D7     | blocked) |
-|     |            |            | passes; Phase B        |                     |          |
-|     |            |            | scripts still blocked  |                     |          |
-|     |            |            | (no GH auth)           |                     |          |
-| 12  | 2026-02-26 | B / run    | GH auth restored; ran  | Run /generate-      | None     |
-|     |            |            | setup-labels.sh (23    | backlog to create   |          |
-|     |            |            | labels) and setup-     | ~80 issues; then    |          |
-|     |            |            | milestones.sh (13      | run infra-01        |          |
-|     |            |            | milestones); closed    | through infra-03    |          |
-|     |            |            | issues #22-#26 via     | (offline)           |          |
-|     |            |            | gh CLI                 |                     |          |
-| 13  | 2026-02-26 | B / final  | Confirmed backlog      | Run infra-          | None     |
-|     |            | + D /      | already generated      | challenge, then     |          |
-|     |            | D2-D4      | (105 issues on board); | verify Azure        |          |
-|     |            |            | added Domain +         | connectivity for    |          |
-|     |            |            | Complexity fields;     | infra-04 through    |          |
-|     |            |            | closed Epic #21;       | infra-07            |          |
-|     |            |            | generated infra-01     |                     |          |
-|     |            |            | (requirements), 02     |                     |          |
-|     |            |            | (architecture), 03     |                     |          |
-|     |            |            | (diagram + 3 ADRs);    |                     |          |
-|     |            |            | commit 8fa0c7b         |                     |          |
-| 14  | 2026-02-26 | D /        | Infra-challenge review | Run infra-04        | None     |
-|     |            | challenge  | of steps 01-03: 9      | governance          |          |
-|     |            |            | findings (0 critical,  | discovery against   |          |
-|     |            |            | 1 high, 5 medium,      | target sub, then    |          |
-|     |            |            | 3 low); verified Azure | infra-05 Bicep      |          |
-|     |            |            | connectivity (sub:     | generation          |          |
-|     |            |            | noalz); challenge-     |                     |          |
-|     |            |            | findings.json updated  |                     |          |
-| 15  | 2026-02-26 | D / D4     | Governance discovery   | Run infra-05        | None     |
-|     |            |            | via REST API: 21       | Bicep code gen      |          |
-|     |            |            | policies, 9 mandatory  |                     |          |
-|     |            |            | tags (RG Deny), Cosmos |                     |          |
-|     |            |            | RBAC-only (Modify),    |                     |          |
-|     |            |            | 0 blocking Deny        |                     |          |
-|     |            |            | policies; generated    |                     |          |
-|     |            |            | impl plan + 2 diagrams |                     |          |
-| 16  | 2026-02-26 | D / D5     | Generated 8 Bicep      | Run infra-06        | None     |
-|     |            |            | files: main.bicep,     | deploy to           |          |
-|     |            |            | main.bicepparam, 5     | rg-hackops-dev      |          |
-|     |            |            | modules (networking,   |                     |          |
-|     |            |            | monitoring, key-vault, |                     |          |
-|     |            |            | cosmos-db, app-svc),   |                     |          |
-|     |            |            | deploy.ps1; 8 AVM      |                     |          |
-|     |            |            | modules; bicep build   |                     |          |
-|     |            |            | + lint clean; created  |                     |          |
-|     |            |            | 05-implementation-     |                     |          |
-|     |            |            | reference.md           |                     |          |
-| 17  | 2026-02-26 | D / D6-D7  | Infra deployed to      | Phase E: create     | None     |
-|     |            |            | rg-hackops-us-dev      | app prompts, then   |          |
-|     |            |            | (centralus); 37        | run app-01-scaffold |          |
-|     |            |            | resources created;     |                     |          |
-|     |            |            | 06-deployment-summary  |                     |          |
-|     |            |            | + 7 as-built docs      |                     |          |
-|     |            |            | generated; Phase D     |                     |          |
-|     |            |            | complete               |                     |          |
-| 18  | 2026-02-26 | E / E1     | Created all 10 app     | Run app-01-scaffold | None     |
-|     |            |            | prompts: app-01        | to set up Turborepo |          |
-|     |            |            | through app-10;        | + Next.js 15        |          |
-|     |            |            | lint:md passes (0      | monorepo            |          |
-|     |            |            | errors)                |                     |          |
-| 19  | 2026-02-27 | E / app-01 | Scaffolded Turborepo   | Run app-02-auth     | None     |
-|     |            |            | + Next.js 15 monorepo; | (auth middleware +  |          |
-|     |            |            | 10 shared types, 10    | role guards)        |          |
-|     |            |            | shadcn/ui components,  |                     |          |
-|     |            |            | Cosmos client, health  |                     |          |
-|     |            |            | endpoint, seed script; |                     |          |
-|     |            |            | npm build + tsc pass;  |                     |          |
-|     |            |            | commit 63dd892         |                     |          |
-| 20  | 2026-02-27 | E / app-02 | Auth middleware: Easy  | Run app-03-api-     | None     |
-|     |            |            | Auth parsing, role     | hackathons          |          |
-|     |            |            | resolution, guards,    | (hackathon/team/    |          |
-|     |            |            | rate limiter (100/5    | join routes)        |          |
-|     |            |            | per min), Zod          |                     |          |
-|     |            |            | validation, audit      |                     |          |
-|     |            |            | logger, CORS, Next.js  |                     |          |
-|     |            |            | middleware; 35 tests   |                     |          |
-|     |            |            | pass; commit 9476766   |                     |          |
-| 21  | 2026-02-27 | E / app-03 | Hackathon CRUD (POST,  | Run app-04-api-     | None     |
-|     |            |            | GET, PATCH), join      | scoring (rubric/    |          |
-|     |            |            | endpoint (event code   | submission/review   |          |
-|     |            |            | + rate limit), team    | routes)             |          |
-|     |            |            | assign (Fisher-Yates), |                     |          |
-|     |            |            | team list + reassign;  |                     |          |
-|     |            |            | added requireAuth      |                     |          |
-|     |            |            | guard; 3 Zod schemas;  |                     |          |
-|     |            |            | 60 tests pass;         |                     |          |
-|     |            |            | commit 5e90170         |                     |          |
-| 22  | 2026-02-28 | E / C-fix  | Remediated debt #15-   | Continue app-04-    | None     |
-|     |            |            | #20: created 5 skills  | api-scoring         |          |
-|     |            |            | (hackops-domain etc),  |                     |          |
-|     |            |            | 5 instructions (TS,    |                     |          |
-|     |            |            | Next.js, React, test,  |                     |          |
-|     |            |            | API routes), 2 issue   |                     |          |
-|     |            |            | templates, business    |                     |          |
-|     |            |            | rules validator (28    |                     |          |
-|     |            |            | checks), fixed ESLint  |                     |          |
-|     |            |            | 10 native flat config; |                     |          |
-|     |            |            | all validators pass    |                     |          |
-| 23  | 2026-02-27 | E / app-04 | Completed app-04:      | Merge PR, start     | None     |
-|     |            |            | 3 Zod schemas, 6       | app-05-api-         |          |
-|     |            |            | route handlers         | challenges          |          |
-|     |            |            | (rubrics CRUD +        |                     |          |
-|     |            |            | pointer swap,          |                     |          |
-|     |            |            | submissions POST/GET/  |                     |          |
-|     |            |            | review, score          |                     |          |
-|     |            |            | override), 28 tests;   |                     |          |
-|     |            |            | tsc + eslint clean;    |                     |          |
-|     |            |            | 88/88 tests pass;      |                     |          |
-|     |            |            | commit 8f7954b         |                     |          |
-| 24  | 2026-02-27 | E / app-05 | Challenge progression  | Merge PR, start     | None     |
-|     |            |            | & gating: 4 CRUD       | app-06-api-admin    |          |
-|     |            |            | routes (challenges),   |                     |          |
-|     |            |            | 1 progression route,   |                     |          |
-|     |            |            | gate middleware,       |                     |          |
-|     |            |            | auto-unlock trigger,   |                     |          |
-|     |            |            | progression init on    |                     |          |
-|     |            |            | launch, ETag writes;   |                     |          |
-|     |            |            | 19 new tests, 107      |                     |          |
-|     |            |            | total pass; commit     |                     |          |
-|     |            |            | d5a6ef9                |                     |          |
-| 25  | 2026-02-27 | E / app-06 | Admin/roles/audit/     | Run app-07-         | None     |
-|     |            |            | config routes: POST    | leaderboard (SSR    |          |
-|     |            |            | invite, GET list,      | aggregation page)   |          |
-|     |            |            | DELETE (primary admin  |                     |          |
-|     |            |            | protected), GET audit  |                     |          |
-|     |            |            | trail with filters,    |                     |          |
-|     |            |            | GET/PATCH config       |                     |          |
-|     |            |            | (read-only keys        |                     |          |
-|     |            |            | protected); 3 Zod      |                     |          |
-|     |            |            | schemas, isGlobalAdmin |                     |          |
-|     |            |            | helper; 24 new tests,  |                     |          |
-|     |            |            | 131 total pass;        |                     |          |
-|     |            |            | commit a12c149         |                     |          |
-| 26  | 2026-02-27 | E / app-07 | SSR leaderboard page:  | Run app-08-         | None     |
-|     |            |            | API route (score agg,  | dashboard (admin/   |          |
-|     |            |            | grade + award badges,  | hacker/coach)       |          |
-|     |            |            | tiebreaker), SSR page  |                     |          |
-|     |            |            | with generateMetadata, |                     |          |
-|     |            |            | client component with  |                     |          |
-|     |            |            | 30s auto-refresh +     |                     |          |
-|     |            |            | expandable rows;       |                     |          |
-|     |            |            | shared buildLeaderboard|                     |          |
-|     |            |            | lib; tsc + build clean;|                     |          |
-|     |            |            | 131 tests pass;        |                     |          |
-|     |            |            | commit 6463b1a         |                     |          |
+| #   | Date       | Phase/Step | What was done           | What's next         | Blockers |
+| --- | ---------- | ---------- | ----------------------- | ------------------- | -------- |
+| 0   | 2026-02-24 | Planning   | Created blueprint,      | B0: Bootstrap       | None     |
+|     |            |            | challenged, and         | issues, then start  |          |
+|     |            |            | resolved 14             | Phase A             |          |
+|     |            |            | findings                |                     |          |
+| 1   | 2026-02-25 | A / A0     | Created 3 A0            | B0: Bootstrap       | B0 needs |
+|     |            |            | doc-gen prompts         | issues              | GH_TOKEN |
+| 2   | 2026-02-25 | B0         | Created 12 GitHub       | A1: Run PRD         | None     |
+|     |            |            | issues (#1-#12),        | generator prompt    |          |
+|     |            |            | epic label              |                     |          |
+| 3   | 2026-02-25 | A / A1     | Generated PRD with      | Adversarial review  | None     |
+|     |            |            | 64 user stories,        | of PRD + add        |          |
+|     |            |            | 8 domains, NFRs         | challenger agents   |          |
+| 3b  | 2026-02-25 | Cross      | Created 3 adversarial   | Fix 6 PRD design    | None     |
+|     |            |            | subagents (infra,       | decisions from      |          |
+|     |            |            | app-security,           | adversarial review  |          |
+|     |            |            | app-logic); moved       |                     |          |
+|     |            |            | 10-Challenger to        |                     |          |
+|     |            |            | subagent; merged        |                     |          |
+|     |            |            | PR #14                  |                     |          |
+| 3c  | 2026-02-25 | A / A1     | Fixed 6 PRD design      | A2: Run API         | None     |
+|     |            |            | decisions; aligned      | contract generator  |          |
+|     |            |            | 7 files (15 edits)      |                     |          |
+| 4   | 2026-02-25 | A / A2     | Generated API           | A3: Run data model  | None     |
+|     |            |            | contract: 26            | generator           |          |
+|     |            |            | endpoints, TS           |                     |          |
+|     |            |            | types + MD ref          |                     |          |
+| 5   | 2026-02-25 | A / A3     | Generated data model:   | A4: UI pages        | None     |
+|     |            |            | 10 containers, TS       | inventory           |          |
+|     |            |            | interfaces, samples,    |                     |          |
+|     |            |            | query patterns          |                     |          |
+| 6   | 2026-02-26 | A / A4-A5  | Created ui-pages.md     | Merge branch,       | GH_TOKEN |
+|     |            |            | (10 pages, 11 shared    | close issues #6 #7  | not set  |
+|     |            |            | components) and         |                     |          |
+|     |            |            | environment-config.md   |                     |          |
+|     |            |            | (Easy Auth contract,    |                     |          |
+|     |            |            | Key Vault refs,         |                     |          |
+|     |            |            | .env template)          |                     |          |
+| 7   | 2026-02-26 | A / merge  | Merged                  | Phase C: C1 agent   | GH_TOKEN |
+|     |            | + C / C1   | feature/product-docs    | definitions         | not set  |
+|     |            |            | to main; created 6      |                     | (issues  |
+|     |            |            | top-level agents +      |                     | #1,#5,#6 |
+|     |            |            | 3 subagents; added      |                     | #7 need  |
+|     |            |            | App Conductor handoff   |                     | closing) |
+|     |            |            | to 01-Conductor         |                     |          |
+| 8   | 2026-02-26 | C / C3-C6  | Created 5 skills        | Merge branch →      | GH_TOKEN |
+|     |            |            | (nextjs-patterns,       | main, then start    | not set  |
+|     |            |            | cosmos-db-sdk,          | Phase B             | (issues  |
+|     |            |            | shadcn-ui-patterns,     |                     | #8-#12   |
+|     |            |            | zod-validation,         |                     | need     |
+|     |            |            | hackops-domain);        |                     | closing) |
+|     |            |            | 5 instructions;         |                     |          |
+|     |            |            | 2 issue templates;      |                     |          |
+|     |            |            | business rules          |                     |          |
+|     |            |            | validator;              |                     |          |
+|     |            |            | validate:all passes     |                     |          |
+| 9   | 2026-02-26 | C / merge  | PR #20 created and      | Phase B: B1 label   | None     |
+|     |            | + B / init | merged to main;         | taxonomy, B2        |          |
+|     |            |            | closed issues #1, #2,   | milestones, B3-B4   |          |
+|     |            |            | #6-#12 via MCP;         | prompt files        |          |
+|     |            |            | created branch          |                     |          |
+|     |            |            | feature/prompts;        |                     |          |
+|     |            |            | created Epic #21 +      |                     |          |
+|     |            |            | issues #22-#26 for      |                     |          |
+|     |            |            | Phase B                 |                     |          |
+| 10  | 2026-02-26 | B / B1-B5  | Created label script    | Run setup scripts   | GH_TOKEN |
+|     |            |            | (setup-labels.sh),      | + backlog prompt    | not set  |
+|     |            |            | milestone script        | (needs GH auth),    | (issues  |
+|     |            |            | (setup-milestones.sh),  | then Phase D        | #22-#26  |
+|     |            |            | generate-backlog        | prompts             | need     |
+|     |            |            | prompt, backlog-triage  |                     | closing) |
+|     |            |            | prompt, and backlog     |                     |          |
+|     |            |            | setup docs; lint:md     |                     |          |
+|     |            |            | passes                  |                     |          |
+| 11  | 2026-02-26 | D / D1     | Created all 8 infra     | Run infra-01        | GH_TOKEN |
+|     |            |            | prompt files:           | (offline), then     | not set  |
+|     |            |            | infra-01 through        | infra-02, infra-03  | (Phase B |
+|     |            |            | infra-07 + infra-       | offline; verify     | scripts  |
+|     |            |            | challenge; lint:md      | Azure for D4-D7     | blocked) |
+|     |            |            | passes; Phase B         |                     |          |
+|     |            |            | scripts still blocked   |                     |          |
+|     |            |            | (no GH auth)            |                     |          |
+| 12  | 2026-02-26 | B / run    | GH auth restored; ran   | Run /generate-      | None     |
+|     |            |            | setup-labels.sh (23     | backlog to create   |          |
+|     |            |            | labels) and setup-      | ~80 issues; then    |          |
+|     |            |            | milestones.sh (13       | run infra-01        |          |
+|     |            |            | milestones); closed     | through infra-03    |          |
+|     |            |            | issues #22-#26 via      | (offline)           |          |
+|     |            |            | gh CLI                  |                     |          |
+| 13  | 2026-02-26 | B / final  | Confirmed backlog       | Run infra-          | None     |
+|     |            | + D /      | already generated       | challenge, then     |          |
+|     |            | D2-D4      | (105 issues on board);  | verify Azure        |          |
+|     |            |            | added Domain +          | connectivity for    |          |
+|     |            |            | Complexity fields;      | infra-04 through    |          |
+|     |            |            | closed Epic #21;        | infra-07            |          |
+|     |            |            | generated infra-01      |                     |          |
+|     |            |            | (requirements), 02      |                     |          |
+|     |            |            | (architecture), 03      |                     |          |
+|     |            |            | (diagram + 3 ADRs);     |                     |          |
+|     |            |            | commit 8fa0c7b          |                     |          |
+| 14  | 2026-02-26 | D /        | Infra-challenge review  | Run infra-04        | None     |
+|     |            | challenge  | of steps 01-03: 9       | governance          |          |
+|     |            |            | findings (0 critical,   | discovery against   |          |
+|     |            |            | 1 high, 5 medium,       | target sub, then    |          |
+|     |            |            | 3 low); verified Azure  | infra-05 Bicep      |          |
+|     |            |            | connectivity (sub:      | generation          |          |
+|     |            |            | noalz); challenge-      |                     |          |
+|     |            |            | findings.json updated   |                     |          |
+| 15  | 2026-02-26 | D / D4     | Governance discovery    | Run infra-05        | None     |
+|     |            |            | via REST API: 21        | Bicep code gen      |          |
+|     |            |            | policies, 9 mandatory   |                     |          |
+|     |            |            | tags (RG Deny), Cosmos  |                     |          |
+|     |            |            | RBAC-only (Modify),     |                     |          |
+|     |            |            | 0 blocking Deny         |                     |          |
+|     |            |            | policies; generated     |                     |          |
+|     |            |            | impl plan + 2 diagrams  |                     |          |
+| 16  | 2026-02-26 | D / D5     | Generated 8 Bicep       | Run infra-06        | None     |
+|     |            |            | files: main.bicep,      | deploy to           |          |
+|     |            |            | main.bicepparam, 5      | rg-hackops-dev      |          |
+|     |            |            | modules (networking,    |                     |          |
+|     |            |            | monitoring, key-vault,  |                     |          |
+|     |            |            | cosmos-db, app-svc),    |                     |          |
+|     |            |            | deploy.ps1; 8 AVM       |                     |          |
+|     |            |            | modules; bicep build    |                     |          |
+|     |            |            | + lint clean; created   |                     |          |
+|     |            |            | 05-implementation-      |                     |          |
+|     |            |            | reference.md            |                     |          |
+| 17  | 2026-02-26 | D / D6-D7  | Infra deployed to       | Phase E: create     | None     |
+|     |            |            | rg-hackops-us-dev       | app prompts, then   |          |
+|     |            |            | (centralus); 37         | run app-01-scaffold |          |
+|     |            |            | resources created;      |                     |          |
+|     |            |            | 06-deployment-summary   |                     |          |
+|     |            |            | + 7 as-built docs       |                     |          |
+|     |            |            | generated; Phase D      |                     |          |
+|     |            |            | complete                |                     |          |
+| 18  | 2026-02-26 | E / E1     | Created all 10 app      | Run app-01-scaffold | None     |
+|     |            |            | prompts: app-01         | to set up Turborepo |          |
+|     |            |            | through app-10;         | + Next.js 15        |          |
+|     |            |            | lint:md passes (0       | monorepo            |          |
+|     |            |            | errors)                 |                     |          |
+| 19  | 2026-02-27 | E / app-01 | Scaffolded Turborepo    | Run app-02-auth     | None     |
+|     |            |            | + Next.js 15 monorepo;  | (auth middleware +  |          |
+|     |            |            | 10 shared types, 10     | role guards)        |          |
+|     |            |            | shadcn/ui components,   |                     |          |
+|     |            |            | Cosmos client, health   |                     |          |
+|     |            |            | endpoint, seed script;  |                     |          |
+|     |            |            | npm build + tsc pass;   |                     |          |
+|     |            |            | commit 63dd892          |                     |          |
+| 20  | 2026-02-27 | E / app-02 | Auth middleware: Easy   | Run app-03-api-     | None     |
+|     |            |            | Auth parsing, role      | hackathons          |          |
+|     |            |            | resolution, guards,     | (hackathon/team/    |          |
+|     |            |            | rate limiter (100/5     | join routes)        |          |
+|     |            |            | per min), Zod           |                     |          |
+|     |            |            | validation, audit       |                     |          |
+|     |            |            | logger, CORS, Next.js   |                     |          |
+|     |            |            | middleware; 35 tests    |                     |          |
+|     |            |            | pass; commit 9476766    |                     |          |
+| 21  | 2026-02-27 | E / app-03 | Hackathon CRUD (POST,   | Run app-04-api-     | None     |
+|     |            |            | GET, PATCH), join       | scoring (rubric/    |          |
+|     |            |            | endpoint (event code    | submission/review   |          |
+|     |            |            | + rate limit), team     | routes)             |          |
+|     |            |            | assign (Fisher-Yates),  |                     |          |
+|     |            |            | team list + reassign;   |                     |          |
+|     |            |            | added requireAuth       |                     |          |
+|     |            |            | guard; 3 Zod schemas;   |                     |          |
+|     |            |            | 60 tests pass;          |                     |          |
+|     |            |            | commit 5e90170          |                     |          |
+| 22  | 2026-02-28 | E / C-fix  | Remediated debt #15-    | Continue app-04-    | None     |
+|     |            |            | #20: created 5 skills   | api-scoring         |          |
+|     |            |            | (hackops-domain etc),   |                     |          |
+|     |            |            | 5 instructions (TS,     |                     |          |
+|     |            |            | Next.js, React, test,   |                     |          |
+|     |            |            | API routes), 2 issue    |                     |          |
+|     |            |            | templates, business     |                     |          |
+|     |            |            | rules validator (28     |                     |          |
+|     |            |            | checks), fixed ESLint   |                     |          |
+|     |            |            | 10 native flat config;  |                     |          |
+|     |            |            | all validators pass     |                     |          |
+| 23  | 2026-02-27 | E / app-04 | Completed app-04:       | Merge PR, start     | None     |
+|     |            |            | 3 Zod schemas, 6        | app-05-api-         |          |
+|     |            |            | route handlers          | challenges          |          |
+|     |            |            | (rubrics CRUD +         |                     |          |
+|     |            |            | pointer swap,           |                     |          |
+|     |            |            | submissions POST/GET/   |                     |          |
+|     |            |            | review, score           |                     |          |
+|     |            |            | override), 28 tests;    |                     |          |
+|     |            |            | tsc + eslint clean;     |                     |          |
+|     |            |            | 88/88 tests pass;       |                     |          |
+|     |            |            | commit 8f7954b          |                     |          |
+| 24  | 2026-02-27 | E / app-05 | Challenge progression   | Merge PR, start     | None     |
+|     |            |            | & gating: 4 CRUD        | app-06-api-admin    |          |
+|     |            |            | routes (challenges),    |                     |          |
+|     |            |            | 1 progression route,    |                     |          |
+|     |            |            | gate middleware,        |                     |          |
+|     |            |            | auto-unlock trigger,    |                     |          |
+|     |            |            | progression init on     |                     |          |
+|     |            |            | launch, ETag writes;    |                     |          |
+|     |            |            | 19 new tests, 107       |                     |          |
+|     |            |            | total pass; commit      |                     |          |
+|     |            |            | d5a6ef9                 |                     |          |
+| 25  | 2026-02-27 | E / app-06 | Admin/roles/audit/      | Run app-07-         | None     |
+|     |            |            | config routes: POST     | leaderboard (SSR    |          |
+|     |            |            | invite, GET list,       | aggregation page)   |          |
+|     |            |            | DELETE (primary admin   |                     |          |
+|     |            |            | protected), GET audit   |                     |          |
+|     |            |            | trail with filters,     |                     |          |
+|     |            |            | GET/PATCH config        |                     |          |
+|     |            |            | (read-only keys         |                     |          |
+|     |            |            | protected); 3 Zod       |                     |          |
+|     |            |            | schemas, isGlobalAdmin  |                     |          |
+|     |            |            | helper; 24 new tests,   |                     |          |
+|     |            |            | 131 total pass;         |                     |          |
+|     |            |            | commit a12c149          |                     |          |
+| 26  | 2026-02-27 | E / app-07 | SSR leaderboard page:   | Run app-08-         | None     |
+|     |            |            | API route (score agg,   | dashboard (admin/   |          |
+|     |            |            | grade + award badges,   | hacker/coach)       |          |
+|     |            |            | tiebreaker), SSR page   |                     |          |
+|     |            |            | with generateMetadata,  |                     |          |
+|     |            |            | client component with   |                     |          |
+|     |            |            | 30s auto-refresh +      |                     |          |
+|     |            |            | expandable rows;        |                     |          |
+|     |            |            | shared buildLeaderboard |                     |          |
+|     |            |            | lib; tsc + build clean; |                     |          |
+|     |            |            | 131 tests pass;         |                     |          |
+|     |            |            | commit 6463b1a          |                     |          |
 
 ---
 
