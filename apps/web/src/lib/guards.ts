@@ -10,6 +10,10 @@ export interface AuthContext {
   hackathonId: string;
 }
 
+export interface AuthOnlyContext {
+  principal: EasyAuthPrincipal;
+}
+
 type RouteContext = { params: Promise<Record<string, string>> };
 
 type AuthenticatedHandler = (
@@ -18,10 +22,35 @@ type AuthenticatedHandler = (
   auth: AuthContext,
 ) => Promise<NextResponse>;
 
+type AuthOnlyHandler = (
+  request: NextRequest,
+  context: RouteContext,
+  auth: AuthOnlyContext,
+) => Promise<NextResponse>;
+
 type RouteHandler = (
   request: NextRequest,
   context: RouteContext,
 ) => Promise<NextResponse>;
+
+/**
+ * Wraps a route handler to require authentication only (no role check).
+ * Use for endpoints where hackathonId is not available (e.g. create hackathon, join).
+ *
+ * Usage: `export const POST = requireAuth(handler);`
+ */
+export function requireAuth(handler: AuthOnlyHandler): RouteHandler {
+  return async (request, context) => {
+    const principal = getAuthPrincipal(request.headers);
+    if (!principal) {
+      return NextResponse.json(
+        { error: "Authentication required", ok: false },
+        { status: 401 },
+      );
+    }
+    return handler(request, context, { principal });
+  };
+}
 
 /**
  * Wraps a route handler to enforce role-based access.
