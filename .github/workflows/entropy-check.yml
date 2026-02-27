@@ -58,7 +58,7 @@ jobs:
 
       - name: Open issue on failures
         if: steps.freshness.outcome == 'failure' || steps.instructions.outcome == 'failure' || steps.skills.outcome == 'failure' || steps.agents.outcome == 'failure'
-        uses: actions/github-script@v7
+        uses: actions/github-script@v8
         with:
           script: |
             const title = `🧹 Entropy check found issues (${new Date().toISOString().split('T')[0]})`;
