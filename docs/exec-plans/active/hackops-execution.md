@@ -45,10 +45,10 @@
 <!-- Update this at the START of each session -->
 
 **Phase**: E — Application Build
-**Step**: app-05-api-challenges (NEXT)
-**Branch**: `feature/app-04-scoring` (merge pending)
-**Goal**: Merge app-04 PR, then implement challenge/progression routes.
-Gate: `tsc --noEmit` + endpoint tests pass.
+**Step**: app-06-api-admin (NEXT)
+**Branch**: `feature/app-05-challenges` (merge pending)
+**Goal**: Merge app-05 PR, then implement admin/audit/config routes.
+Gate: all API tests pass, app-review-subagent APPROVED.
 
 ---
 
@@ -196,8 +196,8 @@ so agents 12–15 have the skills/instructions they were designed to use.
 - [x] Run app-04-api-scoring → rubric/submission/review routes
   - Gate: `tsc --noEmit` + endpoint tests pass ✅
   - Gate: `app-logic-challenger-subagent` (focus: `business-rules`) — scoring correctness
-- [ ] Run app-05-api-challenges → challenge/progression routes
-  - Gate: `tsc --noEmit` + endpoint tests pass
+- [x] Run app-05-api-challenges → challenge/progression routes
+  - Gate: `tsc --noEmit` + endpoint tests pass ✅
   - Gate: `app-logic-challenger-subagent` (focus: `business-rules`) — gating correctness
 - [ ] Run app-06-api-admin → admin/audit/config routes
   - Gate: all API tests pass, app-review-subagent APPROVED
@@ -422,6 +422,17 @@ so agents 12–15 have the skills/instructions they were designed to use.
 |     |            |            | tsc + eslint clean;    |                     |          |
 |     |            |            | 88/88 tests pass;      |                     |          |
 |     |            |            | commit 8f7954b         |                     |          |
+| 24  | 2026-02-27 | E / app-05 | Challenge progression  | Merge PR, start     | None     |
+|     |            |            | & gating: 4 CRUD       | app-06-api-admin    |          |
+|     |            |            | routes (challenges),   |                     |          |
+|     |            |            | 1 progression route,   |                     |          |
+|     |            |            | gate middleware,        |                     |          |
+|     |            |            | auto-unlock trigger,   |                     |          |
+|     |            |            | progression init on    |                     |          |
+|     |            |            | launch, ETag writes;   |                     |          |
+|     |            |            | 19 new tests, 107      |                     |          |
+|     |            |            | total pass; commit     |                     |          |
+|     |            |            | d5a6ef9                |                     |          |
 
 ---
 
