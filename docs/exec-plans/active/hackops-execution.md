@@ -44,12 +44,13 @@
 
 <!-- Update this at the START of each session -->
 
-**Phase**: E — Application Build
-**Step**: Run app-04-api-scoring → rubric/submission/review routes
+**Phase**: E — Application Build (C-fix first)
+**Step**: C-fix 1–6 → remediate phantom completions from Phase C
 **Branch**: `feature/app-02-auth`
-**Goal**: Run the app-04-api-scoring prompt to implement
-rubric CRUD, submission evidence, and coach review endpoints.
-Gate: tsc --noEmit + endpoint tests pass + scoring correctness.
+**Goal**: Recreate the 5 missing skills, 5 missing instructions,
+fix `next lint`, recreate issue templates + business rules validator,
+and correct tracker checkboxes. Then continue with app-04-api-scoring.
+Gate: `npm run validate` + `npx next lint` pass.
 
 ---
 
@@ -170,6 +171,30 @@ Gate: tsc --noEmit + endpoint tests pass + scoring correctness.
 - [x] Run app-03-api-hackathons → hackathon/team/join routes
   - Gate: `tsc --noEmit` + endpoint tests pass ✅
   - Gate: `app-logic-challenger-subagent` (focus: `api-contract`) — contract conformance
+
+#### Phase C-fix — Remediate Phantom Completions (debt #15–#20)
+
+Doc-gardening discovered that Phase C sessions 8–9 marked items complete
+but artifacts were never committed. Recreate before continuing app builds
+so agents 12–15 have the skills/instructions they were designed to use.
+
+- [ ] C-fix 1: Recreate 5 app-dev skills (debt #15)
+  - `hackops-domain`, `nextjs-patterns`, `cosmos-db-sdk`,
+    `shadcn-ui-patterns`, `zod-validation`
+  - Gate: `npm run validate` passes
+- [ ] C-fix 2: Recreate 5 app-dev instructions (debt #16)
+  - `typescript`, `nextjs`, `react-components`, `testing`, `api-routes`
+  - Gate: `npm run lint:instruction-frontmatter` passes
+- [ ] C-fix 3: Fix `next lint` — ESLint 10 circular ref (debt #17)
+  - Pin ESLint to v9, or switch to native flat config
+  - Gate: `npx next lint` exits 0
+- [ ] C-fix 4: Recreate app issue templates (debt #18)
+  - `app-feature.yml`, `app-bug.yml`
+- [ ] C-fix 5: Recreate `validate-business-rules.mjs` + register in package.json (debt #19)
+  - Gate: `npm run validate:business-rules` exits 0
+- [ ] C-fix 6: Correct tracker phantom checkboxes (debt #20)
+  - Uncheck C3–C6 items that were never committed, re-check after recreation
+
 - [ ] Run app-04-api-scoring → rubric/submission/review routes
   - Gate: `tsc --noEmit` + endpoint tests pass
   - Gate: `app-logic-challenger-subagent` (focus: `business-rules`) — scoring correctness
