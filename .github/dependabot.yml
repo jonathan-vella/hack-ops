@@ -27,3 +27,29 @@ updates:
       - ci
     commit-message:
       prefix: "ci"
+
+  - package-ecosystem: pip
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    labels:
+      - dependencies
+      - python
+    commit-message:
+      prefix: "build"
+      include: scope
+
+  - package-ecosystem: pip
+    directory: /mcp/azure-pricing-mcp
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    labels:
+      - dependencies
+      - python
+    commit-message:
+      prefix: "build"
+      include: scope

@@ -1,12 +1,12 @@
 ---
-description: 'JavaScript and Node.js conventions for validation scripts and tooling'
-applyTo: '**/*.{js,mjs,cjs}'
+description: "JavaScript and Node.js conventions for validation scripts and tooling"
+applyTo: "**/*.{js,mjs,cjs}"
 ---
 
 # JavaScript Guidelines
 
 Instructions for writing clean, consistent JavaScript in this repository. All scripts
-target Node.js LTS (22+) and use ES modules (`.mjs`).
+target Node.js LTS (24+) and use ES modules (`.mjs`).
 
 ## Module System
 

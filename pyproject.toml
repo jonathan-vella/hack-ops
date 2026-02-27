@@ -2,7 +2,7 @@
 name = "hackops"
 version = "0.1.0"
 description = "HackOps - Hackathon management platform for structured Microsoft Azure learning events"
-requires-python = ">=3.10"
+requires-python = ">=3.13"
 
 [tool.ruff]
 # Exclude infrastructure folder and generated files
@@ -19,7 +19,7 @@ exclude = [
 line-length = 120
 
 # Target Python 3.10+
-target-version = "py310"
+target-version = "py313"
 
 [tool.ruff.lint]
 # Enable common rule sets

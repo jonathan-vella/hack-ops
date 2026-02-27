@@ -59,6 +59,7 @@ See `docs/hackops-user-guide.md` for the full walkthrough.
 
 ```bash
 npm run validate
+npm run validate:versions
 npm run lint:md
 bicep build infra/bicep/{project}/main.bicep
 ```

@@ -5,7 +5,25 @@ applyTo: "**/package.json, **/*.{js,mjs,cjs,ts,tsx}"
 
 # Dependency Management
 
-Rules for selecting, installing, and maintaining npm packages in this repository.
+Rules for selecting, installing, and maintaining npm and Python packages in this repository.
+
+## Version Manifest (Single Source of Truth)
+
+`.github/version-manifest.json` records the **approved minimum version** for
+every dependency. No agent, PR, or script may propose a version below these
+floors without explicit user authorization.
+
+- Run `npm run validate:versions` to check all files against the manifest
+- The manifest also records the approved Node.js, npm, and Python runtime versions
+
+## Anti-Downgrade Policy
+
+**Downgrading any dependency below the manifest floor is forbidden.**
+
+- If a build breaks, fix the consuming code — do not lower the version
+- If a dependency has a confirmed regression, the user must explicitly approve
+  a temporary floor override in the manifest before any downgrade
+- Agents must never silently propose older versions "for compatibility"
 
 ## Core Rules
 
@@ -18,8 +36,10 @@ Rules for selecting, installing, and maintaining npm packages in this repository
    `node-fetch`)
 4. **Minimize dependencies** — every added package increases attack surface;
    justify each addition
-5. **Pin major, float minor** — use caret ranges (`^`) to get patches
-   automatically while preventing surprise major bumps
+5. **Pin major, float minor** — use caret ranges (`^`) for npm and `>=` for
+   Python to get patches automatically while preventing surprise major bumps
+6. **Update the manifest** — when adding a new dependency or upgrading an
+   existing one, update `.github/version-manifest.json` to match
 
 ## Security
 
@@ -66,16 +86,34 @@ When encountering a deprecated package warning:
 
 ## Node.js Version
 
-- Target: Node.js 22 LTS (pinned in `.nvmrc` and `engines` field)
-- The `engines` field in root `package.json` enforces `>=22.0.0`
+- Target: Node.js 24 LTS (pinned in `.nvmrc` and `engines` field)
+- The `engines` field in root `package.json` enforces `>=24.0.0`
 - `.npmrc` has `engine-strict=true` to block installs on wrong versions
+
+## Python Version
+
+- Target: Python 3.13+ (pinned in `pyproject.toml` and devcontainer config)
+- `requires-python = ">=3.13"` in both root and MCP `pyproject.toml`
+- Ruff and mypy target `py313`
 
 ## Automated Guardrails
 
-| Guardrail                | Where                         | Enforcement |
-| ------------------------ | ----------------------------- | ----------- |
-| `npm audit`              | CI lint workflow               | Blocks PR   |
-| `npm outdated`           | CI lint workflow               | Advisory    |
-| Dependabot               | `.github/dependabot.yml`      | Weekly PRs  |
-| Engine constraints       | `package.json` + `.npmrc`     | Blocks install |
-| Node version pin         | `.nvmrc`, devcontainer config | Dev + CI    |
+| Guardrail           | Where                                   | Enforcement    |
+| ------------------- | --------------------------------------- | -------------- |
+| Version manifest    | `.github/version-manifest.json`         | Anti-downgrade |
+| `validate:versions` | `scripts/validate-version-manifest.mjs` | Blocks PR      |
+| `npm audit`         | CI lint workflow                        | Blocks PR      |
+| `npm outdated`      | CI lint workflow                        | Advisory       |
+| Dependabot (npm)    | `.github/dependabot.yml`                | Weekly PRs     |
+| Dependabot (pip)    | `.github/dependabot.yml`                | Weekly PRs     |
+| Engine constraints  | `package.json` + `.npmrc`               | Blocks install |
+| Node version pin    | `.nvmrc`, devcontainer config           | Dev + CI       |
+| Python version pin  | `pyproject.toml`, devcontainer          | Dev + CI       |
+
+## Upgrade Workflow
+
+1. Run `npm outdated` and/or `pip list --outdated` to find upgrades
+2. Update the dependency file(s) with the new range
+3. Update `.github/version-manifest.json` with the new floor
+4. Run `npm run validate:versions` to confirm compliance
+5. Run full test suite to verify nothing broke

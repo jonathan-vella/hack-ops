@@ -6,11 +6,11 @@ every tool returns errors in a consistent, machine-readable structure:
     {"error": True, "code": "<ERROR_CODE>", "message": "...", ...}
 """
 
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 
-class ErrorCode(str, Enum):
+class ErrorCode(StrEnum):
     """Machine-readable error codes returned by tool handlers."""
 
     # Input validation
