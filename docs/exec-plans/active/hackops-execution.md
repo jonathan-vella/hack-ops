@@ -45,14 +45,10 @@
 <!-- Update this at the START of each session -->
 
 **Phase**: E — Application Build
-**Step**: app-04-api-scoring (IN PROGRESS — partially scaffolded)
-**Branch**: `feature/app-04-scoring` (created from main)
-**Goal**: Implement rubric CRUD, submission pipeline, review queue,
-approve/reject, and score override API routes.
+**Step**: app-05-api-challenges (NEXT)
+**Branch**: `feature/app-04-scoring` (merge pending)
+**Goal**: Merge app-04 PR, then implement challenge/progression routes.
 Gate: `tsc --noEmit` + endpoint tests pass.
-**Partial work**: Zod schemas created (`rubric.ts`, `submission.ts`,
-`score.ts` in `lib/validation/`). Route directories created but route
-handler files are empty. Resume by writing route handlers, then tests.
 
 ---
 
@@ -197,8 +193,8 @@ so agents 12–15 have the skills/instructions they were designed to use.
 - [x] C-fix 6: Correct tracker phantom checkboxes (debt #20)
   - Uncheck C3–C6 items that were never committed, re-check after recreation ✅
 
-- [ ] Run app-04-api-scoring → rubric/submission/review routes
-  - Gate: `tsc --noEmit` + endpoint tests pass
+- [x] Run app-04-api-scoring → rubric/submission/review routes
+  - Gate: `tsc --noEmit` + endpoint tests pass ✅
   - Gate: `app-logic-challenger-subagent` (focus: `business-rules`) — scoring correctness
 - [ ] Run app-05-api-challenges → challenge/progression routes
   - Gate: `tsc --noEmit` + endpoint tests pass
@@ -415,14 +411,17 @@ so agents 12–15 have the skills/instructions they were designed to use.
 |     |            |            | checks), fixed ESLint  |                     |          |
 |     |            |            | 10 native flat config; |                     |          |
 |     |            |            | all validators pass    |                     |          |
-| 23  | 2026-02-27 | E / app-04 | Confirmed C-fix done;  | Write rubric/       | User     |
-|     |            |            | created branch         | submission/score    | paused   |
-|     |            |            | feature/app-04-scoring | route handlers,     | session  |
-|     |            |            | from main; created 3   | then tests;         |          |
-|     |            |            | Zod schemas (rubric,   | tsc + lint gates    |          |
-|     |            |            | submission, score);    |                     |          |
-|     |            |            | created route dirs;    |                     |          |
-|     |            |            | route files empty      |                     |          |
+| 23  | 2026-02-27 | E / app-04 | Completed app-04:      | Merge PR, start     | None     |
+|     |            |            | 3 Zod schemas, 6      | app-05-api-         |          |
+|     |            |            | route handlers         | challenges          |          |
+|     |            |            | (rubrics CRUD +        |                     |          |
+|     |            |            | pointer swap,          |                     |          |
+|     |            |            | submissions POST/GET/  |                     |          |
+|     |            |            | review, score          |                     |          |
+|     |            |            | override), 28 tests;   |                     |          |
+|     |            |            | tsc + eslint clean;    |                     |          |
+|     |            |            | 88/88 tests pass;      |                     |          |
+|     |            |            | commit 8f7954b         |                     |          |
 
 ---
 
