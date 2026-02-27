@@ -11,7 +11,7 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@azure/cosmos": "^4.2.0",
+    "@azure/cosmos": "^4.9.1",
     "@azure/identity": "^4.7.0",
     "@hackops/shared": "*",
     "class-variance-authority": "^0.7.1",
