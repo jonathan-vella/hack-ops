@@ -62,7 +62,7 @@ Introduce a subagent hand-off when ANY of these conditions are true:
 
 When designing a new agent, budget the context:
 
-```
+```text
 Model limit:           200,000 tokens (Opus)
 ─ System overhead:      -2,000 tokens
 ─ Tool schemas (25):    -1,875 tokens

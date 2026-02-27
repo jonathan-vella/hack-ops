@@ -63,7 +63,7 @@ in VS Code settings to capture verbose tool-call data.
 
 The primary signal. Each completed LLM request produces a line like:
 
-```
+```text
 2026-02-27 08:03:29.492 [info] ccreq:c5f11ccd.copilotmd | success | claude-opus-4.6 -> claude-opus-4-6 | 6353ms | [panel/editAgent]
 ```
 
@@ -153,7 +153,7 @@ For each `.agent.md` file, calculate context cost:
 
 Trace how context accumulates through a conversation:
 
-```
+```text
 Turn 1: System prompt + user message     → ~5K tokens
 Turn 2: + assistant response + tool call → ~12K tokens
 Turn 3: + tool result + response         → ~25K tokens
@@ -191,7 +191,7 @@ Priority framework (effort vs impact):
 **Fix**: Extract the tool-heavy work into a subagent that returns a structured
 result. Parent agent stays lean.
 
-```
+```text
 Before: Agent A does planning (5K) + API calls (40K) + reporting (10K) = 55K
 After:  Agent A does planning (5K) + delegates to Subagent (40K isolated) + reporting (15K) = 20K
 ```
@@ -224,7 +224,7 @@ Skill → for domain knowledge.
 
 **Fix**: Parent agent compiles a focused summary before delegating:
 
-```
+```text
 Instead of: "Here's everything we discussed..."
 Do:         "Validate these 3 Bicep files: [paths]. Check for: [specific items]."
 ```

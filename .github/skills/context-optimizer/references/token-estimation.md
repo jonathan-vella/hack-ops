@@ -33,7 +33,7 @@ These components are always present in the context window:
 
 To estimate the fixed context cost of an agent:
 
-```
+```text
 base_cost = 2000  # system prompt overhead
 tool_cost = num_tools * 75  # average per tool
 handoff_cost = num_handoffs * 40

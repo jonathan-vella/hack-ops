@@ -87,6 +87,10 @@ full YAML parsing. Do not add a YAML library dependency.
 ## Dependencies
 
 - Minimize external dependencies — prefer Node.js built-ins
+- **Never add deprecated packages** — check `npm info <pkg>` before adding
+- Prefer native APIs over npm packages (e.g., native `fetch` over `node-fetch`,
+  native `DOMException` over `node-domexception`, `crypto.randomUUID()` over `uuid`)
 - Current dev dependencies: `fast-xml-parser`, `markdownlint-cli2`, `lefthook`,
   `commitlint`, `markdown-link-check`
 - Do not add runtime dependencies — this is a tooling-only `package.json`
+- See `dependency-management.instructions.md` for full version policy
