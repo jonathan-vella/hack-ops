@@ -45,11 +45,11 @@
 <!-- Update this at the START of each session -->
 
 **Phase**: E — Application Build
-**Step**: Run app-02-auth → auth middleware + role guards
-**Branch**: `feature/prompts`
-**Goal**: Run the app-02-auth prompt to implement auth
-middleware, Easy Auth parsing, and role guards.
-Gate: role guard unit tests pass + security review.
+**Step**: Run app-04-api-scoring → rubric/submission/review routes
+**Branch**: `feature/app-02-auth`
+**Goal**: Run the app-04-api-scoring prompt to implement
+rubric CRUD, submission evidence, and coach review endpoints.
+Gate: tsc --noEmit + endpoint tests pass + scoring correctness.
 
 ---
 
@@ -164,11 +164,11 @@ Gate: role guard unit tests pass + security review.
 - [x] E1: Create all 10 app prompts (`app-01` through `app-10`)
 - [x] Run app-01-scaffold → Turborepo + Next.js scaffold
   - Gate: `npm run build` succeeds ✅
-- [ ] Run app-02-auth → auth middleware + role guards
+- [x] Run app-02-auth → auth middleware + role guards
   - Gate: role guard unit tests pass
   - Gate: `app-security-challenger-subagent` (focus: `auth`) — no critical/high findings
-- [ ] Run app-03-api-hackathons → hackathon/team/join routes
-  - Gate: `tsc --noEmit` + endpoint tests pass
+- [x] Run app-03-api-hackathons → hackathon/team/join routes
+  - Gate: `tsc --noEmit` + endpoint tests pass ✅
   - Gate: `app-logic-challenger-subagent` (focus: `api-contract`) — contract conformance
 - [ ] Run app-04-api-scoring → rubric/submission/review routes
   - Gate: `tsc --noEmit` + endpoint tests pass
@@ -358,6 +358,25 @@ Gate: role guard unit tests pass + security review.
 |     |            |            | endpoint, seed script; |                     |          |
 |     |            |            | npm build + tsc pass;  |                     |          |
 |     |            |            | commit 63dd892         |                     |          |
+| 20  | 2026-02-27 | E / app-02 | Auth middleware: Easy  | Run app-03-api-     | None     |
+|     |            |            | Auth parsing, role     | hackathons          |          |
+|     |            |            | resolution, guards,    | (hackathon/team/    |          |
+|     |            |            | rate limiter (100/5    | join routes)        |          |
+|     |            |            | per min), Zod          |                     |          |
+|     |            |            | validation, audit      |                     |          |
+|     |            |            | logger, CORS, Next.js  |                     |          |
+|     |            |            | middleware; 35 tests   |                     |          |
+|     |            |            | pass; commit 9476766   |                     |          |
+| 21  | 2026-02-27 | E / app-03 | Hackathon CRUD (POST,  | Run app-04-api-     | None     |
+|     |            |            | GET, PATCH), join      | scoring (rubric/    |          |
+|     |            |            | endpoint (event code   | submission/review   |          |
+|     |            |            | + rate limit), team    | routes)             |          |
+|     |            |            | assign (Fisher-Yates), |                     |          |
+|     |            |            | team list + reassign;  |                     |          |
+|     |            |            | added requireAuth      |                     |          |
+|     |            |            | guard; 3 Zod schemas;  |                     |          |
+|     |            |            | 60 tests pass;         |                     |          |
+|     |            |            | commit 5e90170         |                     |          |
 
 ---
 
@@ -394,17 +413,18 @@ have enough context for the current step.
 
 <!-- Record any runtime decisions that deviate from the blueprint -->
 
-| Date       | Decision                                                    | Rationale                                                         |
-| ---------- | ----------------------------------------------------------- | ----------------------------------------------------------------- |
-| 2026-02-25 | Hackers submit evidence; Coaches enter rubric scores        | Scoring authority belongs with Coaches, not Hackers               |
-| 2026-02-25 | Event codes stored as plaintext + rate limiting (5/min/IP)  | SHA-256 hashing adds complexity without real security gain        |
-| 2026-02-25 | Tiebreaker: earliest last-approval timestamp wins           | Rewards faster completion when total scores are equal             |
-| 2026-02-25 | Unlimited evidence resubmissions allowed                    | Scores only entered by Coach on review; no reason to limit        |
-| 2026-02-25 | Team balance: `ceil(teamSize/2)` minimum per team           | Prevents runt teams of 1; balanced distribution is fairer         |
-| 2026-02-25 | Coach review queue is hackathon-scoped                      | Coaches should only see submissions for their assigned events     |
-| 2026-02-26 | Moved 10-Challenger to infra-challenger-subagent            | Adversarial review is invoked by parent agents, not directly      |
-| 2026-02-26 | C3 skills created manually (no Learn MCP tools available)   | Skills include Learn MCP search queries for future freshness      |
-| 2026-02-26 | Instructions auto-discovered (no devcontainer.json change)  | `.github/instructions/*.instructions.md` auto-apply by glob       |
-| 2026-02-26 | 9 tags required on RG (not 4 baseline) — lowercase keys     | Deny policy JV-Enforce RG Tags v3 requires 9 tags                 |
-| 2026-02-26 | Cosmos DB uses Entra ID RBAC only (no connection strings)   | Modify policy auto-disables local auth; comply rather than exempt |
-| 2026-02-26 | Tag keys use lowercase (not PascalCase from azure-defaults) | Policy checks `tags['environment']`, not `tags['Environment']`    |
+| Date       | Decision                                                      | Rationale                                                           |
+| ---------- | ------------------------------------------------------------- | ------------------------------------------------------------------- |
+| 2026-02-25 | Hackers submit evidence; Coaches enter rubric scores          | Scoring authority belongs with Coaches, not Hackers                 |
+| 2026-02-25 | Event codes stored as plaintext + rate limiting (5/min/IP)    | SHA-256 hashing adds complexity without real security gain          |
+| 2026-02-25 | Tiebreaker: earliest last-approval timestamp wins             | Rewards faster completion when total scores are equal               |
+| 2026-02-25 | Unlimited evidence resubmissions allowed                      | Scores only entered by Coach on review; no reason to limit          |
+| 2026-02-25 | Team balance: `ceil(teamSize/2)` minimum per team             | Prevents runt teams of 1; balanced distribution is fairer           |
+| 2026-02-25 | Coach review queue is hackathon-scoped                        | Coaches should only see submissions for their assigned events       |
+| 2026-02-26 | Moved 10-Challenger to infra-challenger-subagent              | Adversarial review is invoked by parent agents, not directly        |
+| 2026-02-26 | C3 skills created manually (no Learn MCP tools available)     | Skills include Learn MCP search queries for future freshness        |
+| 2026-02-26 | Instructions auto-discovered (no devcontainer.json change)    | `.github/instructions/*.instructions.md` auto-apply by glob         |
+| 2026-02-26 | 9 tags required on RG (not 4 baseline) — lowercase keys       | Deny policy JV-Enforce RG Tags v3 requires 9 tags                   |
+| 2026-02-26 | Cosmos DB uses Entra ID RBAC only (no connection strings)     | Modify policy auto-disables local auth; comply rather than exempt   |
+| 2026-02-26 | Tag keys use lowercase (not PascalCase from azure-defaults)   | Policy checks `tags['environment']`, not `tags['Environment']`      |
+| 2026-02-27 | Next.js 16 middleware file convention still used (deprecated) | "proxy" rename is cosmetic; middleware works and migration can wait |

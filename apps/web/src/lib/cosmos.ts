@@ -12,6 +12,7 @@ const CONTAINER_NAMES = [
   "roles",
   "challenges",
   "progression",
+  "audit",
 ] as const;
 
 type ContainerName = (typeof CONTAINER_NAMES)[number];
