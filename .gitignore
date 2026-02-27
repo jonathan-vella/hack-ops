@@ -27,6 +27,13 @@ desktop.ini
 *.log
 logs/
 
+# Next.js
+.next/
+out/
+
+# Turbo
+.turbo/
+
 # Environment
 .env
 .env.local
