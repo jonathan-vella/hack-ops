@@ -45,10 +45,10 @@
 <!-- Update this at the START of each session -->
 
 **Phase**: E — Application Build
-**Step**: app-07-leaderboard (NEXT)
+**Step**: app-08-dashboard (NEXT)
 **Branch**: `feature/app-06-admin`
-**Goal**: Implement SSR leaderboard page with aggregation query.
-Gate: `npm run build` succeeds, no type errors.
+**Goal**: Build admin/hacker/coach dashboards.
+Gate: `npm run build` succeeds, app-review APPROVED.
 
 ---
 
@@ -202,8 +202,8 @@ so agents 12–15 have the skills/instructions they were designed to use.
 - [x] Run app-06-api-admin → admin/audit/config routes
   - Gate: all API tests pass ✅ (131/131)
   - Gate: tsc + eslint clean, business rules 28/28 pass
-- [ ] Run app-07-leaderboard → SSR leaderboard page
-  - Gate: `npm run build` succeeds, no type errors
+- [x] Run app-07-leaderboard → SSR leaderboard page
+  - Gate: `npm run build` succeeds, no type errors ✅
   - Gate: `app-security-challenger-subagent` (focus: `data-handling`) — data exposure check
 - [ ] Run app-08-dashboard → admin/hacker/coach dashboards
   - Gate: `npm run build` succeeds, app-review APPROVED
@@ -445,6 +445,18 @@ so agents 12–15 have the skills/instructions they were designed to use.
 |     |            |            | helper; 24 new tests,  |                     |          |
 |     |            |            | 131 total pass;        |                     |          |
 |     |            |            | commit a12c149         |                     |          |
+| 26  | 2026-02-27 | E / app-07 | SSR leaderboard page:  | Run app-08-         | None     |
+|     |            |            | API route (score agg,  | dashboard (admin/   |          |
+|     |            |            | grade + award badges,  | hacker/coach)       |          |
+|     |            |            | tiebreaker), SSR page  |                     |          |
+|     |            |            | with generateMetadata, |                     |          |
+|     |            |            | client component with  |                     |          |
+|     |            |            | 30s auto-refresh +     |                     |          |
+|     |            |            | expandable rows;       |                     |          |
+|     |            |            | shared buildLeaderboard|                     |          |
+|     |            |            | lib; tsc + build clean;|                     |          |
+|     |            |            | 131 tests pass;        |                     |          |
+|     |            |            | commit 6463b1a         |                     |          |
 
 ---
 
