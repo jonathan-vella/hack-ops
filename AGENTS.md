@@ -102,6 +102,7 @@ Subagent definitions: `.github/agents/_subagents/`
 | ------------------------- | ---------------------------------------- |
 | Golden principles         | `.github/skills/golden-principles/`      |
 | Context optimization      | `.github/skills/context-optimizer/`      |
+| Context opt. workflow     | `docs/context-optimization/`             |
 | Domain knowledge (skills) | `.github/skills/*/SKILL.md`              |
 | File-type rules           | `.github/instructions/*.instructions.md` |
 | Azure conventions         | `.github/skills/azure-defaults/`         |

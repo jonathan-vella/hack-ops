@@ -244,8 +244,14 @@ This skill contains **no project-specific logic**. To use in another project:
 1. Copy `.github/skills/context-optimizer/` to the target repo
 2. Copy `.github/agents/10-context-optimizer.agent.md`
 3. Copy `.github/instructions/context-optimization.instructions.md`
-4. Adjust agent numbering if needed (10 is a safe utility slot)
-5. The log parser auto-discovers VS Code log directories
+4. Copy the three prompts: `context-optimize.prompt.md`,
+   `context-optimization-plan.prompt.md`, and the generated
+   `context-optimization-resume.prompt.md`
+5. Adjust agent numbering if needed (10 is a safe utility slot)
+6. The log parser auto-discovers VS Code log directories
+
+For the full end-to-end workflow (audit → plan → execute), see
+`docs/context-optimization/context-optimization-guide.md`.
 
 ---
 
@@ -253,4 +259,6 @@ This skill contains **no project-specific logic**. To use in another project:
 
 - `scripts/parse-chat-logs.py` — Log parser producing structured JSON
 - `templates/optimization-report.md` — Report output template
+- `templates/execution-tracker.md` — Generic execution tracker template
+- `templates/resume-prompt.md` — Generic resume prompt template
 - `references/token-estimation.md` — Detailed token cost heuristics
