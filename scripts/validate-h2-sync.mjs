@@ -177,8 +177,13 @@ function main() {
   const h2RefHeadings = parseMarkdownH2Blocks(readText(H2_REF_PATH));
   const validatorHeadings = parseValidatorHeadings(readText(VALIDATOR_PATH));
 
+  // Instruction file may omit fenced heading blocks (pointing to SKILL.md instead)
+  const h2RefPresent = h2RefHeadings.size > 0;
+
   console.log(
-    `Sources: SKILL.md (${skillHeadings.size}), H2-reference (${h2RefHeadings.size}), Validator (${validatorHeadings.size})\n`,
+    `Sources: SKILL.md (${skillHeadings.size}), ` +
+      `H2-reference (${h2RefHeadings.size}${h2RefPresent ? "" : " — deferred to SKILL.md"}), ` +
+      `Validator (${validatorHeadings.size})\n`,
   );
 
   for (const artifactName of ARTIFACT_NAMES) {
@@ -191,7 +196,7 @@ function main() {
       errors++;
       continue;
     }
-    if (!h2Ref) {
+    if (h2RefPresent && !h2Ref) {
       console.log(`::error::${artifactName}: missing from azure-artifacts`);
       errors++;
       continue;
@@ -204,7 +209,9 @@ function main() {
       continue;
     }
 
-    compareHeadings(artifactName, skill, h2Ref, "SKILL.md", "H2-reference");
+    if (h2Ref) {
+      compareHeadings(artifactName, skill, h2Ref, "SKILL.md", "H2-reference");
+    }
     compareHeadings(artifactName, skill, validator, "SKILL.md", "Validator");
   }
 
@@ -213,8 +220,11 @@ function main() {
     console.log(`❌ ${errors} sync error(s) found`);
     process.exit(1);
   } else {
+    const syncLabel = h2RefPresent
+      ? "3 sources"
+      : "2 sources (SKILL.md + Validator)";
     console.log(
-      `✅ All ${ARTIFACT_NAMES.length} artifact types in sync across 3 sources`,
+      `✅ All ${ARTIFACT_NAMES.length} artifact types in sync across ${syncLabel}`,
     );
   }
 }

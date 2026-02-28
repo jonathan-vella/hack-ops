@@ -167,3 +167,14 @@ bicep build main.bicep
 bicep lint main.bicep
 az deployment group what-if --resource-group rg-example --template-file main.bicep
 ```
+
+## Code Review
+
+When reviewing Bicep code, additionally check:
+
+- AVM modules used where available
+- TLS 1.2+, HTTPS-only, managed identity enforced
+- `uniqueSuffix` passed from main.bicep, not regenerated
+- All parameters have `@description` annotations
+- No hardcoded secrets — use Key Vault references
+- Governance constraints from `04-governance-constraints.md` applied

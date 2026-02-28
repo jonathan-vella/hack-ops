@@ -1,6 +1,6 @@
 ---
 description: "MANDATORY Azure Policy compliance and governance discovery rules for Bicep code generation"
-applyTo: "**/*.bicep, **/*.agent.md, **/04-governance-constraints.*, **/04-governance-constraints.json"
+applyTo: "**/*.bicep, **/04-governance-constraints.*, **/04-governance-constraints.json"
 ---
 
 # Bicep Governance Instructions

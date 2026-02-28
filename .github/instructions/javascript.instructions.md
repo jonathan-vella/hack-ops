@@ -94,3 +94,15 @@ full YAML parsing. Do not add a YAML library dependency.
   `commitlint`, `markdown-link-check`
 - Do not add runtime dependencies — this is a tooling-only `package.json`
 - See `dependency-management.instructions.md` for full version policy
+
+## Code Review
+
+When reviewing JavaScript code, additionally check:
+
+- Descriptive naming; constants for magic numbers/strings
+- Functions < 30 lines; max 3-4 nesting levels
+- `===`/`!==` for comparisons; no silent `catch` blocks
+- Fail fast: validate inputs early
+- Specific test assertions (`toBe`, `toEqual`)
+- Descriptive test names: "should [action] when [condition]"
+- No secrets in code — use `process.env`

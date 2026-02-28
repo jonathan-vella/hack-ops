@@ -38,3 +38,14 @@ applyTo: "**/*.sh"
 
 Use `while [[ $# -gt 0 ]]; do case $1 in ...` pattern with
 `shift` for each option. Include `-h|--help` with a `usage()` function.
+
+## Code Review
+
+When reviewing shell scripts, additionally check:
+
+- `set -euo pipefail` present immediately after shebang
+- All variables double-quoted: `"$var"`
+- `trap cleanup EXIT` for temp files/resources
+- No hardcoded paths or embedded secrets
+- `jq`/`yq` for structured data parsing (not grep/awk)
+- Script exits with meaningful non-zero codes on failure

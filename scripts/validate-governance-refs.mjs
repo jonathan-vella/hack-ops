@@ -127,10 +127,6 @@ check(
   fileContains(policyInstrPath, "**/*.bicep"),
 );
 check(
-  "Has correct applyTo scope including *.agent.md",
-  fileContains(policyInstrPath, "**/*.agent.md"),
-);
-check(
   'States "Azure Policy always wins"',
   fileContains(policyInstrPath, "Azure Policy always wins"),
 );

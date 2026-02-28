@@ -79,3 +79,15 @@ function normalize(value: string) {
 ```
 
 Exported functions must have explicit return types.
+
+## Code Review
+
+When reviewing TypeScript code, additionally check:
+
+- Descriptive naming; constants for magic numbers/strings
+- Functions < 30 lines; max 3-4 nesting levels
+- No `any` — use `unknown` + narrowing
+- Explicit return types on exported functions
+- Specific test assertions (`toBe`, `toEqual`)
+- Descriptive test names: "should [action] when [condition]"
+- No secrets in code — use environment variables

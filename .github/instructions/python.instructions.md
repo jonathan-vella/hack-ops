@@ -1,6 +1,6 @@
 ---
-description: 'Python coding conventions for diagram generation, MCP servers, and tooling scripts'
-applyTo: '**/*.py'
+description: "Python coding conventions for diagram generation, MCP servers, and tooling scripts"
+applyTo: "**/*.py"
 ---
 
 # Python Guidelines
@@ -78,3 +78,13 @@ The Azure Pricing MCP server uses async patterns:
 - Mock framework: `pytest-mock`
 - Tests live alongside source in `tests/` subdirectories
 - Use `@pytest.mark.asyncio` for async test functions
+
+## Code Review
+
+When reviewing Python code, additionally check:
+
+- No bare `except:` or `pass` — use specific exception types
+- Validate inputs early with `ValueError` for bad args
+- Avoid N+1 queries — use JOINs or eager loading
+- Proper resource cleanup with context managers
+- Descriptive test names; `pytest` parametrize for variants

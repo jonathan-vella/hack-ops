@@ -15,10 +15,10 @@
 
 <!-- Update this at the START of each session -->
 
-**Stream**: 2 — Instruction File Optimization
-**Step**: S2.1 — Narrow `code-commenting.instructions.md` applyTo
+**Stream**: 3 — Skill Progressive Loading
+**Step**: S3.1 — `azure-defaults/SKILL.md` split
 **Branch**: `feature/context-optimization`
-**Goal**: Complete Stream 2 (all instruction file optimizations)
+**Goal**: Complete Stream 3 (skill progressive loading splits)
 
 ---
 
@@ -41,13 +41,13 @@
 **Scope**: `.github/instructions/` — 6 files
 **Branch**: `feature/context-optimization`
 
-- [ ] S2.1: `code-commenting.instructions.md` — narrow `applyTo` to code files only
-- [ ] S2.2: `bicep-governance.instructions.md` — remove `**/*.agent.md` from `applyTo`
-- [ ] S2.3: `code-review.instructions.md` — extract language-specific rules to 5 target files
-- [ ] S2.4: `azure-artifacts.instructions.md` — trim to ~100 lines (H2 lists → skill)
-- [ ] S2.5: `markdown.instructions.md` — trim to ≤ 100 lines (remove extended examples)
-- [ ] S2.6: `context-optimization.instructions.md` — fence `applyTo` examples in code blocks
-- [ ] S2.V: Run `npm run validate` — instruction validators pass
+- [x] S2.1: `code-commenting.instructions.md` — narrow `applyTo` to code files only
+- [x] S2.2: `bicep-governance.instructions.md` — remove `**/*.agent.md` from `applyTo`
+- [x] S2.3: `code-review.instructions.md` — extract language-specific rules to 5 target files
+- [x] S2.4: `azure-artifacts.instructions.md` — trim to ~100 lines (H2 lists → skill)
+- [x] S2.5: `markdown.instructions.md` — trim to ≤ 100 lines (remove extended examples)
+- [x] S2.6: `context-optimization.instructions.md` — already fenced (no change needed)
+- [x] S2.V: Run `npm run validate` — all validators pass (with validator updates)
 
 ### Stream 3 — Skill Progressive Loading (P1-P2)
 
@@ -145,10 +145,11 @@ Adjust based on actual context consumption.
 
 <!-- Append one entry per session. Keep entries concise. -->
 
-| #   | Date       | Stream/Step | What was done                                                                                                                                                                               | What's next         | Blockers                                                                     |
-| --- | ---------- | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------- | ---------------------------------------------------------------------------- |
-| 1   | 2026-02-28 | S1 complete | Replaced all MCP tool entries with wildcards in 9 infra agents (S1.1-S1.5). 537 lines removed, 25 added. All frontmatter validators pass.                                                   | S2.1 (instructions) | Pre-existing dead link in docs/hackops-user-guide.md (not caused by changes) |
-| 1b  | 2026-02-28 | S1.2 revert | Reverted `ms-azuretools.vscode-azure-github-copilot/*` wildcard back to 6 individual entries in all 9 agents — wildcards only work for MCP server prefixes, not VS Code extension tool IDs. | S2.1 (instructions) | None                                                                         |
+| #   | Date       | Stream/Step | What was done                                                                                                                                                                                                                                                                                                                        | What's next         | Blockers                                                                     |
+| --- | ---------- | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------- | ---------------------------------------------------------------------------- |
+| 1   | 2026-02-28 | S1 complete | Replaced all MCP tool entries with wildcards in 9 infra agents (S1.1-S1.5). 537 lines removed, 25 added. All frontmatter validators pass.                                                                                                                                                                                            | S2.1 (instructions) | Pre-existing dead link in docs/hackops-user-guide.md (not caused by changes) |
+| 1b  | 2026-02-28 | S1.2 revert | Reverted `ms-azuretools.vscode-azure-github-copilot/*` wildcard back to 6 individual entries in all 9 agents — wildcards only work for MCP server prefixes, not VS Code extension tool IDs.                                                                                                                                          | S2.1 (instructions) | None                                                                         |
+| 2   | 2026-02-28 | S2 complete | Completed all S2 items. Narrowed applyTo globs (S2.1-S2.2), trimmed code-review 314→96 lines with rules extracted to 5 lang files (S2.3), trimmed azure-artifacts 299→91 lines (S2.4), trimmed markdown 257→95 lines (S2.5). Updated validate-h2-sync.mjs (2-source mode) and validate-governance-refs.mjs (removed agent.md check). | S3.1 (skill splits) | Pre-existing dead link in docs/hackops-user-guide.md (unchanged)             |
 
 ---
 
@@ -188,3 +189,6 @@ have enough context for the current step.
 | 2026-02-28 | Combined S1.1-S1.5 into single replacement per agent (9 ops vs 25)                 | All MCP tool blocks are contiguous in each agent, so one replacement per file covers all wildcard types at once |
 | 2026-02-28 | S1.2 skipped — kept `ms-azuretools.vscode-azure-github-copilot` individual entries | Wildcards only work for MCP server prefixes (e.g. `azure-mcp/*`, `bicep/*`), not for VS Code extension tool IDs |
 | 2026-02-28 | S1.5 skipped — kept `ms-python.python` individual entries                          | Same reason as S1.2: `ms-python.python/*` is not a valid wildcard target                                        |
+| 2026-02-28 | S2.6 no-op — applyTo examples already fenced in YAML code block                    | Lines 33-42 of context-optimization.instructions.md already use ```yaml fence                                   |
+| 2026-02-28 | Updated validate-h2-sync.mjs to support 2-source mode                              | Instruction file no longer has fenced heading blocks; validator gracefully skips H2-reference comparison        |
+| 2026-02-28 | Updated validate-governance-refs.mjs to remove `**/*.agent.md` check               | Aligns with S2.2: governance instructions no longer auto-load for agent files                                   |
