@@ -1,7 +1,6 @@
 {
   "name": "HackOps",
   "image": "mcr.microsoft.com/devcontainers/base:ubuntu-24.04",
-
   "features": {
     "ghcr.io/devcontainers/features/azure-cli:1": {
       "installBicep": true,
@@ -21,25 +20,21 @@
       "version": "latest"
     }
   },
-
   // Lifecycle commands - chain apt operations to avoid lock conflicts
   "onCreateCommand": "set -e; sudo rm -f /etc/apt/sources.list.d/yarn.list 2>/dev/null; sudo apt-get update; sudo apt-get install -y graphviz dos2unix; ARCH=$(dpkg --print-architecture); if [ \"$ARCH\" = \"amd64\" ]; then curl -fsSL https://dl.k6.io/key.gpg | sudo gpg --dearmor -o /usr/share/keyrings/k6-archive-keyring.gpg; echo 'deb [signed-by=/usr/share/keyrings/k6-archive-keyring.gpg] https://dl.k6.io/deb stable main' | sudo tee /etc/apt/sources.list.d/k6.list; sudo apt-get update; sudo apt-get install -y k6; else echo \"Skipping k6 install on unsupported architecture: $ARCH\"; fi; curl -LsSf https://astral.sh/uv/install.sh | sh",
   "postCreateCommand": "bash .devcontainer/post-create.sh",
   "postStartCommand": {
     "lefthook": "npx lefthook install 2>/dev/null || true"
   },
-
   // Environment variables for Python optimization
   "containerEnv": {
     "PYTHONDONTWRITEBYTECODE": "1",
     "PYTHONUNBUFFERED": "1",
     "UV_CACHE_DIR": "/home/vscode/.cache/uv"
   },
-
   "remoteEnv": {
     "AZURE_DEFAULTS_LOCATION": "swedencentral"
   },
-
   "customizations": {
     "vscode": {
       "extensions": [
@@ -78,7 +73,9 @@
         "chat.useAgentSkills": true,
         "editor.formatOnSave": true,
         "editor.defaultFormatter": "esbenp.prettier-vscode",
-        "editor.rulers": [120],
+        "editor.rulers": [
+          120
+        ],
         "editor.wordWrap": "wordWrapColumn",
         "editor.wordWrapColumn": 120,
         "terminal.integrated.defaultProfile.linux": "bash",
@@ -86,7 +83,9 @@
         "editor.tabSize": 2,
         "[markdown]": {
           "editor.defaultFormatter": "esbenp.prettier-vscode",
-          "editor.rulers": [120],
+          "editor.rulers": [
+            120
+          ],
           "editor.wordWrap": "wordWrapColumn",
           "editor.wordWrapColumn": 120
         },
@@ -107,16 +106,16 @@
       }
     }
   },
-
   // Mounts for credential/cache persistence across rebuilds
-  // - Azure CLI: Host's ~/.azure (Linux/macOS) or %USERPROFILE%\.azure (Windows)
+  // - Azure CLI: Named volume (bind mount not viable when ~/.azure is a WSL2 symlink to Windows)
   // - GitHub CLI: Docker volume (Windows uses keyring, can't be mounted; Linux/macOS use files)
   // - UV cache: Docker volume for Python package cache
+  // NOTE: After `Rebuild Container`, run `az login` once — credentials persist across stop/start.
   "mounts": [
     {
-      "source": "${localEnv:USERPROFILE}${localEnv:HOME}/.azure",
+      "source": "devcontainer-azure-config-${devcontainerId}",
       "target": "/home/vscode/.azure",
-      "type": "bind"
+      "type": "volume"
     },
     {
       "source": "devcontainer-gh-config-${devcontainerId}",
@@ -129,6 +128,5 @@
       "type": "volume"
     }
   ],
-
   "remoteUser": "vscode"
 }
