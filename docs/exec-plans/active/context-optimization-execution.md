@@ -15,10 +15,10 @@
 
 <!-- Update this at the START of each session -->
 
-**Stream**: 1 — MCP Wildcard Replacement
-**Step**: S1.1 — Replace azure-mcp/\* in all 9 infra agents
+**Stream**: 2 — Instruction File Optimization
+**Step**: S2.1 — Narrow `code-commenting.instructions.md` applyTo
 **Branch**: `feature/context-optimization`
-**Goal**: Complete Stream 1 (all wildcard replacements across 9 agents)
+**Goal**: Complete Stream 2 (all instruction file optimizations)
 
 ---
 
@@ -29,12 +29,12 @@
 **Scope**: `.github/agents/` — 9 infra agents
 **Branch**: `feature/context-optimization`
 
-- [ ] S1.1: Replace 47 `azure-mcp/{service}` → `"azure-mcp/*"` in all 9 agents
-- [ ] S1.2: Replace 6 `ms-azuretools.vscode-azure-github-copilot/{tool}` → wildcard `*` in all 9 agents
-- [ ] S1.3: Replace 10 `bicep/{tool}` → `"bicep/*"` in agents 05, 06, 07, 09
-- [ ] S1.4: Replace 12 `pylance-mcp-server/{tool}` → `"pylance-mcp-server/*"` in agent 04
-- [ ] S1.5: Replace 4 `ms-python.python/{tool}` → `"ms-python.python/*"` in agents 04, 09
-- [ ] S1.V: Run `npm run validate` — frontmatter validators pass
+- [x] S1.1: Replace 47 `azure-mcp/{service}` → `"azure-mcp/*"` in all 9 agents
+- [ ] ~~S1.2~~: `ms-azuretools.vscode-azure-github-copilot/*` wildcard does not work — kept 6 individual entries
+- [x] S1.3: Replace 10 `bicep/{tool}` → `"bicep/*"` in agents 05, 06, 07, 09
+- [x] S1.4: Replace 12 `pylance-mcp-server/{tool}` → `"pylance-mcp-server/*"` in agent 04
+- [ ] ~~S1.5~~: `ms-python.python/*` wildcard does not work — kept 4 individual entries
+- [x] S1.V: Run `npm run validate` — frontmatter validators pass
 
 ### Stream 2 — Instruction File Optimization (P1-P3)
 
@@ -145,9 +145,10 @@ Adjust based on actual context consumption.
 
 <!-- Append one entry per session. Keep entries concise. -->
 
-| #   | Date | Stream/Step | What was done | What's next | Blockers |
-| --- | ---- | ----------- | ------------- | ----------- | -------- |
-|     |      |             |               |             |          |
+| #   | Date       | Stream/Step | What was done                                                                                                                                                                               | What's next         | Blockers                                                                     |
+| --- | ---------- | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------- | ---------------------------------------------------------------------------- |
+| 1   | 2026-02-28 | S1 complete | Replaced all MCP tool entries with wildcards in 9 infra agents (S1.1-S1.5). 537 lines removed, 25 added. All frontmatter validators pass.                                                   | S2.1 (instructions) | Pre-existing dead link in docs/hackops-user-guide.md (not caused by changes) |
+| 1b  | 2026-02-28 | S1.2 revert | Reverted `ms-azuretools.vscode-azure-github-copilot/*` wildcard back to 6 individual entries in all 9 agents — wildcards only work for MCP server prefixes, not VS Code extension tool IDs. | S2.1 (instructions) | None                                                                         |
 
 ---
 
@@ -182,6 +183,8 @@ have enough context for the current step.
 
 <!-- Record any runtime decisions that deviate from the blueprint -->
 
-| Date | Decision | Rationale |
-| ---- | -------- | --------- |
-|      |          |           |
+| Date       | Decision                                                                           | Rationale                                                                                                       |
+| ---------- | ---------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| 2026-02-28 | Combined S1.1-S1.5 into single replacement per agent (9 ops vs 25)                 | All MCP tool blocks are contiguous in each agent, so one replacement per file covers all wildcard types at once |
+| 2026-02-28 | S1.2 skipped — kept `ms-azuretools.vscode-azure-github-copilot` individual entries | Wildcards only work for MCP server prefixes (e.g. `azure-mcp/*`, `bicep/*`), not for VS Code extension tool IDs |
+| 2026-02-28 | S1.5 skipped — kept `ms-python.python` individual entries                          | Same reason as S1.2: `ms-python.python/*` is not a valid wildcard target                                        |
