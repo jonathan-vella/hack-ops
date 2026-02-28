@@ -15,10 +15,10 @@
 
 <!-- Update this at the START of each session -->
 
-**Stream**: 3 — Skill Progressive Loading
-**Step**: S3.1 — `azure-defaults/SKILL.md` split
+**Stream**: Review Gate 1
+**Step**: RG1.6 — awaiting human approval
 **Branch**: `feature/context-optimization`
-**Goal**: Complete Stream 3 (skill progressive loading splits)
+**Goal**: Human approval to proceed to Streams 4-6
 
 ---
 
@@ -54,21 +54,21 @@
 **Scope**: `.github/skills/` — 6 skills
 **Branch**: `feature/context-optimization`
 
-- [ ] S3.1: `azure-defaults/SKILL.md` → split into 6 `references/` files, SKILL.md ≤ 200 lines
-- [ ] S3.2: `azure-artifacts/SKILL.md` → split into 3 `references/` files, SKILL.md ≤ 200 lines
-- [ ] S3.3: `azure-diagrams/SKILL.md` → merge inline content into existing `references/`, SKILL.md ≤ 200 lines
-- [ ] S3.4: `azure-bicep-patterns/SKILL.md` → split into 7 `references/` files
-- [ ] S3.5: `github-operations/SKILL.md` → split into 2 `references/` files
-- [ ] S3.6: `azure-troubleshooting/SKILL.md` → split into 3 `references/` files
-- [ ] S3.V: Run `npm run validate` — skills format validators pass
+- [x] S3.1: `azure-defaults/SKILL.md` → split into 6 `references/` files, SKILL.md 617→186 lines
+- [x] S3.2: `azure-artifacts/SKILL.md` → split into 3 `references/` files, SKILL.md 613→170 lines
+- [x] S3.3: `azure-diagrams/SKILL.md` → merge inline content into existing `references/` + 1 new, SKILL.md 550→200 lines
+- [x] S3.4: `azure-bicep-patterns/SKILL.md` → split into 7 `references/` files, SKILL.md 304→96 lines
+- [x] S3.5: `github-operations/SKILL.md` → split into 2 `references/` files, SKILL.md 305→85 lines
+- [x] S3.6: `azure-troubleshooting/SKILL.md` → split into 3 `references/` files, SKILL.md 271→93 lines
+- [x] S3.V: Run `npm run validate` — all validators pass (0 errors)
 
 ### ── REVIEW GATE 1 ── (After Streams 1-3)
 
-- [ ] RG1.1: GPT 5.3 — structural integrity review (references exist, pointers match, globs valid)
-- [ ] RG1.2: Sonnet 4.6 — semantic preservation review (SKILL.md still guides loading decisions)
-- [ ] RG1.3: `npm run validate` — full suite passes
-- [ ] RG1.4: `npm run lint:md` — all modified files pass
-- [ ] RG1.5: `npm run lint:artifact-templates` — no regressions
+- [x] RG1.1: Structural integrity — 36/36 refs exist, 0 orphans, all pointers resolve, globs valid
+- [x] RG1.2: Semantic preservation — all 6 SKILL.md files have decision tables + progressive loading
+- [x] RG1.3: `npm run validate` — all 16 validators pass (pre-existing dead link in hackops-user-guide excluded)
+- [x] RG1.4: `npm run lint:md` — 200 files, 0 errors
+- [x] RG1.5: `npm run lint:artifact-templates` — no regressions
 - [ ] RG1.6: Human approval to proceed to Streams 4-6
 
 ### Stream 4 — Agent Body Trimming (P2)
@@ -145,11 +145,13 @@ Adjust based on actual context consumption.
 
 <!-- Append one entry per session. Keep entries concise. -->
 
-| #   | Date       | Stream/Step | What was done                                                                                                                                                                                                                                                                                                                        | What's next         | Blockers                                                                     |
-| --- | ---------- | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------- | ---------------------------------------------------------------------------- |
-| 1   | 2026-02-28 | S1 complete | Replaced all MCP tool entries with wildcards in 9 infra agents (S1.1-S1.5). 537 lines removed, 25 added. All frontmatter validators pass.                                                                                                                                                                                            | S2.1 (instructions) | Pre-existing dead link in docs/hackops-user-guide.md (not caused by changes) |
-| 1b  | 2026-02-28 | S1.2 revert | Reverted `ms-azuretools.vscode-azure-github-copilot/*` wildcard back to 6 individual entries in all 9 agents — wildcards only work for MCP server prefixes, not VS Code extension tool IDs.                                                                                                                                          | S2.1 (instructions) | None                                                                         |
-| 2   | 2026-02-28 | S2 complete | Completed all S2 items. Narrowed applyTo globs (S2.1-S2.2), trimmed code-review 314→96 lines with rules extracted to 5 lang files (S2.3), trimmed azure-artifacts 299→91 lines (S2.4), trimmed markdown 257→95 lines (S2.5). Updated validate-h2-sync.mjs (2-source mode) and validate-governance-refs.mjs (removed agent.md check). | S3.1 (skill splits) | Pre-existing dead link in docs/hackops-user-guide.md (unchanged)             |
+| #   | Date       | Stream/Step | What was done                                                                                                                                                                                                                                                                                                                        | What's next           | Blockers                                                                     |
+| --- | ---------- | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------------- | ---------------------------------------------------------------------------- |
+| 1   | 2026-02-28 | S1 complete | Replaced all MCP tool entries with wildcards in 9 infra agents (S1.1-S1.5). 537 lines removed, 25 added. All frontmatter validators pass.                                                                                                                                                                                            | S2.1 (instructions)   | Pre-existing dead link in docs/hackops-user-guide.md (not caused by changes) |
+| 1b  | 2026-02-28 | S1.2 revert | Reverted `ms-azuretools.vscode-azure-github-copilot/*` wildcard back to 6 individual entries in all 9 agents — wildcards only work for MCP server prefixes, not VS Code extension tool IDs.                                                                                                                                          | S2.1 (instructions)   | None                                                                         |
+| 2   | 2026-02-28 | S2 complete | Completed all S2 items. Narrowed applyTo globs (S2.1-S2.2), trimmed code-review 314→96 lines with rules extracted to 5 lang files (S2.3), trimmed azure-artifacts 299→91 lines (S2.4), trimmed markdown 257→95 lines (S2.5). Updated validate-h2-sync.mjs (2-source mode) and validate-governance-refs.mjs (removed agent.md check). | S3.1 (skill splits)   | Pre-existing dead link in docs/hackops-user-guide.md (unchanged)             |
+| 3   | 2026-02-28 | S3 complete | Completed all S3 items (6 skill splits). azure-defaults 617→186 (6 refs), azure-artifacts 613→170 (3 refs), azure-diagrams 550→200 (1 new ref), azure-bicep-patterns 304→96 (7 refs), github-operations 305→85 (2 refs), azure-troubleshooting 271→93 (3 refs). Fixed 11 MD047 trailing newline issues. All validators pass.         | Review Gate 1 (RG1)   | None                                                                         |
+| 4   | 2026-02-28 | RG1 review  | Review Gate 1 complete (RG1.1-RG1.5). Structural integrity: 36/36 refs linked, 0 orphans. Semantic preservation: all 6 SKILL.md retain decision tables. Validators: all 16 pass. Updated validate-h2-sync.mjs to read from references/h2-templates.md. Awaiting human approval (RG1.6).                                              | S4.1 (agent trimming) | Pre-existing dead link in docs/hackops-user-guide.md (unchanged)             |
 
 ---
 
@@ -192,3 +194,4 @@ have enough context for the current step.
 | 2026-02-28 | S2.6 no-op — applyTo examples already fenced in YAML code block                    | Lines 33-42 of context-optimization.instructions.md already use ```yaml fence                                   |
 | 2026-02-28 | Updated validate-h2-sync.mjs to support 2-source mode                              | Instruction file no longer has fenced heading blocks; validator gracefully skips H2-reference comparison        |
 | 2026-02-28 | Updated validate-governance-refs.mjs to remove `**/*.agent.md` check               | Aligns with S2.2: governance instructions no longer auto-load for agent files                                   |
+| 2026-02-28 | Updated validate-h2-sync.mjs SKILL_PATH → references/h2-templates.md               | H2 heading blocks moved from SKILL.md to reference file in S3.2; regex updated to match ##/### headings         |

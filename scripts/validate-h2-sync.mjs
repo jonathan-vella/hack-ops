@@ -3,7 +3,7 @@
  * H2 Heading Sync Validator
  *
  * Ensures the three sources of truth for artifact H2 headings stay in sync:
- *   1. SKILL.md fenced code blocks (what agents read)
+ *   1. references/h2-templates.md fenced code blocks (what agents read)
  *   2. azure-artifacts.instructions.md fenced code blocks (auto-applied instructions)
  *   3. ARTIFACT_HEADINGS in validate-artifact-templates.mjs (what the validator enforces)
  *
@@ -13,7 +13,7 @@
 
 import fs from "node:fs";
 
-const SKILL_PATH = ".github/skills/azure-artifacts/SKILL.md";
+const SKILL_PATH = ".github/skills/azure-artifacts/references/h2-templates.md";
 const H2_REF_PATH = ".github/instructions/azure-artifacts.instructions.md";
 const VALIDATOR_PATH = "scripts/validate-artifact-templates.mjs";
 
@@ -53,10 +53,10 @@ function readText(filePath) {
  */
 function parseMarkdownH2Blocks(text) {
   const result = new Map();
-  // Match ### headings (with optional suffix like "(Agent Name)")
+  // Match ## or ### headings (with optional suffix like "(Agent Name)")
   // followed by a fenced code block (```, ```markdown, or ```text)
   const sectionRegex =
-    /###\s+([\w.-]+\.md)(?:\s+[^\n]*)?\n+```(?:markdown|text)?\n([\s\S]*?)```/g;
+    /#{2,3}\s+([\w.-]+\.md)(?:\s+[^\n]*)?\n+```(?:markdown|text)?\n([\s\S]*?)```/g;
   let match;
 
   while ((match = sectionRegex.exec(text)) !== null) {
@@ -181,8 +181,8 @@ function main() {
   const h2RefPresent = h2RefHeadings.size > 0;
 
   console.log(
-    `Sources: SKILL.md (${skillHeadings.size}), ` +
-      `H2-reference (${h2RefHeadings.size}${h2RefPresent ? "" : " — deferred to SKILL.md"}), ` +
+    `Sources: H2-templates (${skillHeadings.size}), ` +
+      `Instructions (${h2RefHeadings.size}${h2RefPresent ? "" : " — deferred to H2-templates"}), ` +
       `Validator (${validatorHeadings.size})\n`,
   );
 
@@ -192,7 +192,7 @@ function main() {
     const validator = validatorHeadings.get(artifactName);
 
     if (!skill) {
-      console.log(`::error::${artifactName}: missing from SKILL.md`);
+      console.log(`::error::${artifactName}: missing from H2-templates`);
       errors++;
       continue;
     }
@@ -210,9 +210,21 @@ function main() {
     }
 
     if (h2Ref) {
-      compareHeadings(artifactName, skill, h2Ref, "SKILL.md", "H2-reference");
+      compareHeadings(
+        artifactName,
+        skill,
+        h2Ref,
+        "H2-templates",
+        "Instructions",
+      );
     }
-    compareHeadings(artifactName, skill, validator, "SKILL.md", "Validator");
+    compareHeadings(
+      artifactName,
+      skill,
+      validator,
+      "H2-templates",
+      "Validator",
+    );
   }
 
   console.log(`\n${"=".repeat(50)}`);
@@ -222,7 +234,7 @@ function main() {
   } else {
     const syncLabel = h2RefPresent
       ? "3 sources"
-      : "2 sources (SKILL.md + Validator)";
+      : "2 sources (H2-templates + Validator)";
     console.log(
       `✅ All ${ARTIFACT_NAMES.length} artifact types in sync across ${syncLabel}`,
     );

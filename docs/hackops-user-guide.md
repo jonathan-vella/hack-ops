@@ -34,13 +34,13 @@ the [execution blueprint] and the [session tracker].
 | [plan-hackOpsExecution.prompt.md] | The execution blueprint — what to build and in what order | When you need specs for what you're currently building |
 | [hackops-execution.md]            | Session tracker — living checklist of progress            | Every session start and end                            |
 | [session-resume.prompt.md]        | Auto-resume prompt — loads state and continues            | Every session start                                    |
-| [challenge-findings.json]         | Adversarial review findings (all 14 resolved)             | If you want to understand why a decision was made      |
+| [infra-challenge.json]            | Adversarial review findings (all 14 resolved)             | If you want to understand why a decision was made      |
 
 [plan-hackOps.prompt.md]: ../.github/prompts/plan-hackOps.prompt.md
 [plan-hackOpsExecution.prompt.md]: ../.github/prompts/plan-hackOpsExecution.prompt.md
 [hackops-execution.md]: exec-plans/active/hackops-execution.md
 [session-resume.prompt.md]: ../.github/prompts/session-resume.prompt.md
-[challenge-findings.json]: ../agent-output/hackops/challenge-findings.json
+[infra-challenge.json]: ../agent-output/hackops/challenges/infra-challenge.json
 
 ### How Sessions Work
 
