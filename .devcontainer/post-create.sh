@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-# ─── Progress Tracking Helpers ───────────────────────────────────────────────
+# -----------------------------------------------------------------------
 
 TOTAL_STEPS=9
 CURRENT_STEP=0
@@ -38,19 +38,19 @@ step_fail() {
     printf "        ❌ %s (%ds)\n" "${1:-Failed}" "$elapsed"
 }
 
-# ─── Banner ──────────────────────────────────────────────────────────────────
+# -----------------------------------------------------------------------
 
 echo ""
-echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo " 🚀 Agentic InfraOps — Dev Container Setup"
+echo "====================================================="
+echo " 🚀 HackOps — Dev Container Setup"
 echo "    $TOTAL_STEPS steps · $(date '+%H:%M:%S')"
-echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo "====================================================="
 
 # Log output to file for debugging
 exec 1> >(tee -a ~/.devcontainer-install.log)
 exec 2>&1
 
-# ─── Step 1: npm install (local) ─────────────────────────────────────────────
+# -----------------------------------------------------------------------
 
 step_start "📦" "Installing npm dependencies..."
 if npm install --loglevel=warn 2>&1 | tail -3; then
@@ -59,7 +59,7 @@ else
     step_warn "npm install had issues, continuing"
 fi
 
-# ─── Step 2: npm global tools ────────────────────────────────────────────────
+# -----------------------------------------------------------------------
 
 step_start "📦" "Installing global tools (markdownlint-cli2)..."
 if npm install -g markdownlint-cli2 --loglevel=warn 2>&1 | tail -2; then
@@ -68,7 +68,7 @@ else
     step_warn "Global install had issues"
 fi
 
-# ─── Step 3: Directories & Git ───────────────────────────────────────────────
+# -----------------------------------------------------------------------
 
 step_start "🔐" "Configuring Git & directories..."
 mkdir -p "${HOME}/.cache" "${HOME}/.config/gh"
@@ -80,10 +80,16 @@ git config --global --add safe.directory "${PWD}"
 git config --global core.autocrlf input
 step_done "Git configured, cache dirs created"
 
-# ─── Step 4: Python packages ─────────────────────────────────────────────────
+# -----------------------------------------------------------------------
 
 step_start "🐍" "Installing Python packages..."
 export PATH="${HOME}/.local/bin:${PATH}"
+
+# Install uv if onCreateCommand skipped it (e.g. network failure during container build)
+if ! command -v uv &> /dev/null; then
+    curl -LsSf https://astral.sh/uv/install.sh | sh 2>/dev/null || true
+    export PATH="${HOME}/.local/bin:${PATH}"
+fi
 
 if command -v uv &> /dev/null; then
     mkdir -p "${HOME}/.cache/uv" 2>/dev/null || true
@@ -101,7 +107,7 @@ else
     fi
 fi
 
-# ─── Step 5: PowerShell modules ──────────────────────────────────────────────
+# -----------------------------------------------------------------------
 
 step_start "🔧" "Installing Azure PowerShell modules..."
 pwsh -NoProfile -Command "
@@ -129,7 +135,7 @@ pwsh -NoProfile -Command "
     \$jobs | Remove-Job -Force
 " && step_done "PowerShell modules installed" || step_warn "PowerShell module installation incomplete"
 
-# ─── Step 6: Azure Pricing MCP Server ────────────────────────────────────────
+# -----------------------------------------------------------------------
 
 step_start "💰" "Setting up Azure Pricing MCP Server..."
 MCP_DIR="${PWD}/mcp/azure-pricing-mcp"
@@ -151,7 +157,7 @@ else
     step_fail "MCP directory not found at $MCP_DIR"
 fi
 
-# ─── Step 7: Python dependencies (authoritative) ─────────────────────────────
+# -----------------------------------------------------------------------
 
 step_start "📦" "Verifying Python dependencies..."
 if [ -f "${PWD}/requirements.txt" ]; then
@@ -165,7 +171,7 @@ else
     step_warn "requirements.txt not found"
 fi
 
-# ─── Step 8: Azure CLI defaults ──────────────────────────────────────────────
+# -----------------------------------------------------------------------
 
 step_start "☁️ " "Configuring Azure CLI..."
 if az config set defaults.location=swedencentral --only-show-errors 2>/dev/null; then
@@ -175,7 +181,7 @@ else
     step_warn "Azure CLI config skipped (not authenticated)"
 fi
 
-# ─── Step 9: MCP config & final verification ─────────────────────────────────
+# -----------------------------------------------------------------------
 
 step_start "🔍" "Verifying installations & MCP config..."
 
@@ -237,14 +243,14 @@ echo ""
 
 step_done "All verifications complete"
 
-# ─── Summary ─────────────────────────────────────────────────────────────────
+# -----------------------------------------------------------------------
 
 TOTAL_ELAPSED=$(( $(date +%s) - SETUP_START ))
 MINUTES=$((TOTAL_ELAPSED / 60))
 SECONDS_REMAINING=$((TOTAL_ELAPSED % 60))
 
 echo ""
-echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo "====================================================="
 if [ "$FAIL_COUNT" -eq 0 ] && [ "$WARN_COUNT" -eq 0 ]; then
     printf " ✅ Setup complete! %d/%d steps passed (%dm %ds)\n" "$PASS_COUNT" "$TOTAL_STEPS" "$MINUTES" "$SECONDS_REMAINING"
 elif [ "$FAIL_COUNT" -eq 0 ]; then
@@ -252,7 +258,7 @@ elif [ "$FAIL_COUNT" -eq 0 ]; then
 else
     printf " ❌ Setup complete with errors: %d passed, %d warnings, %d failed (%dm %ds)\n" "$PASS_COUNT" "$WARN_COUNT" "$FAIL_COUNT" "$MINUTES" "$SECONDS_REMAINING"
 fi
-echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo "====================================================="
 echo ""
 echo " 📝 Next steps:"
 echo "    1. Authenticate: az login"

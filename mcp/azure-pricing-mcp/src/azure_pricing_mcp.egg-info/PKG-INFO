@@ -14,31 +14,29 @@ Classifier: Development Status :: 4 - Beta
 Classifier: Intended Audience :: Developers
 Classifier: License :: OSI Approved :: MIT License
 Classifier: Programming Language :: Python :: 3
-Classifier: Programming Language :: Python :: 3.10
-Classifier: Programming Language :: Python :: 3.11
-Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: Python :: 3.13
 Classifier: Topic :: Software Development :: Libraries :: Python Modules
 Classifier: Topic :: Internet :: WWW/HTTP :: Dynamic Content
-Requires-Python: >=3.10
+Requires-Python: >=3.13
 Description-Content-Type: text/markdown
 License-File: LICENSE
-Requires-Dist: mcp>=1.0.0
-Requires-Dist: aiohttp>=3.9.0
-Requires-Dist: pydantic>=2.0.0
-Requires-Dist: cachetools>=5.3.0
-Requires-Dist: uvicorn>=0.27.0
-Requires-Dist: starlette>=0.36.0
-Requires-Dist: sse-starlette>=1.8.0
-Requires-Dist: azure-identity>=1.15.0
+Requires-Dist: mcp>=1.8.0
+Requires-Dist: aiohttp>=3.11.0
+Requires-Dist: pydantic>=2.10.0
+Requires-Dist: cachetools>=5.5.0
+Requires-Dist: uvicorn>=0.34.0
+Requires-Dist: starlette>=0.45.0
+Requires-Dist: sse-starlette>=2.2.0
+Requires-Dist: azure-identity>=1.21.0
 Provides-Extra: dev
-Requires-Dist: pytest>=7.0.0; extra == "dev"
-Requires-Dist: pytest-asyncio>=0.21.0; extra == "dev"
-Requires-Dist: pytest-mock>=3.12.0; extra == "dev"
-Requires-Dist: black>=23.0.0; extra == "dev"
-Requires-Dist: mypy>=1.0.0; extra == "dev"
-Requires-Dist: ruff>=0.1.0; extra == "dev"
-Requires-Dist: pre-commit>=3.5.0; extra == "dev"
-Requires-Dist: bandit>=1.7.0; extra == "dev"
+Requires-Dist: pytest>=8.3.0; extra == "dev"
+Requires-Dist: pytest-asyncio>=1.0.0; extra == "dev"
+Requires-Dist: pytest-mock>=3.14.0; extra == "dev"
+Requires-Dist: black>=24.10.0; extra == "dev"
+Requires-Dist: mypy>=1.14.0; extra == "dev"
+Requires-Dist: ruff>=0.9.0; extra == "dev"
+Requires-Dist: pre-commit>=4.0.0; extra == "dev"
+Requires-Dist: bandit>=1.8.0; extra == "dev"
 Dynamic: license-file
 
 # Azure Pricing MCP Server

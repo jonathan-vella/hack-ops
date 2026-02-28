@@ -20,8 +20,17 @@
       "version": "latest"
     }
   },
+  // Python before Azure CLI — avoids GPG key staleness from cached MS repo layers
+  "overrideFeatureInstallOrder": [
+    "ghcr.io/devcontainers/features/python",
+    "ghcr.io/devcontainers/features/node",
+    "ghcr.io/devcontainers/features/powershell",
+    "ghcr.io/devcontainers/features/github-cli",
+    "ghcr.io/devcontainers/features/azure-cli"
+  ],
   // Lifecycle commands - chain apt operations to avoid lock conflicts
-  "onCreateCommand": "set -e; sudo rm -f /etc/apt/sources.list.d/yarn.list 2>/dev/null; sudo apt-get update; sudo apt-get install -y graphviz dos2unix; ARCH=$(dpkg --print-architecture); if [ \"$ARCH\" = \"amd64\" ]; then curl -fsSL https://dl.k6.io/key.gpg | sudo gpg --dearmor -o /usr/share/keyrings/k6-archive-keyring.gpg; echo 'deb [signed-by=/usr/share/keyrings/k6-archive-keyring.gpg] https://dl.k6.io/deb stable main' | sudo tee /etc/apt/sources.list.d/k6.list; sudo apt-get update; sudo apt-get install -y k6; else echo \"Skipping k6 install on unsupported architecture: $ARCH\"; fi; curl -LsSf https://astral.sh/uv/install.sh | sh",
+  // k6 and uv are optional: failures are tolerated so they don't abort the container build
+  "onCreateCommand": "sudo rm -f /etc/apt/sources.list.d/yarn.list 2>/dev/null; sudo apt-get update && sudo apt-get install -y graphviz dos2unix; ARCH=$(dpkg --print-architecture); if [ \"$ARCH\" = \"amd64\" ]; then (curl -fsSL https://dl.k6.io/key.gpg | sudo gpg --dearmor -o /usr/share/keyrings/k6-archive-keyring.gpg && echo 'deb [signed-by=/usr/share/keyrings/k6-archive-keyring.gpg] https://dl.k6.io/deb stable main' | sudo tee /etc/apt/sources.list.d/k6.list && sudo apt-get update && sudo apt-get install -y k6) || echo 'WARNING: k6 install skipped'; else echo \"Skipping k6 install on unsupported architecture: $ARCH\"; fi; curl -LsSf https://astral.sh/uv/install.sh | sh || echo 'WARNING: uv install skipped — will retry in post-create'",
   "postCreateCommand": "bash .devcontainer/post-create.sh",
   "postStartCommand": {
     "lefthook": "npx lefthook install 2>/dev/null || true"
