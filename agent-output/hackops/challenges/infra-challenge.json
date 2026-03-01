@@ -1,0 +1,114 @@
+{
+  "reviewDate": "2026-02-26",
+  "artifactsReviewed": [
+    "agent-output/hackops/01-requirements.md",
+    "agent-output/hackops/02-architecture-assessment.md",
+    "agent-output/hackops/03-des-adr-0001-serverless-cosmos.md",
+    "agent-output/hackops/03-des-adr-0002-app-service-compute.md",
+    "agent-output/hackops/03-des-adr-0003-easy-auth-github.md",
+    "agent-output/hackops/03-des-diagram.py"
+  ],
+  "previousReview": {
+    "date": "2026-02-24",
+    "target": "plan-hackOpsExecution.prompt.md (execution blueprint)",
+    "result": "14 findings, all resolved before infrastructure execution began"
+  },
+  "findings": [
+    {
+      "id": "CF-001",
+      "severity": "high",
+      "category": "reliability",
+      "title": "Deployment slots claimed as Reliability strength but B1 tier does not support them",
+      "description": "The architecture assessment lists 'Deployment slots for zero-downtime deploys' as a Reliability strength (section: Reliability — Score 3/5). However, ADR-0002 correctly states 'Staging slot available on S1+ tiers (not on B1) — dev environment deploys directly.' The dev environment (B1) will NOT have deployment slots. This overstates the reliability posture and could lead to an unexpected direct-deployment workflow in dev without zero-downtime capability. The Implementation Handoff table also lists deployment slots without qualifying the tier restriction.",
+      "recommendation": "Fix the Reliability section to remove deployment slots from B1/dev strengths. Add them only under the prod (S1) posture. Update the Implementation Handoff to clarify that staging slots are S1+ only. Consider whether this changes the Reliability score from 3/5 to 2/5 for dev.",
+      "status": "open"
+    },
+    {
+      "id": "CF-002",
+      "severity": "medium",
+      "category": "cost",
+      "title": "Inconsistent dev cost estimates across three artifacts",
+      "description": "Three different cost figures appear for the dev environment: (1) 01-requirements.md NFR table states '~$30-50/mo'; (2) 02-architecture-assessment.md Executive Summary states '~$20-30 (dev)'; (3) 02-architecture-assessment.md SKU table totals '~$17-26'. All three should converge. The SKU-level rollup ($17-26) is likely the most accurate, but the requirements NFR ($30-50) sets stakeholder expectations higher. If the budget target is $30-50 there is no issue, but the inconsistency undermines trust in the estimates.",
+      "recommendation": "Align all three documents to a single range: use the SKU-level rollup ($17-26) as the estimate and the NFR ($30-50) as the budget ceiling. Add a note: 'Estimated cost: ~$17-26/mo; budget ceiling: $50/mo to absorb spikes and Private DNS zone costs.'",
+      "status": "open"
+    },
+    {
+      "id": "CF-003",
+      "severity": "medium",
+      "category": "operations",
+      "title": "No alerting rules or incident escalation defined anywhere",
+      "description": "The architecture assessment, requirements, and all three ADRs acknowledge that no alerting rules are defined. The Operational Excellence gaps section says 'No automated alerting rules defined yet' and recommends deferring to Phase 12 production hardening. However, Phase 12 does not exist in the execution blueprint — the last infra step is infra-07 (as-built docs). Without alerting, Cosmos DB throttling (429s), App Service high CPU, or Key Vault access failures will go unnoticed until users report problems.",
+      "recommendation": "Define at minimum 3 baseline alerts in the Bicep templates (infra-05): (1) App Service CPU > 85% for 5 minutes; (2) Cosmos DB 429 responses > 0 in 5-minute window; (3) App Service HTTP 5xx > 5 in 5-minute window. These are low-effort metric alerts that can use the existing Log Analytics workspace as the action group target. Add an alert module to the Bicep infrastructure.",
+      "status": "open"
+    },
+    {
+      "id": "CF-004",
+      "severity": "medium",
+      "category": "reliability",
+      "title": "Cosmos DB Serverless burst limit stated inconsistently — 5K vs 1K RU/s",
+      "description": "ADR-0001 Context section states 'automatic scale to 5K RU/s burst' at the account level, but the Consequences section states '1K RU/s burst limit on individual containers could throttle heavy leaderboard aggregation queries.' The architecture assessment also says 'burst limit (1K RU/s) exceeding peak demand.' These are different numbers for different scopes (account vs container). The actual Cosmos DB serverless burst limit is up to 5,000 RU/s per partition (not per container), but queries reading from many partitions consume RUs across multiple partitions. For the leaderboard aggregation query that reads across all teams, the effective throughput depends on partition fan-out, not a single container limit.",
+      "recommendation": "Correct ADR-0001 to clarify: Serverless Cosmos DB provides burst capacity up to 5,000 RU/s per physical partition. For the leaderboard query (cross-partition on scores container partitioned by /teamId), the effective burst is the sum across all partitions touched. At ~75 users with 4-5 teams, this is well within limits. Remove the '1K RU/s per container' claim as it is not accurate for serverless mode.",
+      "status": "open"
+    },
+    {
+      "id": "CF-005",
+      "severity": "medium",
+      "category": "operations",
+      "title": "WEBSITE_VNET_ROUTE_ALL app setting is deprecated — use site property instead",
+      "description": "ADR-0002 Implementation Notes specify 'Set WEBSITE_VNET_ROUTE_ALL=1 to force VNet routing.' The architecture assessment also references this setting. However, this app setting has been deprecated in favor of the 'vnetRouteAllEnabled' site property (available since API version 2022-03-01). The AVM web/site module supports this as a first-class property. Using the deprecated app setting may work today but could be removed in future API versions and creates a governance inconsistency if policies check the site property instead of app settings.",
+      "recommendation": "Replace WEBSITE_VNET_ROUTE_ALL=1 app setting references with the 'vnetRouteAllEnabled: true' site property in Bicep. Update ADR-0002 and architecture assessment implementation notes. The AVM module parameter is 'vnetRouteAllEnabled'.",
+      "status": "open"
+    },
+    {
+      "id": "CF-006",
+      "severity": "medium",
+      "category": "security",
+      "title": "GitHub OAuth client secret rotation strategy not defined",
+      "description": "ADR-0003 states the GitHub OAuth Client Secret is stored in Key Vault, but no rotation strategy, expiration monitoring, or renewal process is documented. GitHub OAuth App secrets do not expire automatically, but security best practices and many enterprise policies require periodic credential rotation. If the secret is rotated in GitHub but not updated in Key Vault, Easy Auth breaks silently (authentication just fails for all users).",
+      "recommendation": "Add a section to the operational requirements documenting: (1) GitHub OAuth secret should be rotated at least annually; (2) Add a Key Vault secret expiration date when storing the secret; (3) Create a Key Vault expiration alert (90-day warning) using the existing monitoring stack. Document the rotation procedure: update in GitHub Developer Settings → update in Key Vault → restart App Service to pick up new value.",
+      "status": "open"
+    },
+    {
+      "id": "CF-007",
+      "severity": "low",
+      "category": "reliability",
+      "title": "Health endpoint /api/health behavior is unspecified",
+      "description": "The requirements list /api/health as the only unauthenticated endpoint but do not define what it checks. A simple 200 OK response only proves the Node.js process is running. It does not validate Cosmos DB connectivity, Key Vault accessibility, or application readiness. App Service health checks and deployment slot warm-up depend on meaningful health probes.",
+      "recommendation": "Define the health endpoint contract: (1) Shallow probe (/api/health) returns 200 if the process is running — used for liveness; (2) Deep probe (/api/health?deep=true) checks Cosmos DB connectivity and Key Vault access — used for readiness and deployment slot warm-up. Document this in the API contract and requirements.",
+      "status": "open"
+    },
+    {
+      "id": "CF-008",
+      "severity": "low",
+      "category": "reliability",
+      "title": "Cosmos DB periodic backup retention (8 hours) is very short",
+      "description": "The requirements and architecture assessment both state the default periodic backup policy: 2 copies every 4 hours with 8-hour retention. This means only the last 2 backup points exist at any time. If data corruption is discovered more than 8 hours after it occurred, all backup copies may already contain the corrupted data. For a hackathon tool with relaxed RPO this is likely acceptable, but it should be an explicit decision rather than an unstated default.",
+      "recommendation": "Accept the 8-hour retention as a conscious decision for the dev environment and document it as an accepted risk in the ADR or requirements. For production, consider increasing retention to 24 hours (still free tier) by setting backupIntervalInMinutes: 240 and backupRetentionIntervalInHours: 24 in the Cosmos DB account configuration.",
+      "status": "open"
+    },
+    {
+      "id": "CF-009",
+      "severity": "low",
+      "category": "security",
+      "title": "Key Vault Private Endpoint increases complexity without proportional security gain for dev",
+      "description": "The requirements mandate Key Vault behind Private Endpoint. For Cosmos DB (data plane with user data), Private Endpoint is clearly justified. For Key Vault in a dev environment, the only consumer is App Service (via managed identity over VNet). Key Vault supports service endpoints and firewall rules that can restrict access to the VNet without requiring a full Private Endpoint + DNS zone. The Private Endpoint adds: a second PE resource, a second Private DNS zone (privatelink.vaultcore.azure.net), a second A-record, and DNS resolution complexity.",
+      "recommendation": "For dev, consider using Key Vault firewall rules (allow VNet subnet) instead of Private Endpoint to reduce complexity. For prod, keep Private Endpoint. Alternatively, accept the complexity and document why PE is used for both Cosmos DB and Key Vault consistently. Either way, make it an explicit decision rather than a blanket 'PE on everything' policy.",
+      "status": "open"
+    }
+  ],
+  "summary": {
+    "critical": 0,
+    "high": 1,
+    "medium": 5,
+    "low": 3,
+    "mustFix": ["CF-001"],
+    "shouldFixBeforeDeployment": ["CF-003", "CF-005"],
+    "wafCoverage": {
+      "security": "CF-006, CF-009 — credential rotation and PE complexity assessed",
+      "reliability": "CF-001, CF-004, CF-007, CF-008 — deployment slots, burst limits, health probes, backup retention",
+      "performance": "No issues found — architecture is appropriate for ~75 users",
+      "cost": "CF-002 — estimate inconsistency flagged",
+      "operations": "CF-003, CF-005 — alerting gap and deprecated setting"
+    }
+  }
+}

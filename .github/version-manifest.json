@@ -1,0 +1,285 @@
+{
+  "$schema": "https://json.schemastore.org/base.json",
+  "metadata": {
+    "description": "Approved dependency version floors. No agent may propose versions below these without explicit user authorization. Validated by scripts/validate-version-manifest.mjs.",
+    "lastUpdated": "2026-02-27",
+    "approvedBy": "jonathan-vella",
+    "nodeVersion": "24",
+    "pythonVersion": "3.13",
+    "npmVersion": "11.8.0"
+  },
+  "npm": {
+    "@commitlint/cli": {
+      "minVersion": "20.4.2",
+      "allowedRange": "^20.4.2",
+      "location": "root"
+    },
+    "@commitlint/config-conventional": {
+      "minVersion": "20.4.2",
+      "allowedRange": "^20.4.2",
+      "location": "root"
+    },
+    "fast-xml-parser": {
+      "minVersion": "5.4.1",
+      "allowedRange": "^5.4.1",
+      "location": "root"
+    },
+    "lefthook": {
+      "minVersion": "2.1.1",
+      "allowedRange": "^2.1.1",
+      "location": "root"
+    },
+    "markdown-link-check": {
+      "minVersion": "3.12.0",
+      "allowedRange": "^3.12.0",
+      "location": "root"
+    },
+    "markdownlint-cli2": {
+      "minVersion": "0.21.0",
+      "allowedRange": "^0.21.0",
+      "location": "root"
+    },
+    "turbo": {
+      "minVersion": "2.5.0",
+      "allowedRange": "^2.5.0",
+      "location": "root"
+    },
+    "typescript": {
+      "minVersion": "5.7.0",
+      "allowedRange": "^5.7.0",
+      "location": "root,apps/web,packages/shared"
+    },
+    "@azure/cosmos": {
+      "minVersion": "4.9.1",
+      "allowedRange": "^4.9.1",
+      "location": "apps/web"
+    },
+    "@azure/identity": {
+      "minVersion": "4.7.0",
+      "allowedRange": "^4.7.0",
+      "location": "apps/web"
+    },
+    "class-variance-authority": {
+      "minVersion": "0.7.1",
+      "allowedRange": "^0.7.1",
+      "location": "apps/web"
+    },
+    "clsx": {
+      "minVersion": "2.1.1",
+      "allowedRange": "^2.1.1",
+      "location": "apps/web"
+    },
+    "lucide-react": {
+      "minVersion": "0.575.0",
+      "allowedRange": "^0.575.0",
+      "location": "apps/web"
+    },
+    "next": {
+      "minVersion": "16.1.6",
+      "allowedRange": "^16.1.6",
+      "location": "apps/web"
+    },
+    "next-themes": {
+      "minVersion": "0.4.6",
+      "allowedRange": "^0.4.6",
+      "location": "apps/web"
+    },
+    "radix-ui": {
+      "minVersion": "1.4.3",
+      "allowedRange": "^1.4.3",
+      "location": "apps/web"
+    },
+    "react": {
+      "minVersion": "19.1.0",
+      "allowedRange": "^19.1.0",
+      "location": "apps/web"
+    },
+    "react-dom": {
+      "minVersion": "19.1.0",
+      "allowedRange": "^19.1.0",
+      "location": "apps/web"
+    },
+    "tailwind-merge": {
+      "minVersion": "3.0.2",
+      "allowedRange": "^3.0.2",
+      "location": "apps/web"
+    },
+    "tailwindcss-animate": {
+      "minVersion": "1.0.7",
+      "allowedRange": "^1.0.7",
+      "location": "apps/web"
+    },
+    "zod": {
+      "minVersion": "4.3.6",
+      "allowedRange": "^4.3.6",
+      "location": "apps/web"
+    },
+    "@next/eslint-plugin-next": {
+      "minVersion": "16.1.6",
+      "allowedRange": "^16.1.6",
+      "location": "apps/web"
+    },
+    "@tailwindcss/postcss": {
+      "minVersion": "4.1.0",
+      "allowedRange": "^4.1.0",
+      "location": "apps/web"
+    },
+    "@testing-library/react": {
+      "minVersion": "16.2.0",
+      "allowedRange": "^16.2.0",
+      "location": "apps/web"
+    },
+    "@types/node": {
+      "minVersion": "25.3.2",
+      "allowedRange": "^25.3.2",
+      "location": "apps/web"
+    },
+    "@types/react": {
+      "minVersion": "19.0.0",
+      "allowedRange": "^19.0.0",
+      "location": "apps/web"
+    },
+    "@types/react-dom": {
+      "minVersion": "19.0.0",
+      "allowedRange": "^19.0.0",
+      "location": "apps/web"
+    },
+    "@vitejs/plugin-react": {
+      "minVersion": "5.1.4",
+      "allowedRange": "^5.1.4",
+      "location": "apps/web"
+    },
+    "eslint": {
+      "minVersion": "10.0.2",
+      "allowedRange": "^10.0.2",
+      "location": "apps/web"
+    },
+    "jsdom": {
+      "minVersion": "28.1.0",
+      "allowedRange": "^28.1.0",
+      "location": "apps/web"
+    },
+    "postcss": {
+      "minVersion": "8.5.0",
+      "allowedRange": "^8.5.0",
+      "location": "apps/web"
+    },
+    "tailwindcss": {
+      "minVersion": "4.1.0",
+      "allowedRange": "^4.1.0",
+      "location": "apps/web"
+    },
+    "typescript-eslint": {
+      "minVersion": "8.56.1",
+      "allowedRange": "^8.56.1",
+      "location": "apps/web"
+    },
+    "vitest": {
+      "minVersion": "4.0.18",
+      "allowedRange": "^4.0.18",
+      "location": "apps/web"
+    }
+  },
+  "python": {
+    "diagrams": {
+      "minVersion": "0.24.0",
+      "allowedRange": ">=0.24.0",
+      "location": "requirements.txt"
+    },
+    "matplotlib": {
+      "minVersion": "3.10.0",
+      "allowedRange": ">=3.10.0",
+      "location": "requirements.txt"
+    },
+    "pillow": {
+      "minVersion": "11.0.0",
+      "allowedRange": ">=11.0.0",
+      "location": "requirements.txt"
+    },
+    "checkov": {
+      "minVersion": "3.2.0",
+      "allowedRange": ">=3.2.0",
+      "location": "requirements.txt"
+    },
+    "mcp": {
+      "minVersion": "1.8.0",
+      "allowedRange": ">=1.8.0",
+      "location": "mcp/azure-pricing-mcp"
+    },
+    "aiohttp": {
+      "minVersion": "3.11.0",
+      "allowedRange": ">=3.11.0",
+      "location": "mcp/azure-pricing-mcp"
+    },
+    "pydantic": {
+      "minVersion": "2.10.0",
+      "allowedRange": ">=2.10.0",
+      "location": "mcp/azure-pricing-mcp"
+    },
+    "cachetools": {
+      "minVersion": "5.5.0",
+      "allowedRange": ">=5.5.0",
+      "location": "mcp/azure-pricing-mcp"
+    },
+    "uvicorn": {
+      "minVersion": "0.34.0",
+      "allowedRange": ">=0.34.0",
+      "location": "mcp/azure-pricing-mcp"
+    },
+    "starlette": {
+      "minVersion": "0.45.0",
+      "allowedRange": ">=0.45.0",
+      "location": "mcp/azure-pricing-mcp"
+    },
+    "sse-starlette": {
+      "minVersion": "2.2.0",
+      "allowedRange": ">=2.2.0",
+      "location": "mcp/azure-pricing-mcp"
+    },
+    "azure-identity": {
+      "minVersion": "1.21.0",
+      "allowedRange": ">=1.21.0",
+      "location": "mcp/azure-pricing-mcp"
+    },
+    "pytest": {
+      "minVersion": "8.3.0",
+      "allowedRange": ">=8.3.0",
+      "location": "mcp/azure-pricing-mcp[dev]"
+    },
+    "pytest-asyncio": {
+      "minVersion": "1.0.0",
+      "allowedRange": ">=1.0.0",
+      "location": "mcp/azure-pricing-mcp[dev]"
+    },
+    "pytest-mock": {
+      "minVersion": "3.14.0",
+      "allowedRange": ">=3.14.0",
+      "location": "mcp/azure-pricing-mcp[dev]"
+    },
+    "black": {
+      "minVersion": "24.10.0",
+      "allowedRange": ">=24.10.0",
+      "location": "mcp/azure-pricing-mcp[dev]"
+    },
+    "mypy": {
+      "minVersion": "1.14.0",
+      "allowedRange": ">=1.14.0",
+      "location": "mcp/azure-pricing-mcp[dev]"
+    },
+    "ruff": {
+      "minVersion": "0.9.0",
+      "allowedRange": ">=0.9.0",
+      "location": "mcp/azure-pricing-mcp[dev]"
+    },
+    "pre-commit": {
+      "minVersion": "4.0.0",
+      "allowedRange": ">=4.0.0",
+      "location": "mcp/azure-pricing-mcp[dev]"
+    },
+    "bandit": {
+      "minVersion": "1.8.0",
+      "allowedRange": ">=1.8.0",
+      "location": "mcp/azure-pricing-mcp[dev]"
+    }
+  }
+}

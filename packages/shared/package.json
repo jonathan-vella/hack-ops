@@ -1,0 +1,19 @@
+{
+  "name": "@hackops/shared",
+  "version": "0.1.0",
+  "private": true,
+  "main": "./types/index.ts",
+  "types": "./types/index.ts",
+  "exports": {
+    ".": "./types/index.ts",
+    "./types": "./types/index.ts",
+    "./types/*": "./types/*"
+  },
+  "scripts": {
+    "type-check": "tsc --noEmit",
+    "lint": "echo 'No lint configured for shared'"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.0"
+  }
+}

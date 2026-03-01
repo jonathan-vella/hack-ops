@@ -1,0 +1,92 @@
+name: App Bug Report
+description: Report a bug in the HackOps web application
+title: "[App Bug]: "
+labels: ["bug", "app"]
+assignees: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## App Bug Report
+
+        Found a bug in the HackOps Next.js application? Report it here.
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Affected Area
+      description: Which part of the application is affected?
+      options:
+        - API Routes (apps/web/src/app/api/)
+        - Pages / UI (apps/web/src/app/)
+        - Components (apps/web/src/components/)
+        - Authentication / Authorization
+        - Scoring / Judging
+        - Team Management
+        - Hackathon Lifecycle
+        - Build / Compilation
+        - Tests
+        - Other
+    validations:
+      required: true
+
+  - type: input
+    id: file-path
+    attributes:
+      label: Affected File(s)
+      description: Path to the affected file(s), if known.
+      placeholder: "apps/web/src/app/api/hackathons/route.ts"
+    validations:
+      required: false
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Bug Description
+      description: What happened? What did you expect instead?
+      placeholder: |
+        **Expected:** POST /api/hackathons returns 201 with created hackathon
+        **Actual:** Returns 500 with "Internal server error"
+
+        Error message:
+        ```
+        TypeError: Cannot read properties of undefined (reading 'id')
+        ```
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to Reproduce
+      description: Minimal steps to reproduce the bug.
+      placeholder: |
+        1. Send POST to /api/hackathons with body: { "name": "Test" }
+        2. Observe 500 response
+    validations:
+      required: true
+
+  - type: dropdown
+    id: severity
+    attributes:
+      label: Severity
+      description: How severe is this bug?
+      options:
+        - Critical — App crash, data loss, security vulnerability
+        - High — Feature broken, no workaround
+        - Medium — Feature broken, workaround available
+        - Low — Cosmetic issue or minor inconvenience
+    validations:
+      required: true
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Where does this occur?
+      placeholder: |
+        - Node.js version: 22.x
+        - Browser: Chrome 130
+        - Environment: local dev / Cosmos DB emulator / deployed
+    validations:
+      required: false

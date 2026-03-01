@@ -1,0 +1,160 @@
+{
+  "challenged_artifact": "agent-output/hackops/04-implementation-plan.md",
+  "project_name": "hackops",
+  "artifact_type": "implementation-plan",
+  "review_date": "2026-03-01",
+  "review_number": 1,
+  "inputs_reviewed": [
+    "agent-output/hackops/04-implementation-plan.md",
+    "agent-output/hackops/04-governance-constraints.md",
+    "agent-output/hackops/04-governance-constraints.json",
+    "agent-output/hackops/02-architecture-assessment.md"
+  ],
+  "challenge_summary": "The implementation plan is strong on baseline controls (TLS 1.2, private endpoints, managed identity, phased deployment), but it has two high-risk correctness gaps: a SQL identity dependency/order problem and incomplete policy traceability for all 21 discovered assignments. Most remaining findings are execution-hardening gaps in rollback, alerting, autoscale, DR objective codification, and governance evidence depth.",
+  "risk_level": "high",
+  "total_must_fix": 2,
+  "total_should_fix": 11,
+  "total_consider": 2,
+  "passes": [
+    {
+      "review_focus": "security",
+      "pass_summary": "Security baseline is mostly present, but identity and secret-handling details are not deployment-safe end-to-end. The SQL admin identity flow is the highest risk.",
+      "risk_level": "high",
+      "must_fix_count": 1,
+      "should_fix_count": 3,
+      "consider_count": 1,
+      "issues": [
+        {
+          "severity": "must_fix",
+          "title": "SQL Entra admin depends on App Service MI before it exists",
+          "description": "The plan sets the App Service managed identity as SQL Server Entra admin, but module order deploys sql-database.bicep before app-service.bicep. This creates a dependency cycle/ordering hazard and can break SQL configuration or force over-privileged workarounds.",
+          "recommendation": "Use a dedicated user-assigned managed identity (or Entra group) created before SQL, set that as SQL Entra admin, then grant App Service MI least-privilege DB roles after app deployment.",
+          "affected_resource_module": "modules/sql-database.bicep + modules/app-service.bicep"
+        },
+        {
+          "severity": "should_fix",
+          "title": "GitHub OAuth secret lifecycle is unspecified",
+          "description": "The plan enables Easy Auth with GitHub but does not define where client secret is sourced at runtime, rotation process, expiry monitoring, or restart procedure after secret update. This creates auth outage and credential hygiene risk.",
+          "recommendation": "Store OAuth secret in Key Vault, reference it via App Service Key Vault reference, define rotation cadence and expiry alerts, and document zero-downtime secret rotation steps.",
+          "affected_resource_module": "modules/app-service.bicep + modules/key-vault.bicep"
+        },
+        {
+          "severity": "should_fix",
+          "title": "ACI seeding security model is undefined",
+          "description": "Phase 4 relies on ACI for schema/data seed inside VNet, but no identity model, image provenance controls, or secret injection method is defined. This can introduce privileged one-off scripts with weak controls.",
+          "recommendation": "Define ACI to use managed identity, pull signed image from ACR, fetch secrets via Key Vault, and run least-privilege SQL role for migrations/seeding.",
+          "affected_resource_module": "Phase 4 seeding flow (ACI) / deploy.ps1 or dedicated seeding module"
+        },
+        {
+          "severity": "should_fix",
+          "title": "ACR network hardening is incomplete",
+          "description": "ACR admin user is disabled and MI pull is defined, but public network exposure and private access path are not explicitly constrained. Supply-chain attack surface remains broader than necessary.",
+          "recommendation": "Explicitly set ACR network rules and disable public network access where feasible, or document justified exception with compensating controls; consider Private Endpoint for ACR if policy/security posture requires it.",
+          "affected_resource_module": "modules/container-registry.bicep"
+        },
+        {
+          "severity": "consider",
+          "title": "No explicit egress restriction strategy for app subnet",
+          "description": "Inbound controls are documented, but outbound restrictions (UDR/Azure Firewall/NAT strategy) are not. This increases lateral movement and data exfiltration blast radius if app compromise occurs.",
+          "recommendation": "Document and implement egress boundaries for the app subnet aligned to required destinations (SQL PE, Key Vault PE, telemetry, OAuth endpoints).",
+          "affected_resource_module": "modules/networking.bicep + modules/app-service.bicep"
+        }
+      ]
+    },
+    {
+      "review_focus": "waf",
+      "pass_summary": "WAF posture is directionally good but not fully operationalized. Key reliability/ops controls (rollback, alerts, autoscale, explicit DR targets) are not yet encoded in the implementation plan.",
+      "risk_level": "medium",
+      "must_fix_count": 0,
+      "should_fix_count": 4,
+      "consider_count": 1,
+      "issues": [
+        {
+          "severity": "should_fix",
+          "title": "No explicit partial-failure rollback strategy across phases",
+          "description": "Phased deployment has approval gates but no concrete rollback path for partially succeeded phases (e.g., SQL succeeds, app fails). This increases recovery time and drift risk.",
+          "recommendation": "Define rollback decision tree per phase, including slot rollback/swap-back, failed PE cleanup rules, and idempotent rerun criteria with state checks.",
+          "affected_resource_module": "deploy.ps1 + phase orchestration"
+        },
+        {
+          "severity": "should_fix",
+          "title": "Monitoring lacks alert rules and SLO-linked thresholds",
+          "description": "Log Analytics and App Insights are deployed, but no alert rules/actions are planned. Operational excellence and reliability remain reactive rather than proactive.",
+          "recommendation": "Add baseline alerts (HTTP 5xx, latency, App Service CPU/memory, SQL DTU/connection failures, health endpoint failures) with action groups and ownership.",
+          "affected_resource_module": "modules/monitoring.bicep (+ alerting module)"
+        },
+        {
+          "severity": "should_fix",
+          "title": "Autoscale strategy is absent for App Service",
+          "description": "Plan acknowledges potential SKU fallback but no autoscale rules or trigger thresholds are defined. Event-time demand spikes can cause performance/SLA degradation.",
+          "recommendation": "Define autoscale for App Service plan (scale out/in thresholds) and rehearse load-based scaling during pre-event validation.",
+          "affected_resource_module": "modules/app-service.bicep"
+        },
+        {
+          "severity": "should_fix",
+          "title": "RTO/RPO and backup restore validation are not codified",
+          "description": "Single-region design is accepted, but implementation plan does not define measurable RTO/RPO targets or restore test cadence for SQL backups.",
+          "recommendation": "Add explicit RTO/RPO targets, PITR window, and restore drill steps/frequency; include pass/fail criteria in operations runbook.",
+          "affected_resource_module": "modules/sql-database.bicep + operational runbook linkage"
+        },
+        {
+          "severity": "consider",
+          "title": "Cost control guardrails are not operationalized",
+          "description": "Cost estimates are present, but budget alerts, anomaly triggers, or environment shutdown policies are not included in implementation tasks.",
+          "recommendation": "Add budget/forecast alerts and optional non-prod cost controls (schedules, retention tuning, image cleanup policy).",
+          "affected_resource_module": "monitoring/cost governance across subscription/resource group"
+        }
+      ]
+    },
+    {
+      "review_focus": "governance",
+      "pass_summary": "Governance intent is strong, but evidence chain is incomplete: not all 21 assignments are traceably mapped in implementation controls, and policy applicability has drift between documents.",
+      "risk_level": "high",
+      "must_fix_count": 1,
+      "should_fix_count": 4,
+      "consider_count": 0,
+      "issues": [
+        {
+          "severity": "must_fix",
+          "title": "Claim of 'all 21 policies addressed' lacks policy-to-control traceability",
+          "description": "The implementation plan states all 21 policies are addressed, but it does not include assignment-level mapping to concrete module properties/tests. This is a compliance evidence gap and can hide blockers until deployment time.",
+          "recommendation": "Add a policy matrix mapping each assignment/effect (Deny, Modify, Audit, DeployIfNotExists) to exact Bicep property path, module owner, and validation check.",
+          "affected_resource_module": "04-implementation-plan.md governance sections + all modules"
+        },
+        {
+          "severity": "should_fix",
+          "title": "Policy applicability drift between governance artifact and SQL-based architecture",
+          "description": "Governance JSON emphasizes Cosmos DB modify policy as critical while architecture/implementation switched to Azure SQL. This indicates stale or mixed applicability context that weakens governance confidence.",
+          "recommendation": "Refresh governance constraints against final planned resource types and explicitly mark each policy as applicable/non-applicable with rationale tied to current architecture.",
+          "affected_resource_module": "04-governance-constraints.md/.json + 04-implementation-plan.md"
+        },
+        {
+          "severity": "should_fix",
+          "title": "SQL AD-only Deny policy mapping is incomplete in governance narrative",
+          "description": "A Deny policy for SQL AD-only authentication exists in discovered set, but governance narrative previously treated SQL as not used. Implementation now uses SQL and sets AD-only; this requires explicit, evidence-backed mapping.",
+          "recommendation": "Document SQL Deny policy compliance with exact property (azureADOnlyAuthentication: true), module path, and preflight validation output.",
+          "affected_resource_module": "modules/sql-database.bicep + governance policy analysis section"
+        },
+        {
+          "severity": "should_fix",
+          "title": "Diagnostic-policy readiness is underspecified outside ACR",
+          "description": "Implementation mentions diagnostics for ACR, but not consistently for SQL/App Service/Key Vault/network resources where audit initiatives commonly evaluate diagnostic settings.",
+          "recommendation": "Standardize diagnostic settings coverage across all supported resources and document any unsupported exceptions.",
+          "affected_resource_module": "modules/container-registry.bicep, sql-database.bicep, app-service.bicep, key-vault.bicep, networking.bicep"
+        },
+        {
+          "severity": "should_fix",
+          "title": "Policy effect handling is not validated in preflight gates",
+          "description": "Policy effects are described conceptually, but implementation phases do not include explicit checks for policy-modified properties or DeployIfNotExists side effects after deployment.",
+          "recommendation": "Add preflight/post-deploy checks to verify effective state (e.g., inherited tags present, ftps state compliant, expected policy modifications observed).",
+          "affected_resource_module": "deploy.ps1 + 04-preflight-check.md linkage"
+        }
+      ]
+    }
+  ],
+  "summary_by_pass": {
+    "security": { "must_fix": 1, "should_fix": 3, "consider": 1 },
+    "waf": { "must_fix": 0, "should_fix": 4, "consider": 1 },
+    "governance": { "must_fix": 1, "should_fix": 4, "consider": 0 }
+  }
+}

@@ -1,0 +1,41 @@
+# ── Git & GitHub ──────────────────────────────────────────────────────
+.git
+.github
+
+# ── Environment files ────────────────────────────────────────────────
+.env
+.env.*
+.env.local
+
+# ── Agent output & docs ──────────────────────────────────────────────
+agent-output/
+docs/
+
+# ── Infrastructure & tooling ─────────────────────────────────────────
+infra/
+mcp/
+scripts/
+
+# ── Node modules (re-installed in container) ─────────────────────────
+node_modules/
+
+# ── Build artifacts ──────────────────────────────────────────────────
+apps/web/.next/
+coverage/
+
+# ── Markdown & docs ──────────────────────────────────────────────────
+*.md
+LICENSE
+
+# ── Test files ───────────────────────────────────────────────────────
+**/*.test.ts
+**/*.spec.ts
+**/*.test.tsx
+**/*.spec.tsx
+vitest.config.*
+
+# ── IDE & OS ─────────────────────────────────────────────────────────
+.vscode/
+.devcontainer/
+.DS_Store
+Thumbs.db

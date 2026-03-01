@@ -1,0 +1,281 @@
+{
+  "status": "COMPLETE",
+  "discoveryDate": "2026-02-26T14:00:00Z",
+  "subscription": {
+    "id": "00858ffc-dded-4f0f-8bbf-e17fff0d47d9",
+    "name": "noalz",
+    "tenantId": "2d04cb4c-999b-4e60-a3a7-e8993edc768b"
+  },
+  "discoveryMethod": "Azure REST API (policyAssignments, policyDefinitions, policySetDefinitions)",
+  "discoveryScope": "Subscription + Management Group (inherited)",
+  "totalPolicyAssignments": 21,
+  "subscriptionScopedAssignments": 12,
+  "managementGroupInheritedAssignments": 9,
+  "plannedResources": [
+    "Microsoft.Resources/resourceGroups",
+    "Microsoft.ManagedIdentity/userAssignedIdentities",
+    "Microsoft.Network/virtualNetworks",
+    "Microsoft.Network/networkSecurityGroups",
+    "Microsoft.Sql/servers",
+    "Microsoft.Sql/servers/databases",
+    "Microsoft.Web/serverfarms",
+    "Microsoft.Web/sites",
+    "Microsoft.Web/sites/slots",
+    "Microsoft.KeyVault/vaults",
+    "Microsoft.ContainerRegistry/registries",
+    "Microsoft.OperationalInsights/workspaces",
+    "Microsoft.Insights/components",
+    "Microsoft.Insights/metricAlerts",
+    "Microsoft.Insights/actionGroups",
+    "Microsoft.Insights/autoscaleSettings",
+    "Microsoft.Network/privateEndpoints",
+    "Microsoft.Network/privateDnsZones"
+  ],
+  "denyPolicies": [
+    {
+      "policyName": "Block Azure RM Resource Creation",
+      "assignmentScope": "Management Group",
+      "effect": "Deny",
+      "actuallyBlocks": "Classic (ASM) resources only: ClassicCompute, ClassicStorage, ClassicNetwork",
+      "blocksHackOps": false,
+      "policyRuleEvidence": "anyOf with 7 conditions checking field type for Microsoft.Classic* types",
+      "bicepPropertyPath": "N/A",
+      "requiredValue": "N/A"
+    },
+    {
+      "policyName": "MCAPSGov Deny Policies",
+      "assignmentScope": "Management Group",
+      "effect": "Deny",
+      "policiesInSet": [
+        {
+          "name": "VirtualMachine_SKU_Deny",
+          "blocksHackOps": false,
+          "reason": "Only blocks HPC/GPU VM SKUs (HB, M, NC, ND, NV series)"
+        },
+        {
+          "name": "AKS_LimitNodeCount_Deny",
+          "blocksHackOps": false,
+          "reason": "AKS not used"
+        },
+        {
+          "name": "VMSS_LimitNodesCount_Deny",
+          "blocksHackOps": false,
+          "reason": "VMSS not used"
+        },
+        {
+          "name": "AzureOpenAI_ProvisionedCapacity_Deny",
+          "blocksHackOps": false,
+          "reason": "OpenAI not used"
+        },
+        {
+          "name": "Sentinel_Commitment_Deny",
+          "blocksHackOps": false,
+          "reason": "Sentinel not used"
+        },
+        {
+          "name": "AzureSQL_WithoutAzureADOnlyAuthentication_Deny",
+          "blocksHackOps": true,
+          "reason": "HackOps uses Azure SQL — COMPLIANT: azureADOnlyAuthentication=true + UAMI as Entra admin",
+          "bicepPropertyPath": "properties.administrators.azureADOnlyAuthentication",
+          "requiredValue": true,
+          "complianceStatus": "COMPLIANT"
+        },
+        {
+          "name": "AzureSQLMI_WithoutAzureADOnlyAuthentication_Deny",
+          "blocksHackOps": false,
+          "reason": "SQL MI not used"
+        },
+        {
+          "name": "ClassicResourceTypes_Deny",
+          "blocksHackOps": false,
+          "reason": "Classic resources not used"
+        }
+      ],
+      "blocksHackOps": true,
+      "blocksHackOpsDetail": "AzureSQL_WithoutAzureADOnlyAuthentication_Deny applies — HackOps is COMPLIANT"
+    }
+  ],
+  "modifyPolicies": [
+    {
+      "policyName": "JV - Inherit Multiple Tags from Resource Group",
+      "assignmentScope": "Management Group",
+      "effect": "Modify",
+      "description": "Auto-copies 9 tags from resource group to child resources",
+      "impactOnHackOps": "Beneficial - ensures tag consistency; tags set on RG propagate automatically",
+      "tagsInherited": [
+        "environment",
+        "owner",
+        "costcenter",
+        "application",
+        "workload",
+        "sla",
+        "backup-policy",
+        "maint-window",
+        "technical-contact"
+      ]
+    },
+    {
+      "policyName": "CosmosDB_LocalAuth_Modify (SFI-ID4.2.3)",
+      "assignmentScope": "Management Group",
+      "effect": "Modify",
+      "description": "Sets disableLocalAuth=true on Cosmos DB NoSQL accounts",
+      "impactOnHackOps": "No impact — Cosmos DB not deployed (ADR-0004: Azure SQL chosen instead)",
+      "bicepPropertyPath": "properties.disableLocalAuth",
+      "requiredValue": true,
+      "exemptionAvailable": "N/A — resource type not deployed"
+    },
+    {
+      "policyName": "StorageAccount_BlobAnonymousAccess_Modify",
+      "assignmentScope": "Management Group",
+      "effect": "Modify",
+      "description": "Disables blob anonymous access on storage accounts",
+      "impactOnHackOps": "No impact \u2014 no storage accounts in architecture"
+    }
+  ],
+  "auditPolicies": [
+    {
+      "policyName": "AppService_FTPSOnly_Audit",
+      "assignmentScope": "Management Group",
+      "effect": "AuditIfNotExists",
+      "description": "Audits App Service sites where ftpsState is not FtpsOnly or Disabled",
+      "impactOnHackOps": "Set ftpsState to Disabled in Bicep to be compliant",
+      "bicepPropertyPath": "properties.siteConfig.ftpsState",
+      "requiredValue": "Disabled"
+    },
+    {
+      "policyName": "Azure Security Baseline",
+      "assignmentScope": "Management Group",
+      "effect": "Audit",
+      "description": "Microsoft Cloud Security Benchmark v1 audit initiative",
+      "impactOnHackOps": "Audit-only; aligns with security baseline already planned"
+    },
+    {
+      "policyName": "EU GDPR 2016/679",
+      "assignmentScope": "Subscription",
+      "effect": "Audit",
+      "description": "Regulatory compliance initiative for GDPR",
+      "impactOnHackOps": "Audit-only; swedencentral region meets EU data residency"
+    },
+    {
+      "policyName": "PCI DSS v4",
+      "assignmentScope": "Subscription",
+      "effect": "Audit",
+      "description": "Regulatory compliance initiative for PCI DSS",
+      "impactOnHackOps": "Audit-only; no payment data processed"
+    },
+    {
+      "policyName": "MCAPSGov Audit Policies",
+      "assignmentScope": "Management Group",
+      "effect": "Audit",
+      "description": "Various audit policies for SQL TLS, diagnostics, Defender, etc.",
+      "impactOnHackOps": "Audit-only; relevant audits: diagnostic settings, TLS"
+    }
+  ],
+  "deployIfNotExistsPolicies": [
+    {
+      "policyName": "MCAPSGov Deploy and Modify Policies",
+      "assignmentScope": "Management Group",
+      "effect": "DeployIfNotExists/Modify",
+      "autoDeployedResources": [
+        "Managed identity on VMs (not applicable)",
+        "Guest extension for Windows (not applicable)",
+        "StorageAccount blob anonymous access disabled (not applicable)",
+        "Cosmos DB local auth disabled (not applicable — Cosmos not deployed)",
+        "Diagnostic settings on Cognitive/AI resources (not applicable)"
+      ]
+    }
+  ],
+  "tagPolicy": {
+    "policyName": "JV-Enforce Resource Group Tags v3",
+    "assignmentScope": "Management Group",
+    "effect": "Deny",
+    "enforcedOn": "Microsoft.Resources/subscriptions/resourceGroups",
+    "requiredTags": [
+      {
+        "key": "environment",
+        "description": "Deployment environment",
+        "exampleValues": ["dev", "staging", "prod"]
+      },
+      {
+        "key": "owner",
+        "description": "Resource owner",
+        "exampleValues": ["jonathan-vella"]
+      },
+      {
+        "key": "costcenter",
+        "description": "Cost center for billing",
+        "exampleValues": ["hackops-dev"]
+      },
+      {
+        "key": "application",
+        "description": "Application name",
+        "exampleValues": ["hackops"]
+      },
+      {
+        "key": "workload",
+        "description": "Workload classification",
+        "exampleValues": ["hackathon-management"]
+      },
+      {
+        "key": "sla",
+        "description": "Service level agreement tier",
+        "exampleValues": ["non-production", "best-effort"]
+      },
+      {
+        "key": "backup-policy",
+        "description": "Backup policy classification",
+        "exampleValues": ["none", "sql-geo-backup"]
+      },
+      {
+        "key": "maint-window",
+        "description": "Maintenance window schedule",
+        "exampleValues": ["anytime", "weekends-only"]
+      },
+      {
+        "key": "technical-contact",
+        "description": "Technical contact email",
+        "exampleValues": ["admin@example.com"]
+      }
+    ],
+    "exemptions": [
+      "AzureBackupRG*",
+      "ResourceMover*",
+      "databricks-rg*",
+      "NetworkWatcherRG",
+      "microsoft-network",
+      "LogAnalyticsDefaultResources",
+      "rg-amba-*",
+      "DynamicsDeployments*",
+      "MC_myResourceGroup*"
+    ],
+    "tagInheritance": {
+      "mechanism": "Modify policy (JV - Inherit Multiple Tags from Resource Group)",
+      "description": "All 9 tags auto-inherited from RG to child resources"
+    }
+  },
+  "regionPolicy": {
+    "allowedRegions": "No region restriction policy detected",
+    "plannedRegion": "swedencentral",
+    "status": "COMPLIANT"
+  },
+  "skuRestrictions": {
+    "description": "Only VM SKUs restricted (HPC/GPU series); no restrictions on App Service, Azure SQL, Key Vault, ACR tiers",
+    "impactOnHackOps": "None — B1/S1 App Service Plan, Azure SQL S2 (50 DTU), ACR Standard, Key Vault Standard are unrestricted"
+  },
+  "mfaEnforcement": {
+    "description": "MFA required for resource write and delete actions",
+    "policies": ["sys.mfa-write", "sys.mfa-delete"],
+    "impactOnHackOps": "CI/CD service principals are exempt; manual deployments require MFA"
+  },
+  "deploymentBlockers": [],
+  "summary": {
+    "totalPolicies": 21,
+    "denyPoliciesBlocking": 1,
+    "denyPoliciesBlockingDetail": "AzureSQL_WithoutAzureADOnlyAuthentication_Deny — COMPLIANT (azureADOnlyAuthentication=true)",
+    "criticalModifyPolicies": 0,
+    "criticalModifyPoliciesDetail": "CosmosDB policy has no impact (Cosmos not deployed); tag inheritance is beneficial",
+    "auditPolicies": 5,
+    "requiredTags": 9,
+    "recommendation": "PROCEED — all policies compliant. Azure SQL AD-only auth Deny policy satisfied (azureADOnlyAuthentication=true + UAMI Entra admin). Resource group requires 9 tags (Deny policy — all included). App Service must set ftpsState=Disabled (audit compliance). Cosmos DB policies have no impact (ADR-0004: SQL chosen)."
+  }
+}

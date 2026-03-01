@@ -1,0 +1,115 @@
+{
+  "reviewDate": "2026-02-28",
+  "reviewType": "post-implementation-logic",
+  "artifactsReviewed": [
+    "apps/web/Dockerfile",
+    ".github/workflows/hackops-deploy.yml",
+    ".github/workflows/hackops-ci.yml",
+    "apps/web/src/app/api/health/route.ts",
+    "infra/bicep/hackops/modules/app-service.bicep",
+    "infra/bicep/hackops/main.bicep",
+    "docs/first-deploy-runbook.md",
+    "scripts/setup-acr-purge.sh"
+  ],
+  "passes": [
+    {
+      "name": "deploy-pipeline",
+      "description": "CI/CD pipeline correctness, ordering, race conditions",
+      "result": "pass"
+    },
+    {
+      "name": "container-runtime",
+      "description": "Container startup, port binding, health checks, env vars",
+      "result": "pass"
+    },
+    {
+      "name": "failure-modes",
+      "description": "Rollback, recovery, partial failure, data loss scenarios",
+      "result": "pass"
+    }
+  ],
+  "summary": {
+    "critical": 0,
+    "high": 0,
+    "medium": 2,
+    "low": 3,
+    "informational": 2,
+    "verdict": "PASS — no critical or high findings; pipeline is sound with 2 medium improvements recommended"
+  },
+  "findings": [
+    {
+      "id": "CL-001",
+      "pass": "deploy-pipeline",
+      "severity": "medium",
+      "title": "Deploy workflow Bicep step missing required secure parameters",
+      "description": "The 'Deploy IaC (Bicep)' steps in deploy-dev and deploy-prod pass only 'environment', 'projectName', and 'imageTag' as parameters. However, main.bicep has required parameters without defaults: 'owner', 'technicalContact', 'githubOAuthClientId', and 'githubOAuthClientSecret'. Without these, the deployment will fail with 'missing required parameter' errors. The first-deploy-runbook.md correctly includes all parameters, but the CI/CD workflow does not.",
+      "file": ".github/workflows/hackops-deploy.yml",
+      "recommendation": "Add the missing required parameters to the Bicep deployment steps: owner (from GitHub environment var), technicalContact (from env var), githubOAuthClientId (from secret or env var), githubOAuthClientSecret (from secret). Alternatively, create a main.bicepparam file per environment and reference it with --parameters @main.dev.bicepparam.",
+      "risk": "High probability — deployment WILL fail without these parameters",
+      "status": "resolved",
+      "resolution": "Added owner, technicalContact, githubOAuthClientId, githubOAuthClientSecret, adminGithubIds params to both dev and prod deploy steps; documented new env vars/secrets in workflow header"
+    },
+    {
+      "id": "CL-002",
+      "pass": "deploy-pipeline",
+      "severity": "medium",
+      "title": "Build job environment context may cause chicken-and-egg issue on first deploy",
+      "description": "The 'build' job uses 'environment: name: ${{ github.event.inputs.environment || 'dev' }}' which scopes it to the GitHub environment. This means the build job requires AZURE_ACR_NAME and AZURE_ACR_LOGIN_SERVER environment variables to exist before the first deploy. The first-deploy-runbook.md documents setting these in Step 7, but the CI/CD pipeline needs them earlier (for ACR login and push). For the very first automated deploy, these variables won't exist yet.",
+      "file": ".github/workflows/hackops-deploy.yml",
+      "recommendation": "Document in the first-deploy-runbook that Steps 7 (set GitHub env vars) must be completed BEFORE the first CI-triggered deploy. The runbook currently has Steps 1-4 as manual local operations, so this is not a blocker for initial deployment, but reorder Step 7 text to clarify the prerequisite order for subsequent automated deploys.",
+      "risk": "Medium — only affects the transition from manual to automated deployment",
+      "status": "resolved",
+      "resolution": "Runbook already documents env vars in Step 7; deploy workflow now documents all required vars/secrets in header comments"
+    },
+    {
+      "id": "CL-003",
+      "pass": "container-runtime",
+      "severity": "low",
+      "title": "CI workflow NODE_VERSION (22) differs from Dockerfile base image (node:24-alpine)",
+      "description": "The CI workflow (hackops-ci.yml) uses NODE_VERSION: '22' for lint, type-check, test, and build jobs. The Dockerfile uses node:24-alpine. While the application builds and tests fine on Node 22, the production image runs on Node 24. Any Node 24-specific runtime behavior (e.g., changed APIs, different V8 version) would not be caught in CI. The root package.json declares engines >= 24.0.0.",
+      "file": ".github/workflows/hackops-ci.yml",
+      "recommendation": "Update NODE_VERSION in hackops-ci.yml from '22' to '24' to match the Dockerfile and engine constraints. This ensures CI tests on the same Node version as production.",
+      "risk": "Low — Node 22 and 24 are highly compatible for Next.js applications",
+      "status": "resolved",
+      "resolution": "Updated NODE_VERSION from 22 to 24 in hackops-ci.yml"
+    },
+    {
+      "id": "CL-004",
+      "pass": "container-runtime",
+      "severity": "low",
+      "title": "Warmup period health check responds with 'ok' status instead of distinct 'warming' value",
+      "description": "The health endpoint during warmup returns { status: 'ok', checks: [{ name: 'warmup', status: 'ok' }] }. The HealthAPI.HealthCheckResponse type uses 'ok' | 'unhealthy' for status. While the spec comment says 'status: warming', the actual implementation uses 'ok' because the type system doesn't include 'warming' as a valid value. This is functionally correct (200 response keeps App Service happy) but makes it harder to distinguish a warming container from a fully healthy one in monitoring.",
+      "recommendation": "Acceptable as-is. The check name 'warmup' in the checks array already identifies the state. If desired, add 'warming' to the HealthAPI.HealthCheckResponse status union type for richer monitoring distinction.",
+      "risk": "No operational risk — App Service only cares about the HTTP status code",
+      "status": "accepted"
+    },
+    {
+      "id": "CL-005",
+      "pass": "failure-modes",
+      "severity": "low",
+      "title": "Rollback swap after health failure may swap in an equally broken staging slot",
+      "description": "In the deploy workflow, if the production health check fails after swap, the workflow performs a reverse swap (staging ↔ production). However, at this point 'staging' contains the old production version and 'production' contains the new broken version. The reverse swap correctly restores the old version to production. The concern is that the broken image remains on the staging slot — if a subsequent deploy fails the pre-swap health check step, it might still try to swap the already-broken staging slot. In practice, each deploy pushes a new image and redeploys to staging first, so this is a theoretical concern only.",
+      "recommendation": "No action needed for initial deploy. The pre-swap staging health check (20 attempts × 15s) already validates the staging slot before swap. Consider adding a 'delete staging slot and recreate' step as a recovery procedure in the runbook.",
+      "risk": "Theoretical only — each deploy cycle replaces the staging image via Bicep",
+      "status": "accepted"
+    },
+    {
+      "id": "CL-006",
+      "pass": "deploy-pipeline",
+      "severity": "informational",
+      "title": "Concurrency group correctly prevents parallel deploys to same environment",
+      "description": "The deploy workflow uses 'concurrency: group: hackops-deploy-${{ ... }}' with cancel-in-progress: false. This queues deploys rather than cancelling them, ensuring no two deployments to the same environment overlap. Combined with the slot swap pattern, this prevents race conditions during deployment.",
+      "recommendation": "No action needed. Positive finding.",
+      "status": "closed"
+    },
+    {
+      "id": "CL-007",
+      "pass": "failure-modes",
+      "severity": "informational",
+      "title": "Container start time limit of 300s (5 min) is appropriate for Next.js + Cosmos DB prewarm",
+      "description": "WEBSITES_CONTAINER_START_TIME_LIMIT is set to 300 seconds in app-service.bicep. The default is 230s. Given that the container needs to: (1) start Node.js, (2) load the Next.js standalone server, (3) pre-warm the Cosmos connection, and (4) pass health checks — 300s is appropriate. The 60s warmup mode in the health endpoint provides additional buffer within this window.",
+      "recommendation": "No action needed. Positive finding.",
+      "status": "closed"
+    }
+  ]
+}

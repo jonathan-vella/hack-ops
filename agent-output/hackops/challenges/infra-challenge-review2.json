@@ -1,0 +1,168 @@
+{
+  "challenged_artifact": "agent-output/hackops/04-implementation-plan.md",
+  "project_name": "hackops",
+  "artifact_type": "implementation-plan",
+  "review_date": "2026-03-01",
+  "review_number": 2,
+  "net_new_only": true,
+  "excluded_prior_review_reference": "agent-output/hackops/challenges/infra-challenge-review1.json",
+  "challenge_summary": "Second-pass adversarial review found net-new risks in three deeper areas: (1) supply-chain and DNS trust-chain controls are not fully codified, (2) performance/reliability capacity assumptions are not evidence-backed for peak hackathon load, and (3) governance evidence focuses on policy existence but not value constraints, initiative drift, and scope-precision validation.",
+  "risk_level": "high",
+  "total_must_fix": 1,
+  "total_should_fix": 12,
+  "total_consider": 3,
+  "passes": [
+    {
+      "review_focus": "security",
+      "pass_summary": "Security baseline exists, but net-new high-risk gaps remain around container supply-chain integrity, private DNS trust boundaries, RBAC scope precision, and slot parity controls.",
+      "risk_level": "high",
+      "must_fix_count": 1,
+      "should_fix_count": 4,
+      "consider_count": 1,
+      "issues": [
+        {
+          "severity": "must_fix",
+          "title": "Unsigned/mutable container promotion path",
+          "description": "Plan relies on Trivy scanning and imageTag, but does not require immutable digest deployment, signature verification, or provenance attestation between CI, ACR, and App Service. A scanned tag can be retagged/replaced after scan, enabling poisoned image promotion.",
+          "recommendation": "Enforce deploy-by-digest (DOCKER|<registry>/<repo>@sha256:...), require signed images (e.g., Sigstore/Notary v2), and verify signature+provenance in release gate before slot swap.",
+          "affected_resource_module": "modules/container-registry.bicep + modules/app-service.bicep + CI/CD release pipeline"
+        },
+        {
+          "severity": "should_fix",
+          "title": "Private Endpoint DNS resolution chain not fully specified",
+          "description": "Plan creates private DNS zones and links, but does not define end-to-end resolver chain assumptions (Azure-provided DNS vs custom DNS/forwarders). If DNS forwarding is introduced later, SQL/Key Vault private endpoint names can resolve incorrectly and break runtime connectivity.",
+          "recommendation": "Document and test authoritative DNS chain for privatelink.database.windows.net and privatelink.vaultcore.azure.net, including resolver/forwarder requirements and failure-mode runbook validation.",
+          "affected_resource_module": "modules/networking.bicep + modules/sql-database.bicep + modules/key-vault.bicep"
+        },
+        {
+          "severity": "should_fix",
+          "title": "Private DNS zone RBAC attack surface is undefined",
+          "description": "The plan does not specify least-privilege RBAC boundaries for private DNS zone write operations. Broad write roles on DNS zones can redirect private endpoint resolution to attacker-controlled targets.",
+          "recommendation": "Restrict DNS zone write permissions to minimal deployment identities, split read/write roles, and add change-audit alerts for private DNS record-set modifications.",
+          "affected_resource_module": "Private DNS zones in sql/key-vault modules and RBAC assignments in deployment orchestration"
+        },
+        {
+          "severity": "should_fix",
+          "title": "Cross-module secret propagation model is underspecified",
+          "description": "Plan passes multiple values across modules and app settings but does not clearly enforce that sensitive values are sourced only via Key Vault references at runtime. This increases risk of secret exposure through deployment parameters, logs, or config drift.",
+          "recommendation": "Declare a strict boundary: sensitive values never passed as plain params/outputs; use Key Vault secret references for app settings and secure parameter handling only.",
+          "affected_resource_module": "main.bicep orchestration + modules/app-service.bicep + modules/key-vault.bicep"
+        },
+        {
+          "severity": "should_fix",
+          "title": "Staging slot security parity is assumed, not enforced",
+          "description": "Plan states staging slot has 'same config' but does not explicitly guarantee parity for auth restrictions, managed identity behavior, network restrictions, and secret references during slot operations.",
+          "recommendation": "Codify slot-specific parity checks for auth/network/identity settings and add pre-swap validation that blocks swap if parity drift is detected.",
+          "affected_resource_module": "modules/app-service.bicep (site + slot configuration)"
+        },
+        {
+          "severity": "consider",
+          "title": "Role assignment scope may be broader than necessary",
+          "description": "Plan references AcrPull and managed identity use, but does not define explicit scope-minimization strategy for each assignment. Overly broad scopes increase blast radius after credential compromise.",
+          "recommendation": "Document each role assignment with minimum required scope and justification, and add a policy/validation step that rejects non-minimal assignment scopes.",
+          "affected_resource_module": "modules/container-registry.bicep + sql/key-vault role assignment steps"
+        }
+      ]
+    },
+    {
+      "review_focus": "waf",
+      "pass_summary": "Net-new WAF risks center on unproven capacity assumptions and missing runtime readiness mechanics (health/warm-up/retry) needed for predictable event-time performance.",
+      "risk_level": "medium",
+      "must_fix_count": 0,
+      "should_fix_count": 5,
+      "consider_count": 1,
+      "issues": [
+        {
+          "severity": "should_fix",
+          "title": "Subnet sizing headroom not validated for scale operations",
+          "description": "Subnet CIDRs are defined, but no headroom model is provided for App Service scale events, slot activity, and future private endpoints. IP exhaustion in app or PE subnet can block scaling and deployment changes mid-event.",
+          "recommendation": "Add subnet capacity calculation with reserved headroom targets and scale/future-growth assumptions; fail preflight if free IP threshold is below defined minimum.",
+          "affected_resource_module": "modules/networking.bicep"
+        },
+        {
+          "severity": "should_fix",
+          "title": "SQL S2 DTU and connection ceilings are unproven for peak write bursts",
+          "description": "S2 is selected, but no workload evidence maps hackathon spike patterns (submissions/scoring/leaderboard refresh) to DTU, worker, and connection limits.",
+          "recommendation": "Run targeted load test against peak event profile and define objective scale triggers (or SKU escalation gates) for DTU/CPU/worker saturation thresholds.",
+          "affected_resource_module": "modules/sql-database.bicep + pre-event validation process"
+        },
+        {
+          "severity": "should_fix",
+          "title": "P1v4 capacity assumption lacks explicit concurrency budget",
+          "description": "P1v4 is chosen with fallback, but no quantified request/concurrency budget is tied to expected event traffic and SSR/API mix. Capacity risk remains opaque.",
+          "recommendation": "Define per-instance throughput assumptions, target instance count at event start, and evidence-backed margin for peak concurrency.",
+          "affected_resource_module": "modules/app-service.bicep"
+        },
+        {
+          "severity": "should_fix",
+          "title": "Health probe and slot warm-up configuration not codified in plan",
+          "description": "Architecture references health checks, but implementation plan does not explicitly define health check path, warm-up behavior, and swap gating criteria.",
+          "recommendation": "Specify health probe endpoint, readiness semantics (including DB dependency), warm-up settings, and strict swap blockers tied to probe success windows.",
+          "affected_resource_module": "modules/app-service.bicep + deployment phase gates"
+        },
+        {
+          "severity": "should_fix",
+          "title": "Connection pooling and retry behavior is not defined",
+          "description": "Plan does not specify database connection pooling/retry/circuit-breaker expectations for App Service under transient SQL/network conditions, increasing timeout and thread exhaustion risk.",
+          "recommendation": "Define and validate standardized retry backoff, timeout budgets, and connection-pool limits aligned with SQL/App Service constraints.",
+          "affected_resource_module": "Application runtime config consumed by modules/app-service.bicep and SQL access layer"
+        },
+        {
+          "severity": "consider",
+          "title": "Regional SKU/quota fallback matrix is incomplete",
+          "description": "Only partial fallback logic is described (e.g., App Service plan), while quota/availability checks for all critical SKUs/resources are not fully enumerated.",
+          "recommendation": "Add a regional availability and quota matrix for all selected SKUs and make it a mandatory preflight artifact.",
+          "affected_resource_module": "04-preflight-check.md + deployment orchestration"
+        }
+      ]
+    },
+    {
+      "review_focus": "governance",
+      "pass_summary": "Governance net-new gaps are in policy semantics depth: value constraints, initiative evolution, inheritance-chain freshness, and Deny scope precision are not operationally validated.",
+      "risk_level": "medium",
+      "must_fix_count": 0,
+      "should_fix_count": 3,
+      "consider_count": 1,
+      "issues": [
+        {
+          "severity": "should_fix",
+          "title": "Tag value constraints are not validated (only tag presence)",
+          "description": "Governance artifacts strongly enforce tag existence, but implementation plan does not validate allowed values/format constraints (if any) before deployment. Existence-only checks can still fail under value-enforcing policies.",
+          "recommendation": "Add preflight validation for tag value rules (allowedValues/patterns/length) derived from effective policy definitions, not static assumptions.",
+          "affected_resource_module": "main.bicepparam + deploy.ps1 governance validation stage"
+        },
+        {
+          "severity": "should_fix",
+          "title": "Initiative-to-policy expansion is not version-pinned",
+          "description": "Plan references policy counts but does not pin initiative definition versions/hashes. Initiative updates can silently introduce new Deny rules after planning, causing deployment drift/failure.",
+          "recommendation": "Capture policy/initiative definition IDs + version/hash snapshot in governance artifact and fail deployment when effective definitions drift from approved baseline.",
+          "affected_resource_module": "04-governance-constraints.json generation + preflight drift check"
+        },
+        {
+          "severity": "should_fix",
+          "title": "Management-group inheritance chain freshness is not revalidated at deploy time",
+          "description": "Governance discovery is point-in-time. Without a just-in-time effective-assignment refresh, newly inherited management-group policies can invalidate an otherwise approved plan.",
+          "recommendation": "Re-run effective policy assignment discovery immediately before deployment and compare against approved constraints snapshot; block on material differences.",
+          "affected_resource_module": "deploy.ps1 + governance discovery workflow"
+        },
+        {
+          "severity": "consider",
+          "title": "Deny policy scope precision is not explicitly mapped to deployment scopes",
+          "description": "Current narrative focuses on high-level applicability but does not provide explicit scope-precision mapping (MG/subscription/RG/resource) for each Deny assignment relative to actual deployment scopes.",
+          "recommendation": "Add Deny scope matrix listing assignment scope, evaluated resource types/scopes, and expected enforcement point for each deployment phase.",
+          "affected_resource_module": "04-governance-constraints.md + 04-implementation-plan.md phase governance section"
+        }
+      ]
+    }
+  ],
+  "summary_by_pass": {
+    "security": { "must_fix": 1, "should_fix": 4, "consider": 1 },
+    "waf": { "must_fix": 0, "should_fix": 5, "consider": 1 },
+    "governance": { "must_fix": 0, "should_fix": 3, "consider": 1 }
+  },
+  "summary_by_severity": {
+    "must_fix": 1,
+    "should_fix": 12,
+    "consider": 3
+  }
+}

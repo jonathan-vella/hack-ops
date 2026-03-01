@@ -1,0 +1,116 @@
+{
+  "reviewDate": "2026-02-28",
+  "reviewType": "post-implementation-security",
+  "artifactsReviewed": [
+    "apps/web/Dockerfile",
+    ".dockerignore",
+    "infra/bicep/hackops/modules/container-registry.bicep",
+    "infra/bicep/hackops/main.bicep",
+    "infra/bicep/hackops/modules/app-service.bicep",
+    ".github/workflows/hackops-deploy.yml",
+    ".github/workflows/hackops-ci.yml",
+    "apps/web/src/app/api/health/route.ts",
+    "scripts/setup-acr-purge.sh",
+    "docs/first-deploy-runbook.md"
+  ],
+  "passes": [
+    {
+      "name": "auth",
+      "description": "Authentication, authorization, and identity review",
+      "result": "pass"
+    },
+    {
+      "name": "container-supply-chain",
+      "description": "Image provenance, scanning, and supply chain integrity",
+      "result": "pass"
+    },
+    {
+      "name": "infra-permissions",
+      "description": "RBAC scoping, least privilege, managed identity configuration",
+      "result": "pass"
+    }
+  ],
+  "summary": {
+    "critical": 0,
+    "high": 0,
+    "medium": 2,
+    "low": 3,
+    "informational": 2,
+    "verdict": "PASS — no critical or high findings; 2 medium findings are acceptable risk"
+  },
+  "findings": [
+    {
+      "id": "CS-001",
+      "pass": "container-supply-chain",
+      "severity": "medium",
+      "title": "Trivy action uses @master tag instead of pinned SHA or version",
+      "description": "In hackops-deploy.yml, the Trivy scan step uses 'aquasecurity/trivy-action@master'. This follows the latest master branch which could introduce breaking changes or, in a supply-chain compromise scenario, execute untrusted code. Other actions in the workflow are pinned to version tags (e.g. @v6, @v3).",
+      "file": ".github/workflows/hackops-deploy.yml",
+      "recommendation": "Pin to a specific release tag (e.g. aquasecurity/trivy-action@0.28.0) or a commit SHA for maximum reproducibility. This aligns with the GitHub Actions supply-chain hardening guidance.",
+      "risk": "Low probability, medium impact — unlikely but would run untrusted code in CI",
+      "status": "resolved",
+      "resolution": "Pinned to aquasecurity/trivy-action@0.28.0"
+    },
+    {
+      "id": "CS-002",
+      "pass": "container-supply-chain",
+      "severity": "low",
+      "title": "No SBOM generation or image signing in the pipeline",
+      "description": "The deploy workflow builds, scans (Trivy), and pushes the container image but does not generate a Software Bill of Materials (SBOM) or sign the image (e.g. with cosign/notation). For a hackathon management tool this is acceptable, but it leaves no audit trail for image provenance beyond the SHA tag.",
+      "recommendation": "Consider adding 'trivy image --format spdx-json' for SBOM generation and/or cosign signing in a future hardening pass. Not blocking for initial deploy.",
+      "risk": "No immediate operational risk; compliance gap only",
+      "status": "accepted"
+    },
+    {
+      "id": "CS-003",
+      "pass": "auth",
+      "severity": "low",
+      "title": "Health endpoint returns internal dependency names in warming and error states",
+      "description": "The /api/health endpoint returns dependency names ('cosmos-db', 'warmup') and error messages in the JSON body. While the endpoint is behind App Service internal health probing, it is also publicly accessible. Error messages from Cosmos DB operations could leak internal endpoint names or connection details.",
+      "file": "apps/web/src/app/api/health/route.ts",
+      "recommendation": "Consider returning generic error messages (e.g. 'database unreachable') instead of raw Error.message in production. The dependency name 'cosmos-db' is acceptable as it reveals only the technology choice, not connection strings.",
+      "risk": "Low — no credentials exposed, only technology stack information",
+      "status": "accepted"
+    },
+    {
+      "id": "CS-004",
+      "pass": "infra-permissions",
+      "severity": "medium",
+      "title": "Staging slot has identical app settings including ADMIN_GITHUB_IDS and OAuth secrets",
+      "description": "The staging slot in app-service.bicep receives the exact same app settings as production, including ADMIN_GITHUB_IDS, GITHUB_OAUTH_CLIENT_ID, and the Key Vault reference for the OAuth client secret. If the staging slot is accidentally exposed or used for testing, it has full admin-equivalent configuration. The staging slot should ideally use a separate OAuth app registration or at minimum different admin IDs.",
+      "file": "infra/bicep/hackops/modules/app-service.bicep",
+      "recommendation": "For initial deploy this is acceptable (staging is only briefly active during swap). In production hardening, consider: (1) separate OAuth app for staging, (2) restricted ADMIN_GITHUB_IDS for staging, (3) staging-specific token store settings.",
+      "risk": "Low probability — staging slot is transient and behind VNet integration",
+      "status": "accepted"
+    },
+    {
+      "id": "CS-005",
+      "pass": "infra-permissions",
+      "severity": "low",
+      "title": "ACR public network access enabled without IP restrictions",
+      "description": "container-registry.bicep sets publicNetworkAccess to 'Enabled' without any IP-based network rules. This means any authenticated identity with AcrPull/AcrPush can interact with the registry from any network. The plan explicitly chose 'ACR public with anonymousPullEnabled: false' as a design decision, so this is by-design. However, for production hardening, IP restrictions or private endpoints would be advisable.",
+      "file": "infra/bicep/hackops/modules/container-registry.bicep",
+      "recommendation": "No action required for initial deploy. For production: consider adding networkRuleSet with defaultAction 'Deny' and IP allow-lists for GitHub-hosted runner ranges, or upgrade to Premium SKU for private endpoint support.",
+      "risk": "Acceptable — anonymous pull disabled, authentication required, Standard SKU limitation",
+      "status": "accepted"
+    },
+    {
+      "id": "CS-006",
+      "pass": "auth",
+      "severity": "informational",
+      "title": "tokenStore.enabled set to false is correct for container deployment",
+      "description": "The app-service.bicep correctly sets tokenStore.enabled to false. Container-based App Service uses ephemeral filesystem; token store requires persistent storage. Easy Auth with GitHub uses x-ms-client-principal headers which work without token storage.",
+      "recommendation": "No action needed. This is a positive finding confirming correct configuration.",
+      "status": "closed"
+    },
+    {
+      "id": "CS-007",
+      "pass": "infra-permissions",
+      "severity": "informational",
+      "title": "All RBAC assignments use principalType ServicePrincipal — correct",
+      "description": "All four role assignments in main.bicep (AcrPull prod, AcrPull staging, KV Secrets User prod, KV Secrets User staging) correctly specify principalType: 'ServicePrincipal'. This avoids the delayed propagation issue that occurs when principalType is omitted (ARM has to look up the type at deploy time).",
+      "recommendation": "No action needed. This is a positive finding.",
+      "status": "closed"
+    }
+  ]
+}
