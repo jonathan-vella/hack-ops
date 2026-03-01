@@ -144,13 +144,13 @@ my GitHub identity.
 ---
 
 **US-002**: As a logged-in user, I want my role resolved from
-the roles container, so that I see only what my role permits.
+the roles table, so that I see only what my role permits.
 
 **Acceptance criteria**:
 
 - Given I am authenticated with GitHub userId `U1` for
   hackathon `H1`, when my role is looked up in the `roles`
-  container, then I receive one of Admin, Coach, Hacker, or
+  table, then I receive one of Admin, Coach, Hacker, or
   Anonymous.
 - Given no role record exists for my userId and hackathonId,
   when the lookup completes, then my role defaults to Anonymous
@@ -426,7 +426,7 @@ help.
 
 - Given I enter a valid event code for an active hackathon,
   when I call `POST /api/join`, then my hacker profile is
-  created in the `hackers` container.
+  created in the `hackers` table.
 - Given I enter an invalid event code, when the comparison
   fails, then a `401 Unauthorized` response is returned without
   revealing whether the hackathon exists.
@@ -521,8 +521,8 @@ consistent.
   and Markdown descriptions, when I call `POST /api/rubrics`,
   then a versioned rubric document is created.
 - Given the rubric is created, when I inspect the `rubrics`
-  container, then a version document (`rubric-v1`) and a
-  pointer document exist.
+  tables, then a version record (`rubric-v1`) and a
+  pointer record exist.
 
 > Enforces invariant: Score entry and grading are fully
 > rubric-driven — nothing hardcoded.
@@ -627,7 +627,7 @@ the scores are recorded on the leaderboard.
 - Given a `pending` submission, when I call `PATCH
 /api/submissions/:id` with status `approved` and rubric scores
   per category, then the Coach-entered scores are copied to the
-  `scores` container as immutable records.
+  `scores` table as immutable records.
 - Given the approval completes, when I check the audit fields,
   then `reviewedBy`, `reviewedAt`, `reviewReason`, and the
   per-category scores are populated.
@@ -956,7 +956,7 @@ GitHub username, so that I can build my review team.
 
 - Given I provide a valid GitHub username and select the Coach
   role, when I call `POST /api/roles/invite`, then a role
-  record is created in the `roles` container.
+  record is created in the `roles` table.
 - Given I provide the same username that already has a role,
   when the invite is processed, then the existing role is
   updated (not duplicated).
@@ -1058,7 +1058,7 @@ that I can adjust app-wide settings.
   then I see current settings (leaderboard refresh interval,
   max team size, etc.).
 - Given I update the leaderboard refresh interval from 30s to
-  60s, when I save, then the `config` container is updated and
+  60s, when I save, then the `config` table is updated and
   the leaderboard uses the new interval.
 
 ---
@@ -1116,7 +1116,7 @@ that I can monitor all hackathon activity at a glance.
   (dev only)
 - Rate limiting at 100 requests/min/IP on all API routes
 - Zod validation on all request bodies at API boundary
-- Cosmos DB accessible only via Private Endpoint
+- Azure SQL Database accessible only via Private Endpoint
   (`publicNetworkAccess: Disabled`)
 - Key Vault secrets accessed via managed identity, not
   connection strings in production
@@ -1187,7 +1187,7 @@ The following items are explicitly **not** included in HackOps:
 | **MicroHack**            | A structured hackathon event with defined challenges, team-based scoring, and gated progression                                                        |
 | **Event code**           | A 4-digit numeric code (`1000`–`9999`) auto-generated per hackathon; used by hackers to self-register; stored as plaintext, protected by rate limiting |
 | **Rubric**               | A configurable, Markdown-driven scoring template defining categories, max points, and grade thresholds                                                 |
-| **Pointer document**     | A small Cosmos DB document that references the active rubric version; enables atomic swap                                                              |
+| **Pointer document**     | A small database record (`rubric_pointers` table) that references the active rubric version; enables atomic swap via transaction                       |
 | **Staging pattern**      | Submissions enter a `pending` state and must be explicitly approved before scores appear on the leaderboard                                            |
 | **Fisher-Yates shuffle** | An unbiased algorithm for randomly assigning hackers to teams with equal probability                                                                   |
 | **Easy Auth**            | Azure App Service built-in authentication; handles GitHub OAuth without custom middleware                                                              |

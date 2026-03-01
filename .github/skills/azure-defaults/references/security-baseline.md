@@ -24,7 +24,7 @@
 | Policy             | Impact                          | Solution                              |
 | ------------------ | ------------------------------- | ------------------------------------- |
 | Required tags      | Deployment fails without tags   | Include all 4 required tags           |
-| Allowed locations  | Resources rejected outside list | Use `centralus` default               |
+| Allowed locations  | Resources rejected outside list | Use `swedencentral` default           |
 | SQL AAD-only auth  | SQL password auth blocked       | Use `azureADOnlyAuthentication: true` |
 | Storage shared key | Shared key access denied        | Use managed identity RBAC             |
 | Zone redundancy    | Non-zonal SKUs rejected         | Use P1v4+ for App Service Plans       |

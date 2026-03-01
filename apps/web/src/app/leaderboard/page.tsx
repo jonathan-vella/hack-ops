@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { getContainer } from "@/lib/cosmos";
+import { query } from "@/lib/sql";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { TrophyIcon, ArrowRightIcon } from "lucide-react";
@@ -20,14 +20,9 @@ export default async function LeaderboardIndexPage() {
   let hackathons: HackathonSummary[] = [];
 
   try {
-    const container = getContainer("hackathons");
-    const { resources } = await container.items
-      .query<HackathonSummary>({
-        query:
-          "SELECT c.id, c.name, c.status FROM c WHERE c.status IN ('active', 'judging') ORDER BY c.name",
-      })
-      .fetchAll();
-    hackathons = resources;
+    hackathons = await query<HackathonSummary>(
+      "SELECT id, name, status FROM hackathons WHERE status IN ('active', 'judging') ORDER BY name",
+    );
   } catch {
     hackathons = [];
   }

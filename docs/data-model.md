@@ -4,7 +4,7 @@
 > JSON columns, and cross-table query patterns.
 >
 > **Database**: Azure SQL Database, Serverless General Purpose (GP_S_Gen5_2)
-> **Region**: centralus
+> **Region**: swedencentral
 > **Auth**: Entra-only authentication via managed identity (no SQL passwords)
 > **DDL source**: `apps/web/src/lib/schema.sql`
 > **Migration ADR**: `agent-output/hackops/03-des-adr-0004-sql-database-over-cosmos.md`

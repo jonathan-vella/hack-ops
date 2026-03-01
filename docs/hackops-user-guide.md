@@ -175,9 +175,9 @@ Output: `docs/data-model.md`
 
 **What to check**:
 
-- All 10 Cosmos DB containers defined
-- Partition keys documented with rationale
-- Sample documents included
+- All 11 SQL Database tables defined
+- Foreign keys and indexes documented with rationale
+- Sample SQL and TypeScript interfaces included
 
 #### 1e. Create UI pages and environment config
 
@@ -235,7 +235,7 @@ Run it for each technology skill:
 > docs using Learn MCP tools."
 
 Repeat for `shadcn-ui-patterns` and `zod-validation`.
-(`cosmos-db-sdk` has been archived — replaced by SQL.)
+(`cosmos-db-sdk` skill has been archived — replaced by SQL patterns.)
 
 For `hackops-domain` (the keystone skill):
 
@@ -442,16 +442,16 @@ Create a PR and merge after CI passes.
 These can be done at any point. Pick them up between other
 phases or when you need a break from the main build.
 
-| Task                 | What to do                                                                                       |
-| -------------------- | ------------------------------------------------------------------------------------------------ |
-| Seed data            | "Create SQL seed script (Cosmos seeder archived — see `archive/scripts/seed-cosmos.ts`)"         |
-| OpenAPI spec         | "Generate `docs/openapi.yaml` from `docs/api-contract.md`"                                       |
-| Testing strategy     | "Create `docs/testing-strategy.md` as specified in blueprint Phase F section F3"                 |
-| Security checklist   | "Create `docs/security-checklist.md` as specified in blueprint Phase F section F4"               |
-| Local dev guide      | "Create `docs/local-dev-guide.md` as specified in blueprint Phase F section F5"                  |
-| Update AGENTS.md     | "Update `AGENTS.md` to include agents 11-16 and 3 subagents"                                     |
-| Update docs README   | "Update `docs/README.md` to link all new documentation"                                          |
-| Update quality score | "Update `QUALITY_SCORE.md` to track app-dev progress"                                            |
+| Task                 | What to do                                                                                        |
+| -------------------- | ------------------------------------------------------------------------------------------------- |
+| Seed data            | "Create SQL seed script (original Cosmos seeder archived — see `archive/scripts/seed-cosmos.ts`)" |
+| OpenAPI spec         | "Generate `docs/openapi.yaml` from `docs/api-contract.md`"                                        |
+| Testing strategy     | "Create `docs/testing-strategy.md` as specified in blueprint Phase F section F3"                  |
+| Security checklist   | "Create `docs/security-checklist.md` as specified in blueprint Phase F section F4"                |
+| Local dev guide      | "Create `docs/local-dev-guide.md` as specified in blueprint Phase F section F5"                   |
+| Update AGENTS.md     | "Update `AGENTS.md` to include agents 11-16 and 3 subagents"                                      |
+| Update docs README   | "Update `docs/README.md` to link all new documentation"                                           |
+| Update quality score | "Update `QUALITY_SCORE.md` to track app-dev progress"                                             |
 
 ---
 

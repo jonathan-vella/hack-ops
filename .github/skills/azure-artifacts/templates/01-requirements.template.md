@@ -266,7 +266,7 @@ Table of recommended controls based on workload pattern and compliance requireme
 
 | Preference         | Value                               | Justification                    |
 | ------------------ | ----------------------------------- | -------------------------------- |
-| Primary Region     | centralus                           | {default — override if required} |
+| Primary Region     | swedencentral                       | {default — override if required} |
 | Failover Region    | {region or N/A}                     | {compliance / latency / cost}    |
 | Availability Zones | {Required / Preferred / Not needed} | {SLA / cost trade-off}           |
 

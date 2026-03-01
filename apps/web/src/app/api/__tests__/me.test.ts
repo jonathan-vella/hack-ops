@@ -3,13 +3,11 @@ import { NextRequest } from "next/server";
 import type { EasyAuthPrincipal } from "@hackops/shared";
 
 const mockQuery = vi.fn();
+const mockExecute = vi.fn();
 
-vi.mock("@/lib/cosmos", () => ({
-  getContainer: vi.fn(() => ({
-    items: {
-      query: mockQuery,
-    },
-  })),
+vi.mock("@/lib/sql", () => ({
+  query: mockQuery,
+  execute: mockExecute,
 }));
 
 vi.mock("@/lib/auth", () => ({
@@ -31,10 +29,6 @@ function createRequest(url: string): NextRequest {
   return new NextRequest(new URL(url));
 }
 
-function emptyFetchAll(resources: unknown[] = []) {
-  return { fetchAll: vi.fn().mockResolvedValue({ resources }) };
-}
-
 describe("GET /api/me", () => {
   beforeEach(() => vi.clearAllMocks());
   afterEach(() => vi.unstubAllEnvs());
@@ -51,15 +45,13 @@ describe("GET /api/me", () => {
     expect(body.ok).toBe(false);
   });
 
-  it("returns principal and roles from Cosmos", async () => {
+  it("returns principal and roles from database", async () => {
     mockGetAuth.mockReturnValue(fakePrincipal);
     vi.stubEnv("NODE_ENV", "production");
-    mockQuery.mockReturnValue(
-      emptyFetchAll([
-        { hackathonId: "h1", role: "admin" },
-        { hackathonId: "h2", role: "coach" },
-      ]),
-    );
+    mockQuery.mockResolvedValue([
+      { hackathonId: "h1", role: "admin" },
+      { hackathonId: "h2", role: "coach" },
+    ]);
 
     const { GET } = await import("../me/route");
     const req = createRequest("http://localhost/api/me");
@@ -76,12 +68,10 @@ describe("GET /api/me", () => {
   it("derives highest role correctly (coach when no admin)", async () => {
     mockGetAuth.mockReturnValue(fakePrincipal);
     vi.stubEnv("NODE_ENV", "production");
-    mockQuery.mockReturnValue(
-      emptyFetchAll([
-        { hackathonId: "h1", role: "hacker" },
-        { hackathonId: "h2", role: "coach" },
-      ]),
-    );
+    mockQuery.mockResolvedValue([
+      { hackathonId: "h1", role: "hacker" },
+      { hackathonId: "h2", role: "coach" },
+    ]);
 
     const { GET } = await import("../me/route");
     const req = createRequest("http://localhost/api/me");
@@ -94,7 +84,7 @@ describe("GET /api/me", () => {
   it("returns null highestRole when no roles exist", async () => {
     mockGetAuth.mockReturnValue(fakePrincipal);
     vi.stubEnv("NODE_ENV", "production");
-    mockQuery.mockReturnValue(emptyFetchAll([]));
+    mockQuery.mockResolvedValue([]);
 
     const { GET } = await import("../me/route");
     const req = createRequest("http://localhost/api/me");
@@ -119,11 +109,11 @@ describe("GET /api/me", () => {
     expect(body.data.highestRole).toBe("admin");
   });
 
-  it("falls back to Cosmos when DEV_USER_ROLE is invalid", async () => {
+  it("falls back to SQL when DEV_USER_ROLE is invalid", async () => {
     mockGetAuth.mockReturnValue(fakePrincipal);
     vi.stubEnv("NODE_ENV", "development");
     vi.stubEnv("DEV_USER_ROLE", "superuser");
-    mockQuery.mockReturnValue(emptyFetchAll([]));
+    mockQuery.mockResolvedValue([]);
 
     const { GET } = await import("../me/route");
     const req = createRequest("http://localhost/api/me");
@@ -133,12 +123,10 @@ describe("GET /api/me", () => {
     expect(body.data.roles).toHaveLength(0);
   });
 
-  it("handles Cosmos query errors gracefully", async () => {
+  it("handles SQL query errors gracefully", async () => {
     mockGetAuth.mockReturnValue(fakePrincipal);
     vi.stubEnv("NODE_ENV", "production");
-    mockQuery.mockReturnValue({
-      fetchAll: vi.fn().mockRejectedValue(new Error("Cosmos unavailable")),
-    });
+    mockQuery.mockRejectedValue(new Error("SQL connection failed"));
 
     const { GET } = await import("../me/route");
     const req = createRequest("http://localhost/api/me");

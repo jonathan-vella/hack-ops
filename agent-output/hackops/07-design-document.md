@@ -58,7 +58,7 @@ security review, and future implementation changes.
 ### 1.2 Project Overview
 
 HackOps is an Azure-hosted hackathon management platform using Next.js 15 on App Service,
-Cosmos DB NoSQL (serverless), Key Vault, private networking, and Azure Monitor.
+Azure SQL Database (serverless), Key Vault, private networking, and Azure Monitor.
 
 **Business Objectives:**
 
@@ -71,9 +71,9 @@ Cosmos DB NoSQL (serverless), Key Vault, private networking, and Azure Monitor.
 | Objective    | Target                                          | Implementation                                     |
 | ------------ | ----------------------------------------------- | -------------------------------------------------- |
 | Availability | Single-region dev reliability                   | App Service + managed PaaS services in `centralus` |
-| Performance  | <2s leaderboard SSR at expected load            | Always-on Linux App Service + Cosmos DB serverless |
-| Security     | Private data plane and strong identity controls | Key Vault/Cosmos private endpoints, TLS1.2, RBAC   |
-| Scalability  | Support bursty event traffic                    | Serverless Cosmos and scalable App Service plan    |
+| Performance  | <2s leaderboard SSR at expected load            | Always-on Linux App Service + Azure SQL Database   |
+| Security     | Private data plane and strong identity controls | Key Vault/SQL private endpoints, TLS1.2, RBAC      |
+| Scalability  | Support bursty event traffic                    | Azure SQL Database and scalable App Service plan   |
 
 ### 1.4 Constraints & Assumptions
 
@@ -91,7 +91,7 @@ Cosmos DB NoSQL (serverless), Key Vault, private networking, and Azure Monitor.
 
 | Role              | Team             | Responsibility                           |
 | ----------------- | ---------------- | ---------------------------------------- |
-| Platform Owner    | InfraOps         | Infrastructure lifecycle and standards   |
+| Platform Owner    | Platform Ops     | Infrastructure lifecycle and standards   |
 | Application Owner | HackOps App Team | Feature delivery and runtime correctness |
 | Security Reviewer | Security/GRC     | Control verification and remediation     |
 
@@ -125,13 +125,13 @@ Source: [07-ab-diagram.py](./07-ab-diagram.py)
 `vnet-hackops-dev` (`10.0.0.0/16`) contains:
 
 - `snet-app-dev` (`10.0.1.0/24`) delegated to `Microsoft.Web/serverFarms`
-- `snet-pe-dev` (`10.0.2.0/24`) for private endpoints (`pe-kv-hackops-dev`, `pe-cosmos-hackops-dev`)
+- `snet-pe-dev` (`10.0.2.0/24`) for private endpoints (`pe-kv-hackops-dev`, `pe-sql-hackops-dev`)
 - `snet-default-dev` (`10.0.0.0/24`) reserved/general
 
 Private DNS zones:
 
 - `privatelink.vaultcore.azure.net`
-- `privatelink.documents.azure.com`
+- `privatelink.database.windows.net`
 
 Each zone is linked to the VNet via a dedicated `virtualNetworkLink`.
 
@@ -139,8 +139,8 @@ Each zone is linked to the VNet via a dedicated `virtualNetworkLink`.
 
 ## 💾 4. Storage
 
-Primary data store is `cosmos-hackops-dev-fplrs3` (NoSQL serverless) with database
-`hackops-db` and 10 containers (`hackathons`, `teams`, `hackers`, `rubrics`, `rubric-active`,
+Primary data store is `sql-hackops-dev` (Azure SQL Database) with database
+`hackops-db` and 10 tables (`hackathons`, `teams`, `hackers`, `rubrics`, `rubric-active`,
 `submissions`, `scores`, `challenges`, `progression`, `roles`).
 
 Data-protection controls in deployed state:
@@ -162,7 +162,7 @@ Compute tier:
 Runtime integration:
 
 - App Service integrated with `snet-app-dev`
-- App settings include Cosmos endpoint, Key Vault URI, and App Insights connection string
+- App settings include SQL Server endpoint, Key Vault URI, and App Insights connection string
 
 ---
 
@@ -177,7 +177,7 @@ Identity model:
 Authentication design intent (from ADRs and implementation):
 
 - GitHub OAuth via App Service Easy Auth (`authsettingsV2`)
-- Role authorization resolved from Cosmos `roles` container
+- Role authorization resolved from SQL `roles` table
 
 ---
 
@@ -186,12 +186,12 @@ Authentication design intent (from ADRs and implementation):
 <details>
 <summary><strong>🔒 Security Controls</strong></summary>
 
-| Control           | Implementation                                           | Evidence                                                               |
-| ----------------- | -------------------------------------------------------- | ---------------------------------------------------------------------- |
-| TLS 1.2+          | App Service and Cosmos minimum TLS 1.2                   | `az webapp show`, `az cosmosdb show`                                   |
-| HTTPS-only        | App Service `httpsOnly: true`                            | `az webapp show`                                                       |
-| Managed Identity  | System-assigned identity on web app                      | `az webapp show`                                                       |
-| Network isolation | Cosmos and Key Vault via private endpoints + private DNS | `az network private-endpoint list`, `az network private-dns zone list` |
+| Control           | Implementation                                                 | Evidence                                                               |
+| ----------------- | -------------------------------------------------------------- | ---------------------------------------------------------------------- |
+| TLS 1.2+          | App Service and SQL minimum TLS 1.2                            | `az webapp show`, `az sql server show`                                 |
+| HTTPS-only        | App Service `httpsOnly: true`                                  | `az webapp show`                                                       |
+| Managed Identity  | System-assigned identity on web app                            | `az webapp show`                                                       |
+| Network isolation | SQL Database and Key Vault via private endpoints + private DNS | `az network private-endpoint list`, `az network private-dns zone list` |
 
 </details>
 
@@ -215,7 +215,7 @@ process maturity (alert tuning, formal DR exercises).
 
 Current deployment is single-region. Recovery depends on:
 
-- Cosmos DB continuous backup tier (`Continuous30Days`)
+- Azure SQL automated backups (geo-redundant, 7-day retention)
 - Key Vault soft-delete + purge protection
 - Infrastructure redeployment from Bicep templates
 
@@ -233,7 +233,7 @@ Monitoring stack:
 - Log Analytics workspace `log-hackops-dev` (`PerGB2018`, retention 30 days)
 - Application Insights `appi-hackops-dev` (workspace-based, retention 365 days)
 
-Diagnostic settings are configured from modules for key services (App Service, Cosmos DB, Key Vault).
+Diagnostic settings are configured from modules for key services (App Service, Azure SQL Database, Key Vault).
 
 ---
 
@@ -247,7 +247,7 @@ Diagnostic settings are configured from modules for key services (App Service, C
 - Region: `centralus`
 - VNet ID: `/subscriptions/00858ffc-dded-4f0f-8bbf-e17fff0d47d9/resourceGroups/rg-hackops-us-dev/providers/Microsoft.Network/virtualNetworks/vnet-hackops-dev`
 - App hostname: `app-hackops-dev.azurewebsites.net`
-- Cosmos endpoint: `https://cosmos-hackops-dev-fplrs3.documents.azure.com:443/`
+- SQL Server endpoint: `tcp:sql-hackops-dev.database.windows.net,1433`
 - Key Vault URI: `https://kv-hackops-dev-fplrs3.vault.azure.net/`
 
 </details>
@@ -255,11 +255,11 @@ Diagnostic settings are configured from modules for key services (App Service, C
 <details>
 <summary>📚 Reference Architecture Links</summary>
 
-| Architecture                      | Link                                                            |
-| --------------------------------- | --------------------------------------------------------------- |
-| Azure Well-Architected Framework  | https://learn.microsoft.com/azure/well-architected/             |
-| Azure App Service secure baseline | https://learn.microsoft.com/azure/app-service/overview-security |
-| Cosmos DB security baseline       | https://learn.microsoft.com/azure/cosmos-db/security-baseline   |
+| Architecture                      | Link                                                                   |
+| --------------------------------- | ---------------------------------------------------------------------- |
+| Azure Well-Architected Framework  | https://learn.microsoft.com/azure/well-architected/                    |
+| Azure App Service secure baseline | https://learn.microsoft.com/azure/app-service/overview-security        |
+| Azure SQL security baseline       | https://learn.microsoft.com/azure/azure-sql/database/security-overview |
 
 </details>
 

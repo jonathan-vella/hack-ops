@@ -42,7 +42,7 @@ Always specify language for syntax highlighting:
 
 ```markdown
 ` ` `bicep
-param location string = 'centralus'
+param location string = 'swedencentral'
 ` ` `
 ```
 

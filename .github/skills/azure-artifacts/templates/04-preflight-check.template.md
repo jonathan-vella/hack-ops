@@ -89,10 +89,10 @@ flowchart LR
 
 ## 🌍 Region Limitations Identified
 
-| Resource         | Default Region | Limitation                 | Action              |
-| ---------------- | -------------- | -------------------------- | ------------------- |
-| Static Web App   | centralus      | Not supported in centralus | Hardcode westeurope |
-| {Other resource} | {region}       | {limitation if any}        | {action}            |
+| Resource         | Default Region | Limitation                     | Action              |
+| ---------------- | -------------- | ------------------------------ | ------------------- |
+| Static Web App   | swedencentral  | Not supported in swedencentral | Hardcode westeurope |
+| {Other resource} | {region}       | {limitation if any}            | {action}            |
 
 ## ⚠️ Pitfalls Checklist
 

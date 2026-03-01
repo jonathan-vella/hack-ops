@@ -86,8 +86,8 @@ export const config = {
 ## Data Fetching
 
 - Use `fetch()` in Server Components with Next.js caching
-- For Cosmos DB, use the `@azure/cosmos` SDK directly in route handlers
-- Import `getContainer()` from `@/lib/cosmos`
+- For Azure SQL, use the `mssql` package directly in route handlers
+- Import `getPool()` from `@/lib/db`
 - Always use parameterized queries — never string interpolation
 
 ## Path Aliases

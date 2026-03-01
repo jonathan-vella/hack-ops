@@ -87,6 +87,6 @@ body:
       placeholder: |
         - Node.js version: 22.x
         - Browser: Chrome 130
-        - Environment: local dev / Cosmos DB emulator / deployed
+        - Environment: local dev / local SQL Server / deployed
     validations:
       required: false

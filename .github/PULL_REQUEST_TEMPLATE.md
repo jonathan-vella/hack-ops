@@ -81,7 +81,7 @@ Fixes #
 
 ### Code Standards
 
-- [ ] Region defaults to `centralus` (or `swedencentral`)
+- [ ] Region defaults to `swedencentral` (or `northeurope`)
 - [ ] Unique suffixes used for globally-unique resource names
 - [ ] Resource names within length limits (Key Vault ≤24, Storage ≤24)
 - [ ] Required tags included (Environment, ManagedBy, Project, Owner)

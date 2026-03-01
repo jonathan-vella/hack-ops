@@ -69,34 +69,41 @@ as the source of truth.
 Create each Step 7 document following the artifact templates:
 
 #### 07-design-document.md
+
 Comprehensive design document covering architecture overview,
-networking, storage (Cosmos DB), compute (App Service), identity
+networking, storage (Azure SQL Database), compute (App Service), identity
 and access, security, backup/DR, and monitoring.
 
 #### 07-operations-runbook.md
+
 Operational procedures: daily checks, incident response, common
 procedures (scaling, key rotation, certificate renewal),
 maintenance windows, contacts, and change log.
 
 #### 07-ab-cost-estimate.md
+
 As-built cost estimate based on actual deployed SKUs and
 observed usage patterns. Dev and prod projections.
 
 #### 07-compliance-matrix.md
+
 Map deployed resources against security and governance
 requirements. Control mapping, gap analysis, evidence
 collection guidance.
 
 #### 07-backup-dr-plan.md
-Recovery objectives (RPO/RTO), backup strategy (Cosmos DB
-periodic backup, App Service snapshots), disaster recovery
+
+Recovery objectives (RPO/RTO), backup strategy (Azure SQL
+automated backups, App Service snapshots), disaster recovery
 procedures, testing schedule.
 
 #### 07-resource-inventory.md
+
 Complete inventory of all deployed resources with IDs,
 SKUs, regions, tags, networking details, and dependencies.
 
 #### 07-documentation-index.md
+
 Index linking all generated documentation with descriptions
 and quick reference for each document.
 

@@ -51,10 +51,10 @@ dev = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/jonathan-vella/azure-agentic-infraops"
-Repository = "https://github.com/jonathan-vella/azure-agentic-infraops"
-Issues = "https://github.com/jonathan-vella/azure-agentic-infraops/issues"
-Documentation = "https://github.com/jonathan-vella/azure-agentic-infraops/tree/main/mcp/azure-pricing-mcp#readme"
+Homepage = "https://github.com/jonathan-vella/hack-ops"
+Repository = "https://github.com/jonathan-vella/hack-ops"
+Issues = "https://github.com/jonathan-vella/hack-ops/issues"
+Documentation = "https://github.com/jonathan-vella/hack-ops/tree/main/mcp/azure-pricing-mcp#readme"
 
 [project.scripts]
 azure-pricing-mcp = "azure_pricing_mcp.server:run"

@@ -35,9 +35,9 @@ review and business logic review of the complete API surface.
 - **API contract**: `packages/shared/types/api-contract.ts`
   — `RolesAPI`, `AuditAPI`, `ConfigAPI` namespaces
 - **Data model**: `docs/data-model.md` — `roles` and `config`
-  containers
+  tables
 - **Skills**: Read `hackops-domain` (primary admin protection,
-  role lifecycle), `cosmos-db-sdk`
+  role lifecycle)
 
 ## Workflow
 
@@ -45,7 +45,7 @@ review and business logic review of the complete API surface.
 
 1. `packages/shared/types/api-contract.ts` — roles, audit,
    config types
-2. `docs/data-model.md` — `roles` and `config` containers
+2. `docs/data-model.md` — `roles` and `config` tables
 3. `docs/api-contract.md` — Phase 10 endpoints
 4. `.github/skills/hackops-domain/SKILL.md` — primary admin
    rules, role assignment rules
@@ -56,12 +56,12 @@ Create API route handlers:
 
 - `POST /api/roles/invite` (Admin) — invite a user by GitHub
   username, assign `coach` or `admin` role for a specific
-  hackathon. Create record in `roles` container.
+  hackathon. Create record in `roles` table.
 - `GET /api/roles` (Admin) — list role assignments for a
   hackathon. Include user details.
 - `DELETE /api/roles/:id` (Admin) — remove a role assignment.
   **Cannot demote the primary admin** — look up primary admin
-  in `config` container and reject if target matches.
+  in `config` table and reject if target matches.
 
 File structure:
 
@@ -82,7 +82,7 @@ File: `apps/web/src/app/api/audit/[hackathonId]/route.ts`
 ### Step 4 — Config management
 
 - `GET /api/config` (Admin) — return app-wide configuration
-  from `config` container (leaderboard refresh interval,
+  from `config` table (leaderboard refresh interval,
   max team size, primary admin ID, etc.)
 - `PATCH /api/config/:key` (Admin) — update a config value.
   Some keys are read-only (e.g. primary admin cannot be

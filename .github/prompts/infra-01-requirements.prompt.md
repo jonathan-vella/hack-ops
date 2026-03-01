@@ -22,7 +22,7 @@ the architecture assessment.
 
 Read the technical plan and produce
 `agent-output/hackops/01-requirements.md` — the infrastructure
-requirements document covering networking, Cosmos DB, App Service,
+requirements document covering networking, Azure SQL Database, App Service,
 Key Vault, and monitoring components.
 
 ## Scope & Preconditions
@@ -54,7 +54,7 @@ Read `.github/prompts/plan-hackOps.prompt.md`. Extract:
 
 Read `.github/skills/azure-defaults/SKILL.md`. Apply:
 
-1. Default region: `centralus`
+1. Default region: `swedencentral`
 2. Required tags: `Environment`, `Project`, `Owner`, `CostCenter`
 3. Security baseline: TLS 1.2, HTTPS-only, managed identity, no
    public endpoints on data-plane resources
@@ -73,11 +73,11 @@ template from the azure-artifacts skill. Include:
 4. **Resource inventory**:
    - Virtual Network with 3 subnets
    - App Service Plan (P1v3) + App Service (Linux, Node 22)
-   - Cosmos DB NoSQL (Serverless) with 10 containers
+   - Azure SQL Database (Serverless) with 10 tables
    - Key Vault with RBAC authorization
    - Log Analytics workspace + Application Insights
-   - Private DNS Zone for Cosmos DB
-   - Private Endpoint for Cosmos DB
+   - Private DNS Zone for Azure SQL
+   - Private Endpoint for Azure SQL
    - NSGs for each subnet
 5. **Non-functional requirements**: Performance, availability,
    security, cost targets

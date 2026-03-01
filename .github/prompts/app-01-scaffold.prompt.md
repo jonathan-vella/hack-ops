@@ -1,5 +1,5 @@
 ---
-description: "Scaffold Turborepo + Next.js 15 monorepo with shared packages, Cosmos DB emulator config, and seed script"
+description: "Scaffold Turborepo + Next.js 15 monorepo with shared packages, local SQL Server (Docker) config, and seed script"
 agent: 11-App Builder
 tools:
   [
@@ -18,7 +18,7 @@ tools:
 # Scaffold HackOps Monorepo
 
 Set up the Turborepo + Next.js 15 monorepo, shared type
-packages, Cosmos DB emulator config, and dev environment.
+packages, local SQL Server (Docker) config, and dev environment.
 
 ## Mission
 
@@ -31,13 +31,13 @@ business logic — only project structure and plumbing.
 
 - **Plan reference**: `.github/prompts/plan-hackOps.prompt.md`
   — read `Phase 1: Monorepo Scaffold & Dev Environment`
-- **Data model**: `docs/data-model.md` — 10 container
+- **Data model**: `docs/data-model.md` — 10 table
   interfaces to create in `packages/shared/types/`
 - **API contract**: `packages/shared/types/api-contract.ts`
   — already exists; do NOT overwrite
 - **Env config**: `docs/environment-config.md` — variable
   reference for `.env.example`
-- **Skills**: Read `nextjs-patterns`, `cosmos-db-sdk`,
+- **Skills**: Read `nextjs-patterns`,
   `zod-validation`, and `hackops-domain` skills before starting
 
 ## Workflow
@@ -47,11 +47,10 @@ business logic — only project structure and plumbing.
 Read these files (in order):
 
 1. `.github/prompts/plan-hackOps.prompt.md` — Phase 1 section
-2. `docs/data-model.md` — all 10 container schemas
+2. `docs/data-model.md` — all 10 table schemas
 3. `docs/environment-config.md` — env var reference
 4. `packages/shared/types/api-contract.ts` — existing types
 5. `.github/skills/nextjs-patterns/SKILL.md`
-6. `.github/skills/cosmos-db-sdk/SKILL.md`
 
 ### Step 2 — Create monorepo structure
 
@@ -68,7 +67,7 @@ Read these files (in order):
 
 In `apps/web/`:
 
-- `@azure/cosmos`, `@azure/identity` — Cosmos DB SDK + auth
+- `mssql`, `@azure/identity` — SQL Database client + auth
 - `zod` — runtime validation
 - `next-themes` — dark mode support
 - Dev: `vitest`, `@testing-library/react`, `@types/node`
@@ -79,7 +78,7 @@ Install and configure shadcn/ui — init + base components:
 
 ### Step 4 — Create shared types
 
-In `packages/shared/types/`, create one file per container
+In `packages/shared/types/`, create one file per table
 matching `docs/data-model.md` interfaces:
 
 - `hackathon.ts`, `team.ts`, `hacker.ts`, `score.ts`,
@@ -94,10 +93,10 @@ and re-export where appropriate.
 
 In `apps/web/src/lib/`:
 
-- `cosmos.ts` — Cosmos DB client singleton with factory
-  function: connection string auth for emulator, managed
+- `sql.ts` — SQL Database client singleton with factory
+  function: connection string auth for local SQL Server, managed
   identity (`DefaultAzureCredential`) for production.
-  Export typed container accessors for all 10 containers.
+  Export typed query helpers (`query<T>`, `queryOne<T>`, `execute`, `transaction`) for all 10 tables.
 - `auth.ts` — stub with Easy Auth header parsing signature
   (implementation in app-02)
 - `validation/index.ts` — stub for Zod middleware
@@ -116,16 +115,15 @@ In `apps/web/src/lib/`:
 
 - Create `apps/web/.env.example` from
   `docs/environment-config.md`
-- Create `apps/web/.env.local` (gitignored) with Cosmos DB
-  emulator defaults
-- Add `NODE_TLS_REJECT_UNAUTHORIZED=0` for emulator
-  self-signed cert
+- Create `apps/web/.env.local` (gitignored) with local SQL Server
+  (Docker) defaults
+- Add `trustServerCertificate: true` for local dev
 
 ### Step 8 — Seed script
 
-Create `scripts/seed-cosmos.ts`:
+Create `scripts/seed-sql.ts`:
 
-- Creates all 10 containers with correct partition keys
+- Creates all 10 tables with correct primary keys and indexes
 - Inserts sample documents from `docs/data-model.md` examples
 - Idempotent — safe to run multiple times
 
@@ -144,7 +142,7 @@ Run these commands and fix any errors:
 - Next.js 15 app in `apps/web/`
 - Shared types in `packages/shared/`
 - Health endpoint at `/api/health`
-- Seed script at `scripts/seed-cosmos.ts`
+- Seed script at `scripts/seed-sql.ts`
 - `.env.example` with all required variables
 
 ## Exit Criteria
@@ -156,9 +154,9 @@ Run these commands and fix any errors:
 ## Quality Assurance
 
 - [ ] Turborepo pipelines configured (`build`, `lint`, `type-check`, `test`)
-- [ ] All 10 container interfaces created in `packages/shared/types/`
+- [ ] All 10 table interfaces created in `packages/shared/types/`
 - [ ] `@hackops/shared` importable from `apps/web`
-- [ ] Cosmos DB client singleton with emulator/production factory
+- [ ] SQL Database client singleton with local/production factory
 - [ ] `.env.example` matches `docs/environment-config.md`
 - [ ] shadcn/ui initialized with base components
 - [ ] No hardcoded secrets in committed files

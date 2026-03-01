@@ -52,7 +52,7 @@ transitive packages.
 
 | Package               | Pinned Range | Installed | Latest     | Breaking?       |
 | --------------------- | ------------ | --------- | ---------- | --------------- |
-| `@azure/cosmos`       | `^4.2.0`     | 4.2.x     | 4.2.x      | No              |
+| `mssql`               | `^11.0.1`    | 11.0.x    | 11.0.x     | No              |
 | `@azure/identity`     | `^4.7.0`     | 4.7.x     | 4.7.x      | No              |
 | `next`                | `^15.3.0`    | 15.5.12   | **16.1.6** | **Yes — major** |
 | `react` / `react-dom` | `^19.1.0`    | 19.1.x    | 19.1.x     | No              |

@@ -15,7 +15,6 @@ export default defineConfig({
       exclude: [
         "src/**/*.test.ts",
         "src/**/__tests__/**",
-        "src/lib/cosmos.ts",
         "src/lib/hooks/**",
         "src/lib/validation/index.ts",
       ],

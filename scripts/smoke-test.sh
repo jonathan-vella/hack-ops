@@ -252,8 +252,8 @@ if [[ "$HEALTH_OK" == "true" ]]; then
 
   # Parse health response
   HEALTH_STATUS=$(jq -r '.status // .data.status // "unknown"' /tmp/smoke-body.txt 2>/dev/null || echo "unknown")
-  COSMOS_STATUS=$(jq -r '.checks[]? | select(.name=="cosmos-db") | .status // "missing"' /tmp/smoke-body.txt 2>/dev/null || echo "not-checked")
-  echo -e "        Overall: $HEALTH_STATUS | Cosmos DB: $COSMOS_STATUS"
+  SQL_STATUS=$(jq -r '.checks[]? | select(.name=="sql-database") | .status // "missing"' /tmp/smoke-body.txt 2>/dev/null || echo "not-checked")
+  echo -e "        Overall: $HEALTH_STATUS | SQL Database: $SQL_STATUS"
 else
   echo -e "  ${RED}FAIL${NC}  GET /api/health — not reachable after $RETRIES attempts"
   FAIL=$((FAIL + 1))

@@ -27,8 +27,8 @@ echo "=== HackOps Milestones ==="
 
 create_milestone \
   "Phase 1: Monorepo Scaffold" \
-  "Goal: Working Next.js app running locally with TypeScript, Tailwind, shadcn/ui, and Cosmos DB emulator.
-Exit: npm run dev shows hello-world page; API route returns { status: ok } from emulator."
+  "Goal: Working Next.js app running locally with TypeScript, Tailwind, shadcn/ui, and local SQL Server.
+Exit: npm run dev shows hello-world page; API route returns { status: ok } from database."
 
 create_milestone \
   "Phase 1.5: Governance Discovery" \
@@ -42,13 +42,13 @@ Exit: bicep build succeeds; az deployment group what-if shows expected resources
 
 create_milestone \
   "Phase 3: Database IaC & Schema" \
-  "Goal: Cosmos DB deployed with all 10 containers via Private Endpoint.
-Exit: Cosmos DB accessible from VNet; all containers created; publicNetworkAccess disabled."
+  "Goal: Azure SQL Database deployed with schema via Private Endpoint.
+Exit: SQL Database accessible from VNet; all tables created; publicNetworkAccess disabled."
 
 create_milestone \
   "Phase 4: Compute IaC & Deployment" \
-  "Goal: App Service with VNet integration, Easy Auth, Cosmos DB connectivity.
-Exit: App Service reachable via HTTPS; GitHub OAuth works; API routes query Cosmos DB."
+  "Goal: App Service with VNet integration, Easy Auth, SQL Database connectivity.
+Exit: App Service reachable via HTTPS; GitHub OAuth works; API routes query SQL Database."
 
 create_milestone \
   "Phase 5: Auth & Authorization" \

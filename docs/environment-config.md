@@ -16,19 +16,19 @@
 | `NEXT_PUBLIC_APP_URL` | Public-facing app URL | `.env.local` → `http://localhost:3000` | App Setting → `https://app-hackops-{env}-{suffix}.azurewebsites.net` |
 | `PORT`                | HTTP listen port      | Default `3000`                         | App Service managed (port `8080`)                                    |
 
-### Azure Cosmos DB
+### Azure SQL Database
 
-| Variable                   | Description                           | Source (Dev)                | Source (Prod)                       |
-| -------------------------- | ------------------------------------- | --------------------------- | ----------------------------------- |
-| `COSMOS_ENDPOINT`          | Cosmos DB account endpoint URL        | `.env.local` → emulator URL | Key Vault reference                 |
-| `COSMOS_KEY`               | Cosmos DB account key (emulator only) | `.env.local` → emulator key | **Not used** — managed identity     |
-| `COSMOS_DATABASE_NAME`     | Database name                         | `.env.local` → `hackops`    | App Setting → `hackops`             |
-| `COSMOS_CONNECTION_STRING` | Full connection string (fallback)     | `.env.local` → emulator     | Key Vault reference (fallback only) |
+| Variable       | Description                   | Source (Dev)                | Source (Prod)                   |
+| -------------- | ----------------------------- | --------------------------- | ------------------------------- |
+| `SQL_SERVER`   | SQL Database server hostname  | `.env.local` → `localhost`  | App Setting (from Bicep output) |
+| `SQL_DATABASE` | Database name                 | `.env.local` → `hackops`    | App Setting → `hackops`         |
+| `SQL_USER`     | SQL login (local dev only)    | `.env.local` → `sa`         | **Not used** — managed identity |
+| `SQL_PASSWORD` | SQL password (local dev only) | `.env.local` → dev password | **Not used** — managed identity |
 
 > In production, the app uses `@azure/identity`
 > `DefaultAzureCredential` with the App Service
-> system-assigned managed identity. Connection strings
-> are a fallback only — prefer managed identity auth.
+> system-assigned managed identity. SQL passwords
+> are not used in production — Entra-only auth is enforced.
 
 ### Authentication (Easy Auth)
 
@@ -60,12 +60,12 @@
 
 ### TLS & Security
 
-| Variable                       | Description                            | Source (Dev)       | Source (Prod)                    |
-| ------------------------------ | -------------------------------------- | ------------------ | -------------------------------- |
-| `NODE_TLS_REJECT_UNAUTHORIZED` | Disable TLS cert validation (emulator) | `.env.local` → `0` | **Not set** (must remain strict) |
+| Variable                       | Description                       | Source (Dev)       | Source (Prod)                    |
+| ------------------------------ | --------------------------------- | ------------------ | -------------------------------- |
+| `NODE_TLS_REJECT_UNAUTHORIZED` | Disable TLS cert validation (dev) | `.env.local` → `0` | **Not set** (must remain strict) |
 
-> `NODE_TLS_REJECT_UNAUTHORIZED=0` is required only
-> for the Cosmos DB emulator's self-signed certificate.
+> `NODE_TLS_REJECT_UNAUTHORIZED=0` is only needed
+> if using a self-signed certificate for local SQL Server.
 > Never set this in production.
 
 ---
@@ -148,11 +148,11 @@ configuration.
 
 ### Secrets Stored in Key Vault
 
-| Secret Name                  | Description                            |
-| ---------------------------- | -------------------------------------- |
-| `github-oauth-client-id`     | GitHub OAuth App client ID             |
-| `github-oauth-client-secret` | GitHub OAuth App client secret         |
-| `cosmos-connection-string`   | Cosmos DB connection string (fallback) |
+| Secret Name                  | Description                               |
+| ---------------------------- | ----------------------------------------- |
+| `github-oauth-client-id`     | GitHub OAuth App client ID                |
+| `github-oauth-client-secret` | GitHub OAuth App client secret            |
+| `sql-connection-string`      | SQL Database connection string (fallback) |
 
 > The App Service system-assigned managed identity is
 > granted the **Key Vault Secrets User** role via ARM
@@ -171,10 +171,11 @@ This template should be copied to `.env.local` in
 NODE_ENV=development
 NEXT_PUBLIC_APP_URL=http://localhost:3000
 
-# Cosmos DB Emulator
-COSMOS_ENDPOINT=https://localhost:8081
-COSMOS_KEY=C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw==
-COSMOS_DATABASE_NAME=hackops
+# SQL Database (local dev)
+SQL_SERVER=localhost
+SQL_DATABASE=hackops
+SQL_USER=sa
+SQL_PASSWORD=HackOps@Dev123
 NODE_TLS_REJECT_UNAUTHORIZED=0
 
 # Dev Auth Bypass (Easy Auth simulation)
@@ -195,12 +196,12 @@ DEV_USER_ROLE=admin
 
 ## Environment Comparison
 
-| Aspect          | Local Dev                    | Azure (Production)                                     |
-| --------------- | ---------------------------- | ------------------------------------------------------ |
-| **Auth**        | Dev bypass (`DEV_USER_*`)    | Easy Auth (GitHub OAuth)                               |
-| **Cosmos DB**   | Emulator (connection string) | Managed identity + private endpoint                    |
-| **Secrets**     | `.env.local` file            | Key Vault references                                   |
-| **TLS**         | Self-signed cert (emulator)  | Platform-managed TLS 1.2                               |
-| **Networking**  | `localhost`                  | VNet integration + private DNS                         |
-| **Monitoring**  | Console logging              | App Insights + Log Analytics                           |
-| **CORS origin** | `http://localhost:3000`      | `https://app-hackops-{env}-{suffix}.azurewebsites.net` |
+| Aspect           | Local Dev                   | Azure (Production)                                     |
+| ---------------- | --------------------------- | ------------------------------------------------------ |
+| **Auth**         | Dev bypass (`DEV_USER_*`)   | Easy Auth (GitHub OAuth)                               |
+| **SQL Database** | Local SQL Server (SA login) | Managed identity + private endpoint                    |
+| **Secrets**      | `.env.local` file           | Key Vault references                                   |
+| **TLS**          | Standard TLS (local SQL)    | Platform-managed TLS 1.2                               |
+| **Networking**   | `localhost`                 | VNet integration + private DNS                         |
+| **Monitoring**   | Console logging             | App Insights + Log Analytics                           |
+| **CORS origin**  | `http://localhost:3000`     | `https://app-hackops-{env}-{suffix}.azurewebsites.net` |

@@ -100,5 +100,5 @@ timestamp wins. This rewards faster completion.
 
 - `packages/shared/types/api-contract.ts` — type-level contract
 - `docs/prd.md` — user stories and acceptance criteria
-- `docs/data-model.md` — Cosmos DB container design
+- `docs/data-model.md` — SQL table design
 - `docs/api-contract.md` — endpoint documentation

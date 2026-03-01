@@ -79,7 +79,7 @@ Each invocation runs **3 focused review passes** to ensure comprehensive coverag
 - [ ] Leaderboard API does not expose submission details, only aggregated scores
 - [ ] Hacker-facing endpoints do not return other hackers' personal data
 - [ ] Audit trail data is only accessible to admins
-- [ ] Cosmos DB queries use parameterized queries, not string interpolation
+- [ ] SQL queries use parameterized queries, not string interpolation
 - [ ] No secrets (API keys, connection strings) in client-side bundles
 
 ### Injection & XSS
@@ -87,7 +87,7 @@ Each invocation runs **3 focused review passes** to ensure comprehensive coverag
 - [ ] User-provided strings (team names, hacker names) are sanitized before rendering
 - [ ] Markdown content from rubrics/challenges is sanitized before HTML rendering
 - [ ] No `dangerouslySetInnerHTML` without DOMPurify or equivalent
-- [ ] Cosmos DB queries use parameterized inputs, not string concatenation
+- [ ] SQL queries use parameterized inputs, not string concatenation
 - [ ] File uploads (if any) are validated for type, size, and content
 
 ### Missing Security Controls

@@ -8,7 +8,7 @@
 | ------- | ------- | ---------------------------- |
 | Node.js | ≥20 LTS | Runtime                      |
 | npm     | ≥10     | Package manager (workspaces) |
-| Docker  | Latest  | Cosmos DB emulator           |
+| Docker  | Latest  | SQL Server container         |
 
 ## 1. Clone and Install
 
@@ -18,38 +18,40 @@ cd hack-ops
 npm install
 ```
 
-## 2. Start the Cosmos DB Emulator
+## 2. Start the Local SQL Server
 
 ```bash
-docker run -d --name cosmos-emulator \
-  -p 8081:8081 -p 10250-10255:10250-10255 \
-  -e AZURE_COSMOS_EMULATOR_PARTITION_COUNT=5 \
-  mcr.microsoft.com/cosmosdb/linux/azure-cosmos-emulator:latest
+docker run -d --name sql-server \
+  -p 1433:1433 \
+  -e ACCEPT_EULA=Y \
+  -e MSSQL_SA_PASSWORD='HackOps@Dev123' \
+  mcr.microsoft.com/mssql/server:2022-latest
 ```
 
-Wait for the emulator to be ready (check https://localhost:8081/\_explorer/index.html).
+Wait for SQL Server to be ready (check with `sqlcmd -S localhost -U sa -P 'HackOps@Dev123' -Q "SELECT 1"`).
 
-> The emulator uses a well-known key for local development. Never use this
-> key in production.
+> The SA password above is for local development only. Never use this
+> password in production.
 
 ## 3. Configure Environment
 
 Create `apps/web/.env.local`:
 
 ```env
-COSMOS_ENDPOINT=https://localhost:8081
-COSMOS_KEY=C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw==
-COSMOS_DATABASE=hackops
+SQL_SERVER=localhost
+SQL_DATABASE=hackops
+SQL_USER=sa
+SQL_PASSWORD=HackOps@Dev123
 ```
 
-The key above is the well-known emulator key (safe to commit in local configs).
+The SA password above is for local development only (safe to commit in local configs).
 
 ## 4. Seed the Database
 
-> **Note**: The Cosmos DB seeder (`seed-cosmos.ts`) has been archived.
+> **Note**: The original Cosmos DB seeder has been archived.
 > A new SQL seeder will be created as part of Phase I.
-> The DB is behind a private endpoint — seeding must run from
-> inside the VNet (e.g., via ACI).
+> In production, the DB is behind a private endpoint — seeding
+> must run from inside the VNet (e.g., via ACI).
 
 <!-- TODO: Replace with SQL seed script once created -->
 
@@ -99,9 +101,9 @@ Key routes to verify after setup:
 
 ## Troubleshooting
 
-| Problem                       | Solution                                             |
-| ----------------------------- | ---------------------------------------------------- |
-| Cosmos emulator not reachable | Check Docker container is running: `docker ps`       |
-| Certificate errors            | Set `NODE_TLS_REJECT_UNAUTHORIZED=0` in `.env.local` |
-| Port 3000 in use              | Kill existing process: `lsof -ti:3000 \| xargs kill` |
-| Seed script fails             | Ensure emulator is fully started (takes ~30s)        |
+| Problem                    | Solution                                                         |
+| -------------------------- | ---------------------------------------------------------------- |
+| SQL Server not reachable   | Check Docker container is running: `docker ps`                   |
+| Connection refused on 1433 | Ensure SQL Server container is healthy: `docker logs sql-server` |
+| Port 3000 in use           | Kill existing process: `lsof -ti:3000 \| xargs kill`             |
+| Seed script fails          | Ensure SQL Server is fully started (takes ~15s)                  |

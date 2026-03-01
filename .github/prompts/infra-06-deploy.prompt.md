@@ -32,7 +32,7 @@ summary documenting all created resources.
   status is not `"pending"`. Governance discovery must be complete
   before any deployment
 - **Azure connectivity**: Required. Verify with `az account show`
-- **Target**: Resource group `rg-hackops-dev` in `centralus`
+- **Target**: Resource group `rg-hackops-dev` in `swedencentral`
 - **Deployment method**: Azure Deployment Stacks
   (`az stack group create`)
 - **Output**: `agent-output/hackops/06-deployment-summary.md`
@@ -91,7 +91,7 @@ Monitor deployment status and capture outputs.
 
 1. Verify all resources created:
    `az resource list -g rg-hackops-dev -o table`
-2. Verify Cosmos DB private endpoint connectivity
+2. Verify Azure SQL private endpoint connectivity
 3. Verify Key Vault accessibility
 4. Verify App Service is running and reachable via HTTPS
 5. Verify App Insights is receiving telemetry

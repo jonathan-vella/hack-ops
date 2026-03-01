@@ -1,6 +1,5 @@
 ---
 description: "Adversarial review of HackOps architecture assessment and implementation plan before deployment proceeds"
-agent: infra-challenger-subagent
 tools: ["read/readFile", "search/textSearch", "search/fileSearch"]
 ---
 
@@ -55,7 +54,7 @@ For each architecture decision, challenge:
 2. **WAF blind spots**: Which WAF pillars were underweighted?
 3. **Scale limits**: Will the architecture handle the stated
    ~75 concurrent users with headroom?
-4. **Failure modes**: What happens when Cosmos DB throttles? When
+4. **Failure modes**: What happens when Azure SQL is unavailable? When
    App Service restarts? When private endpoint DNS fails?
 5. **Security gaps**: Are there unprotected endpoints, unaudited
    operations, or credential exposure risks?
@@ -66,11 +65,11 @@ For each architecture decision, challenge:
 2. Are there `Deny` policies that could block deployment?
 3. Are tag requirements complete?
 4. Are SKU restrictions respected?
-5. Is `centralus` confirmed for all resource types?
+5. Is `swedencentral` confirmed for all resource types?
 
 ### Step 4 — Challenge cost assumptions
 
-1. Are Serverless Cosmos DB burst limits sufficient?
+1. Are Serverless Azure SQL auto-pause limits acceptable?
 2. Is P1v3 App Service adequate for the workload?
 3. Are there hidden costs (private DNS zones, data transfer,
    Log Analytics ingestion)?

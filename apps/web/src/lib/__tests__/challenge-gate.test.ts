@@ -1,36 +1,27 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
-const challengeQuery = vi.fn();
-const progressionQuery = vi.fn();
-const progressionReplace = vi.fn();
-
-vi.mock("../cosmos", () => ({
-  getContainer: vi.fn((name: string) => {
-    if (name === "challenges") {
-      return { items: { query: challengeQuery } };
-    }
-    if (name === "progression") {
-      return {
-        items: { query: progressionQuery },
-        item: vi.fn(() => ({ replace: progressionReplace })),
-      };
-    }
-    return { items: { query: vi.fn() } };
-  }),
+vi.mock("../sql", () => ({
+  query: vi.fn(),
+  queryOne: vi.fn(),
+  execute: vi.fn(),
 }));
 
 import { checkChallengeGate, advanceProgression } from "../challenge-gate";
+import { queryOne, execute } from "../sql";
 
-function emptyFetchAll(resources: unknown[] = []) {
-  return { fetchAll: vi.fn().mockResolvedValue({ resources }) };
-}
+const mockQueryOne = vi.mocked(queryOne);
+const mockExecute = vi.mocked(execute);
 
 describe("checkChallengeGate", () => {
   beforeEach(() => vi.clearAllMocks());
 
   it("returns allowed:true when challenge order <= currentChallenge", async () => {
-    challengeQuery.mockReturnValue(emptyFetchAll([{ order: 1 }]));
-    progressionQuery.mockReturnValue(emptyFetchAll([{ currentChallenge: 2 }]));
+    mockQueryOne
+      .mockResolvedValueOnce({ order: 1 })
+      .mockResolvedValueOnce({
+        currentChallenge: 2,
+        rowVersion: Buffer.from("v1"),
+      });
 
     const result = await checkChallengeGate("team-1", "h1", "ch-1");
 
@@ -39,8 +30,12 @@ describe("checkChallengeGate", () => {
   });
 
   it("returns allowed:false when challenge is locked", async () => {
-    challengeQuery.mockReturnValue(emptyFetchAll([{ order: 3 }]));
-    progressionQuery.mockReturnValue(emptyFetchAll([{ currentChallenge: 2 }]));
+    mockQueryOne
+      .mockResolvedValueOnce({ order: 3 })
+      .mockResolvedValueOnce({
+        currentChallenge: 2,
+        rowVersion: Buffer.from("v1"),
+      });
 
     const result = await checkChallengeGate("team-1", "h1", "ch-3");
 
@@ -49,7 +44,7 @@ describe("checkChallengeGate", () => {
   });
 
   it("returns allowed:false when challenge not found", async () => {
-    challengeQuery.mockReturnValue(emptyFetchAll([]));
+    mockQueryOne.mockResolvedValueOnce(null);
 
     const result = await checkChallengeGate("team-1", "h1", "nonexistent");
 
@@ -58,8 +53,9 @@ describe("checkChallengeGate", () => {
   });
 
   it("returns allowed:false when no progression record exists", async () => {
-    challengeQuery.mockReturnValue(emptyFetchAll([{ order: 1 }]));
-    progressionQuery.mockReturnValue(emptyFetchAll([]));
+    mockQueryOne
+      .mockResolvedValueOnce({ order: 1 })
+      .mockResolvedValueOnce(null);
 
     const result = await checkChallengeGate("team-1", "h1", "ch-1");
 
@@ -68,8 +64,12 @@ describe("checkChallengeGate", () => {
   });
 
   it("allows current challenge (order === currentChallenge)", async () => {
-    challengeQuery.mockReturnValue(emptyFetchAll([{ order: 2 }]));
-    progressionQuery.mockReturnValue(emptyFetchAll([{ currentChallenge: 2 }]));
+    mockQueryOne
+      .mockResolvedValueOnce({ order: 2 })
+      .mockResolvedValueOnce({
+        currentChallenge: 2,
+        rowVersion: Buffer.from("v1"),
+      });
 
     const result = await checkChallengeGate("team-1", "h1", "ch-2");
 
@@ -81,62 +81,52 @@ describe("advanceProgression", () => {
   beforeEach(() => vi.clearAllMocks());
 
   it("advances when approved challenge matches currentChallenge", async () => {
-    challengeQuery.mockReturnValue(emptyFetchAll([{ order: 2 }]));
-    progressionQuery.mockReturnValue(
-      emptyFetchAll([
-        {
-          id: "prog-1",
-          currentChallenge: 2,
-          unlockedChallenges: [
-            { challengeId: "ch-1", unlockedAt: "2025-01-01T00:00:00Z" },
-          ],
-          _etag: "etag-1",
-        },
+    mockQueryOne.mockResolvedValueOnce({ order: 2 }).mockResolvedValueOnce({
+      id: "prog-1",
+      currentChallenge: 2,
+      unlockedChallenges: JSON.stringify([
+        { challengeId: "ch-1", unlockedAt: "2025-01-01T00:00:00Z" },
       ]),
-    );
-    progressionReplace.mockResolvedValue({ resource: {} });
+      rowVersion: Buffer.from("v1"),
+    });
+    mockExecute.mockResolvedValueOnce(1);
 
     await advanceProgression("team-1", "h1", "ch-2");
 
-    expect(progressionReplace).toHaveBeenCalledTimes(1);
-    const [updated, options] = progressionReplace.mock.calls[0];
-    expect(updated.currentChallenge).toBe(3);
-    expect(updated.unlockedChallenges).toHaveLength(2);
-    expect(options.accessCondition.condition).toBe("etag-1");
+    expect(mockExecute).toHaveBeenCalledTimes(1);
+    const [sqlText, params] = mockExecute.mock.calls[0];
+    expect(sqlText).toContain("UPDATE progressions");
+    expect(params?.nextChallenge).toBe(3);
   });
 
   it("does not advance when challenge order !== currentChallenge", async () => {
-    challengeQuery.mockReturnValue(emptyFetchAll([{ order: 1 }]));
-    progressionQuery.mockReturnValue(
-      emptyFetchAll([
-        {
-          id: "prog-1",
-          currentChallenge: 2,
-          unlockedChallenges: [],
-          _etag: "etag-1",
-        },
-      ]),
-    );
+    mockQueryOne.mockResolvedValueOnce({ order: 1 }).mockResolvedValueOnce({
+      id: "prog-1",
+      currentChallenge: 2,
+      unlockedChallenges: "[]",
+      rowVersion: Buffer.from("v1"),
+    });
 
     await advanceProgression("team-1", "h1", "ch-1");
 
-    expect(progressionReplace).not.toHaveBeenCalled();
+    expect(mockExecute).not.toHaveBeenCalled();
   });
 
   it("does nothing when challenge not found", async () => {
-    challengeQuery.mockReturnValue(emptyFetchAll([]));
+    mockQueryOne.mockResolvedValueOnce(null);
 
     await advanceProgression("team-1", "h1", "nonexistent");
 
-    expect(progressionReplace).not.toHaveBeenCalled();
+    expect(mockExecute).not.toHaveBeenCalled();
   });
 
   it("does nothing when no progression record", async () => {
-    challengeQuery.mockReturnValue(emptyFetchAll([{ order: 1 }]));
-    progressionQuery.mockReturnValue(emptyFetchAll([]));
+    mockQueryOne
+      .mockResolvedValueOnce({ order: 1 })
+      .mockResolvedValueOnce(null);
 
     await advanceProgression("team-1", "h1", "ch-1");
 
-    expect(progressionReplace).not.toHaveBeenCalled();
+    expect(mockExecute).not.toHaveBeenCalled();
   });
 });

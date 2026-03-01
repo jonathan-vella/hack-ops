@@ -4,22 +4,11 @@ import type { EasyAuthPrincipal } from "@hackops/shared";
 
 // ── Mocks ──────────────────────────────────────────────────
 
-const mockQuery = vi.fn();
-const mockCreate = vi.fn();
-const mockRead = vi.fn();
-const mockReplace = vi.fn();
-
-vi.mock("@/lib/cosmos", () => ({
-  getContainer: vi.fn(() => ({
-    items: {
-      query: mockQuery,
-      create: mockCreate,
-    },
-    item: vi.fn(() => ({
-      read: mockRead,
-      replace: mockReplace,
-    })),
-  })),
+vi.mock("@/lib/sql", () => ({
+  query: vi.fn(),
+  queryOne: vi.fn(),
+  execute: vi.fn(),
+  transaction: vi.fn(),
 }));
 
 vi.mock("@/lib/auth", () => ({
@@ -34,9 +23,14 @@ vi.mock("@/lib/audit", () => ({
   auditLog: vi.fn(),
 }));
 
+import { query, queryOne, execute, transaction } from "@/lib/sql";
 import { getAuthPrincipal } from "@/lib/auth";
 import { resolveRole } from "@/lib/roles";
 
+const mockQuery = vi.mocked(query);
+const mockQueryOne = vi.mocked(queryOne);
+const mockExecute = vi.mocked(execute);
+const mockTransaction = vi.mocked(transaction);
 const mockGetAuth = vi.mocked(getAuthPrincipal);
 const mockResolveRole = vi.mocked(resolveRole);
 
@@ -68,66 +62,62 @@ describe("POST /api/hackathons/:id/assign-teams", () => {
     mockGetAuth.mockReturnValue(fakePrincipal);
     mockResolveRole.mockResolvedValue("admin");
 
-    // Hackathon read
-    mockRead.mockResolvedValueOnce({
-      resource: { id: "h1", teamSize: 3, status: "active" },
+    // queryOne: hackathon read
+    mockQueryOne.mockResolvedValueOnce({
+      id: "h1",
+      teamSize: 3,
+      status: "active",
     });
 
-    // Unassigned hackers query, then existing teams count
-    let queryCount = 0;
-    mockQuery.mockReturnValue({
-      fetchAll: vi.fn().mockImplementation(() => {
-        queryCount++;
-        if (queryCount === 1) {
-          return Promise.resolve({
-            resources: [
-              {
-                id: "hkr-1",
-                hackathonId: "h1",
-                githubLogin: "a",
-                displayName: "A",
-                teamId: null,
-              },
-              {
-                id: "hkr-2",
-                hackathonId: "h1",
-                githubLogin: "b",
-                displayName: "B",
-                teamId: null,
-              },
-              {
-                id: "hkr-3",
-                hackathonId: "h1",
-                githubLogin: "c",
-                displayName: "C",
-                teamId: null,
-              },
-              {
-                id: "hkr-4",
-                hackathonId: "h1",
-                githubLogin: "d",
-                displayName: "D",
-                teamId: null,
-              },
-              {
-                id: "hkr-5",
-                hackathonId: "h1",
-                githubLogin: "e",
-                displayName: "E",
-                teamId: null,
-              },
-            ],
-          });
-        }
-        // Existing teams count
-        return Promise.resolve({ resources: [] });
-      }),
-    });
+    // query: 1) unassigned hackers, 2) existing teams count
+    mockQuery
+      .mockResolvedValueOnce([
+        {
+          id: "hkr-1",
+          hackathonId: "h1",
+          githubLogin: "a",
+          displayName: "A",
+          teamId: null,
+        },
+        {
+          id: "hkr-2",
+          hackathonId: "h1",
+          githubLogin: "b",
+          displayName: "B",
+          teamId: null,
+        },
+        {
+          id: "hkr-3",
+          hackathonId: "h1",
+          githubLogin: "c",
+          displayName: "C",
+          teamId: null,
+        },
+        {
+          id: "hkr-4",
+          hackathonId: "h1",
+          githubLogin: "d",
+          displayName: "D",
+          teamId: null,
+        },
+        {
+          id: "hkr-5",
+          hackathonId: "h1",
+          githubLogin: "e",
+          displayName: "E",
+          teamId: null,
+        },
+      ])
+      .mockResolvedValueOnce([]); // existing teams
 
-    mockCreate.mockResolvedValue({ resource: {} });
-    // For hacker updates
-    mockReplace.mockResolvedValue({ resource: {} });
-    mockRead.mockResolvedValue({ resource: {} });
+    mockTransaction.mockImplementation(async (fn) => {
+      const tx = {
+        query: vi.fn().mockResolvedValue([]),
+        queryOne: vi.fn().mockResolvedValue(null),
+        execute: vi.fn().mockResolvedValue(1),
+      };
+      await fn(tx);
+    });
 
     const { POST } = await import("../hackathons/[id]/assign-teams/route");
     const req = createRequest(
@@ -149,12 +139,12 @@ describe("POST /api/hackathons/:id/assign-teams", () => {
   it("returns 422 when no unassigned hackers", async () => {
     mockGetAuth.mockReturnValue(fakePrincipal);
     mockResolveRole.mockResolvedValue("admin");
-    mockRead.mockResolvedValue({
-      resource: { id: "h1", teamSize: 3, status: "active" },
+    mockQueryOne.mockResolvedValueOnce({
+      id: "h1",
+      teamSize: 3,
+      status: "active",
     });
-    mockQuery.mockReturnValue({
-      fetchAll: vi.fn().mockResolvedValue({ resources: [] }),
-    });
+    mockQuery.mockResolvedValueOnce([]); // unassigned hackers
 
     const { POST } = await import("../hackathons/[id]/assign-teams/route");
     const req = createRequest(
@@ -193,14 +183,14 @@ describe("GET /api/teams", () => {
   it("returns teams for a hackathon", async () => {
     mockGetAuth.mockReturnValue(fakePrincipal);
     mockResolveRole.mockResolvedValue("admin");
-    mockQuery.mockReturnValue({
-      fetchNext: vi.fn().mockResolvedValue({
-        resources: [
-          { id: "t1", hackathonId: "h1", name: "Team Alpha", members: [] },
-        ],
-        continuationToken: null,
-      }),
-    });
+    mockQuery.mockResolvedValueOnce([
+      {
+        id: "t1",
+        hackathonId: "h1",
+        name: "Team Alpha",
+        members: JSON.stringify([]),
+      },
+    ]);
 
     const { GET } = await import("../teams/route");
     const req = createRequest(
@@ -235,32 +225,35 @@ describe("PATCH /api/teams/:id/reassign", () => {
     mockGetAuth.mockReturnValue(fakePrincipal);
     mockResolveRole.mockResolvedValue("admin");
 
-    // Source team read, then target team read, then hacker read
-    mockRead
+    const sourceMembers = [
+      { hackerId: "hkr-1", githubLogin: "alice", displayName: "Alice" },
+      { hackerId: "hkr-2", githubLogin: "bob", displayName: "Bob" },
+    ];
+    const targetMembers = [
+      { hackerId: "hkr-3", githubLogin: "carol", displayName: "Carol" },
+    ];
+
+    // queryOne: source team, target team
+    mockQueryOne
       .mockResolvedValueOnce({
-        resource: {
-          id: "t1",
-          hackathonId: "h1",
-          members: [
-            { hackerId: "hkr-1", githubLogin: "alice", displayName: "Alice" },
-            { hackerId: "hkr-2", githubLogin: "bob", displayName: "Bob" },
-          ],
-        },
+        id: "t1",
+        hackathonId: "h1",
+        members: JSON.stringify(sourceMembers),
       })
       .mockResolvedValueOnce({
-        resource: {
-          id: "t2",
-          hackathonId: "h1",
-          members: [
-            { hackerId: "hkr-3", githubLogin: "carol", displayName: "Carol" },
-          ],
-        },
-      })
-      .mockResolvedValueOnce({
-        resource: { id: "hkr-1", hackathonId: "h1", teamId: "t1" },
+        id: "t2",
+        hackathonId: "h1",
+        members: JSON.stringify(targetMembers),
       });
 
-    mockReplace.mockResolvedValue({ resource: {} });
+    mockTransaction.mockImplementation(async (fn) => {
+      const tx = {
+        query: vi.fn().mockResolvedValue([]),
+        queryOne: vi.fn().mockResolvedValue(null),
+        execute: vi.fn().mockResolvedValue(1),
+      };
+      await fn(tx);
+    });
 
     const { PATCH } = await import("../teams/[id]/reassign/route");
     const req = createRequest(
@@ -281,12 +274,16 @@ describe("PATCH /api/teams/:id/reassign", () => {
     mockGetAuth.mockReturnValue(fakePrincipal);
     mockResolveRole.mockResolvedValue("admin");
 
-    mockRead
+    mockQueryOne
       .mockResolvedValueOnce({
-        resource: { id: "t1", hackathonId: "h1", members: [] },
+        id: "t1",
+        hackathonId: "h1",
+        members: JSON.stringify([]),
       })
       .mockResolvedValueOnce({
-        resource: { id: "t2", hackathonId: "h2", members: [] },
+        id: "t2",
+        hackathonId: "h2",
+        members: JSON.stringify([]),
       });
 
     const { PATCH } = await import("../teams/[id]/reassign/route");
@@ -308,22 +305,18 @@ describe("PATCH /api/teams/:id/reassign", () => {
     mockGetAuth.mockReturnValue(fakePrincipal);
     mockResolveRole.mockResolvedValue("admin");
 
-    mockRead
+    mockQueryOne
       .mockResolvedValueOnce({
-        resource: {
-          id: "t1",
-          hackathonId: "h1",
-          members: [
-            { hackerId: "hkr-99", githubLogin: "other", displayName: "Other" },
-          ],
-        },
+        id: "t1",
+        hackathonId: "h1",
+        members: JSON.stringify([
+          { hackerId: "hkr-99", githubLogin: "other", displayName: "Other" },
+        ]),
       })
       .mockResolvedValueOnce({
-        resource: {
-          id: "t2",
-          hackathonId: "h1",
-          members: [],
-        },
+        id: "t2",
+        hackathonId: "h1",
+        members: JSON.stringify([]),
       });
 
     const { PATCH } = await import("../teams/[id]/reassign/route");

@@ -33,21 +33,21 @@
 
 ## ⚡ Quick Reference
 
-| Item                | Value                                              |
-| ------------------- | -------------------------------------------------- |
-| **Primary Region**  | centralus                                          |
-| **Resource Group**  | rg-hackops-us-dev                                  |
-| **Support Contact** | noalz@lordofthecloud.eu                            |
-| **Escalation Path** | L1 InfraOps → L2 Platform Owner → L3 Service Owner |
+| Item                | Value                                                  |
+| ------------------- | ------------------------------------------------------ |
+| **Primary Region**  | centralus                                              |
+| **Resource Group**  | rg-hackops-us-dev                                      |
+| **Support Contact** | noalz@lordofthecloud.eu                                |
+| **Escalation Path** | L1 Platform Ops → L2 Platform Owner → L3 Service Owner |
 
 ### Critical Resources
 
-| Resource      | Name                      | Resource Group    | Severity |
-| ------------- | ------------------------- | ----------------- | -------- |
-| Web App       | app-hackops-dev           | rg-hackops-us-dev | 🔴 P1    |
-| Cosmos DB     | cosmos-hackops-dev-fplrs3 | rg-hackops-us-dev | 🔴 P1    |
-| Key Vault     | kv-hackops-dev-fplrs3     | rg-hackops-us-dev | 🟠 P2    |
-| Log Workspace | log-hackops-dev           | rg-hackops-us-dev | 🟠 P2    |
+| Resource      | Name                  | Resource Group    | Severity |
+| ------------- | --------------------- | ----------------- | -------- |
+| Web App       | app-hackops-dev       | rg-hackops-us-dev | 🔴 P1    |
+| SQL Database  | sql-hackops-dev       | rg-hackops-se-dev | 🔴 P1    |
+| Key Vault     | kv-hackops-dev-fplrs3 | rg-hackops-us-dev | 🟠 P2    |
+| Log Workspace | log-hackops-dev       | rg-hackops-us-dev | 🟠 P2    |
 
 ---
 
@@ -58,7 +58,7 @@
 **Morning Health Check:**
 
 1. ✅ Confirm web app state is `Running` and HTTPS endpoint responds
-2. ✅ Verify Cosmos DB account `provisioningState` is `Succeeded`
+2. ✅ Verify SQL Database server `state` is `Ready`
 3. ✅ Verify Key Vault private endpoint connection remains `Approved`
 
 **KQL Query - System Health Overview:**
@@ -79,11 +79,11 @@ AppTraces
 
 **Priority Logs to Review:**
 
-| Log Source                | Query Focus                                  | Action Threshold                  |
-| ------------------------- | -------------------------------------------- | --------------------------------- |
-| Application Insights      | Unhandled exceptions and dependency failures | > 5 critical errors/hour          |
-| App Service Platform Logs | Startup/restart anomalies                    | > 2 restarts/day                  |
-| Cosmos Diagnostics        | Throttling/latency anomalies                 | Sustained 429s or high RU latency |
+| Log Source                | Query Focus                                  | Action Threshold                             |
+| ------------------------- | -------------------------------------------- | -------------------------------------------- |
+| Application Insights      | Unhandled exceptions and dependency failures | > 5 critical errors/hour                     |
+| App Service Platform Logs | Startup/restart anomalies                    | > 2 restarts/day                             |
+| SQL Diagnostics           | Throttling/latency anomalies                 | Sustained DTU pressure or high query latency |
 
 ---
 
@@ -112,11 +112,11 @@ flowchart LR
 
 ### 2.2 Runbooks by Alert
 
-| Alert                              | Runbook                                           | Owner               |
-| ---------------------------------- | ------------------------------------------------- | ------------------- |
-| Web app unavailable                | Section 3.1 restart and health verify             | InfraOps            |
-| Cosmos connection failures         | Verify private endpoint + DNS + app settings      | InfraOps + App Team |
-| Key Vault secret resolution errors | Validate RBAC identity access and endpoint status | Security + InfraOps |
+| Alert                              | Runbook                                           | Owner                   |
+| ---------------------------------- | ------------------------------------------------- | ----------------------- |
+| Web app unavailable                | Section 3.1 restart and health verify             | Platform Ops            |
+| SQL connection failures            | Verify private endpoint + DNS + app settings      | Platform Ops + App Team |
+| Key Vault secret resolution errors | Validate RBAC identity access and endpoint status | Security + Platform Ops |
 
 ---
 
@@ -180,7 +180,7 @@ gantt
 
 | Role                | Contact        | Phone | On-Call Rotation |
 | ------------------- | -------------- | ----- | ---------------- |
-| L1 On-Call Engineer | InfraOps       | N/A   | Weekly           |
+| L1 On-Call Engineer | Platform Ops   | N/A   | Weekly           |
 | L2 Team Lead        | Platform Owner | N/A   | Escalation only  |
 | L3 Service Owner    | HackOps Owner  | N/A   | Escalation only  |
 

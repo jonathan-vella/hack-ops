@@ -64,7 +64,7 @@
 - ⏳ Deferred: Multi-region failover, formal reservation strategy, advanced alert optimization
 - 🔁 Redesign Trigger: Sustained RU pressure, higher traffic, or stricter SLA targets
 
-**Confidence**: Medium | **Expected Variance**: ±20% (usage-variable Cosmos/Logs/PrivateLink assumptions)
+**Confidence**: Medium | **Expected Variance**: ±20% (usage-variable SQL/Logs/PrivateLink assumptions)
 
 ### Design vs As-Built Summary
 
@@ -85,13 +85,13 @@
 
 ## 📊 Top 5 Cost Drivers
 
-| Rank | Resource                            | Monthly Cost | % of Total | Trend | Optimization                       |
-| ---- | ----------------------------------- | ------------ | ---------- | ----- | ---------------------------------- |
-| 1️⃣   | App Service Plan B1 (x3)            | $164.25      | 70.7%      | ➡️    | Scheduled scale-down               |
-| 2️⃣   | Data Services (Cosmos RU + storage) | $25.16       | 10.8%      | ↗️    | Index/TTL tuning                   |
-| 3️⃣   | Monitoring ingestion                | $19.32       | 8.3%       | ↗️    | Sampling/filtering                 |
-| 4️⃣   | Networking (PE + DNS + processing)  | $18.60       | 8.0%       | ➡️    | Reduce private data transfer       |
-| 5️⃣   | Security (KV ops + premium keys)    | $5.00        | 2.2%       | ➡️    | Right-size key operation frequency |
+| Rank | Resource                           | Monthly Cost | % of Total | Trend | Optimization                       |
+| ---- | ---------------------------------- | ------------ | ---------- | ----- | ---------------------------------- |
+| 1️⃣   | App Service Plan B1 (x3)           | $164.25      | 70.7%      | ➡️    | Scheduled scale-down               |
+| 2️⃣   | Data Services (SQL Database)       | $25.16       | 10.8%      | ↗️    | Query/index tuning                 |
+| 3️⃣   | Monitoring ingestion               | $19.32       | 8.3%       | ↗️    | Sampling/filtering                 |
+| 4️⃣   | Networking (PE + DNS + processing) | $18.60       | 8.0%       | ➡️    | Reduce private data transfer       |
+| 5️⃣   | Security (KV ops + premium keys)   | $5.00        | 2.2%       | ➡️    | Right-size key operation frequency |
 
 > 💡 **Quick Win**: Reduce off-peak App Service capacity from 3 to 2 workers.
 
@@ -133,7 +133,7 @@
 | Decision                        | Cost Impact         | Business Rationale                        | Status             |
 | ------------------------------- | ------------------- | ----------------------------------------- | ------------------ |
 | App Service plan capacity 3     | +$164.25/month      | Handle event bursts and avoid cold impact | Required currently |
-| Cosmos DB serverless            | Variable usage cost | Lower baseline vs provisioned RU          | Required           |
+| SQL Database serverless         | Variable usage cost | Lower baseline vs provisioned DTU         | Required           |
 | Private endpoints on data plane | +network baseline   | Security and policy compliance            | Required           |
 
 ## 🧾 What We Are Not Paying For (Yet)
@@ -148,18 +148,18 @@
 | Resource                 | Risk Level | Issue                                 | Mitigation                        |
 | ------------------------ | ---------- | ------------------------------------- | --------------------------------- |
 | App Service Plan (B1 x3) | 🟠 Medium  | Overprovisioned for non-event windows | Schedule downscale                |
-| Cosmos Serverless        | 🟡 Medium  | RU burst variability during events    | Monitor RU and tune indexing      |
+| SQL Database Serverless  | 🟡 Medium  | DTU burst variability during events   | Monitor DTU and tune queries      |
 | Log Analytics            | 🟡 Medium  | Ingestion drift over time             | Sampling and retention governance |
 
 > **⚠️ Watch Item**: App Service plan capacity is the dominant and most controllable cost lever.
 
 ## 🎯 Quick Decision Matrix
 
-| Requirement                 | Additional Cost                     | SKU Change                                 | Verdict    | Notes                           |
-| --------------------------- | ----------------------------------- | ------------------------------------------ | ---------- | ------------------------------- |
-| Higher availability SLA     | +$ (depending on region redundancy) | Add secondary-region stack                 | 🟡 Monitor | Requires architecture expansion |
-| Lower baseline spend        | -$54.75/month approximate           | B1 capacity 3 → 2                          | 🟢 Go      | Suitable outside event windows  |
-| Higher sustained throughput | +$ variable                         | Cosmos serverless tuning or provisioned RU | 🟡 Monitor | Trigger by observed RU pressure |
+| Requirement                 | Additional Cost                     | SKU Change                             | Verdict    | Notes                            |
+| --------------------------- | ----------------------------------- | -------------------------------------- | ---------- | -------------------------------- |
+| Higher availability SLA     | +$ (depending on region redundancy) | Add secondary-region stack             | 🟡 Monitor | Requires architecture expansion  |
+| Lower baseline spend        | -$54.75/month approximate           | B1 capacity 3 → 2                      | 🟢 Go      | Suitable outside event windows   |
+| Higher sustained throughput | +$ variable                         | SQL Database tuning or higher DTU tier | 🟡 Monitor | Trigger by observed DTU pressure |
 
 ## 💰 Savings Opportunities
 
@@ -169,26 +169,26 @@
 > | ------------------------------- | ---------- | --------------- | -------------- | ----------- |
 > | Scheduled App Service downscale | N/A        | ~$54.75         | ~$657          | 23.6%       |
 > | Log ingestion optimization      | N/A        | ~$7.00          | ~$84           | 3.0%        |
-> | Cosmos indexing/TTL tuning      | N/A        | ~$7.25          | ~$87           | 3.1%        |
+> | SQL Database query/index tuning | N/A        | ~$7.25          | ~$87           | 3.1%        |
 
 ## 🧾 Detailed Cost Breakdown
 
 ### IaC / Pricing Coverage
 
-| Signal             | Value                                                                  | Status |
-| ------------------ | ---------------------------------------------------------------------- | ------ |
-| Templates scanned  | 6                                                                      | ✅     |
-| Resources detected | 19 (RG view) + child resources                                         | ✅     |
-| Resources priced   | Major billable categories covered                                      | ✅     |
-| Unpriced resources | Minor meter-level uncertainties (PrivateLink/Cosmos storage precision) | ⚠️     |
+| Signal             | Value                                                               | Status |
+| ------------------ | ------------------------------------------------------------------- | ------ |
+| Templates scanned  | 6                                                                   | ✅     |
+| Resources detected | 19 (RG view) + child resources                                      | ✅     |
+| Resources priced   | Major billable categories covered                                   | ✅     |
+| Unpriced resources | Minor meter-level uncertainties (PrivateLink/SQL storage precision) | ⚠️     |
 
 ### Line Items
 
 | Category         | Service                     | SKU / Meter             | Quantity / Units         | Est. Monthly |
 | ---------------- | --------------------------- | ----------------------- | ------------------------ | ------------ |
 | 💻 Compute       | Azure App Service Plan      | B1 Linux                | 3 instances x 730h       | $164.25      |
-| 💾 Data Services | Cosmos DB serverless RU     | Serverless usage        | Assumed low/variable     | $17.66       |
-| 💾 Data Services | Cosmos DB storage           | data storage            | ~30 GB assumption        | $7.50        |
+| 💾 Data Services | SQL Database serverless     | Serverless usage        | Assumed low/variable     | $17.66       |
+| 💾 Data Services | SQL Database storage        | data storage            | ~30 GB assumption        | $7.50        |
 | 🔐 Security      | Key Vault premium keys      | Premium key versions    | 2 active key versions    | $2.00        |
 | 🔐 Security      | Key Vault operations        | Advanced key operations | ~200K ops/month          | $3.00        |
 | 📊 Monitoring    | Log Analytics ingestion     | PerGB2018               | ~12 GB/month assumption  | $19.32       |

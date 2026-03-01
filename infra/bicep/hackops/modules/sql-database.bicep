@@ -1,7 +1,7 @@
 // -----------------------------------------------------------------------
 // HackOps — Azure SQL Database Module
 // SQL Server + DB (S2 50 DTU) with PE, Private DNS, Entra-only auth
-// (UAMI as admin), and diagnostics. Replaces Cosmos DB (ADR-0004).
+// (UAMI as admin), and diagnostics.
 // -----------------------------------------------------------------------
 
 @description('Deployment environment.')

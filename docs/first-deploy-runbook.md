@@ -45,7 +45,7 @@ az appservice plan delete \
   --yes
 ```
 
-> **Note**: Cosmos DB, Key Vault, VNet, and monitoring resources
+> **Note**: Azure SQL Database, Key Vault, VNet, and monitoring resources
 > are kept — only compute is recreated. Orphaned RBAC assignments
 > referencing old managed identity principal IDs are harmless and
 > will be overwritten by the new deployment.
@@ -85,7 +85,7 @@ echo "ACR: $ACR_NAME ($ACR_LOGIN_SERVER)"
 
 ### 2. Wait for role assignments to propagate
 
-Azure RBAC assignments (AcrPull for App Service MI, Cosmos Data Contributor,
+Azure RBAC assignments (AcrPull for App Service MI, SQL DB Contributor,
 Key Vault Secrets User) take approximately 1–2 minutes to propagate.
 
 ```bash
@@ -200,6 +200,6 @@ az webapp deployment slot swap \
 | Symptom                          | Cause                               | Fix                                           |
 | -------------------------------- | ----------------------------------- | --------------------------------------------- |
 | `401 Unauthorized` pulling image | AcrPull role not yet propagated     | Wait 2 min, restart App Service               |
-| Container starts but 503         | Cosmos connection failing           | Check VNet integration, Cosmos RBAC           |
+| Container starts but 503         | SQL Database connection failing     | Check VNet integration, SQL Database RBAC     |
 | `ImagePullBackOff`               | Wrong ACR login server or image tag | Verify `linuxFxVersion` in App Service config |
 | Health check returns warming     | Normal — first 60s after start      | Wait and retry                                |

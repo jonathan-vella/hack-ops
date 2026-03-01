@@ -42,7 +42,7 @@
     "UV_CACHE_DIR": "/home/vscode/.cache/uv"
   },
   "remoteEnv": {
-    "AZURE_DEFAULTS_LOCATION": "centralus"
+    "AZURE_DEFAULTS_LOCATION": "swedencentral"
   },
   "customizations": {
     "vscode": {

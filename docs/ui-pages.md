@@ -516,7 +516,7 @@ protected from demotion.
 | **Layout** | Admin                       |
 
 **Description**: App-wide settings stored in the `config`
-Cosmos DB container. Manage leaderboard refresh interval,
+SQL Database table. Manage leaderboard refresh interval,
 max team size, and other operational parameters.
 
 **Key components**:

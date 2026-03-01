@@ -32,7 +32,7 @@ with client-side polling for live updates.
 ## Scope & Preconditions
 
 - **Prerequisite**: app-06-api-admin completed — all API
-  routes work, scores exist in the `scores` container
+  routes work, scores exist in the `scores` table
 - **Plan reference**: `.github/prompts/plan-hackOps.prompt.md`
   — read `Phase 8: Leaderboard & Live Updates`
 - **API contract**: `packages/shared/types/api-contract.ts`
@@ -49,7 +49,7 @@ with client-side polling for live updates.
 
 1. `packages/shared/types/api-contract.ts` — leaderboard types
 2. `docs/ui-pages.md` — leaderboard page specification
-3. `docs/data-model.md` — `scores` container, aggregation
+3. `docs/data-model.md` — `scores` table, aggregation
 4. `docs/prd.md` — leaderboard success metrics (< 2s load)
 5. `.github/skills/nextjs-patterns/SKILL.md`
 6. `.github/skills/shadcn-ui-patterns/SKILL.md`

@@ -1,6 +1,5 @@
-# Agentic InfraOps — Agent Map
+# HackOps — Agent Map
 
-> Azure infrastructure engineered by agents. Verified. Well-Architected. Deployable.
 > This file is the **table of contents** — not the encyclopedia.
 > Read deeper sources only when needed.
 
@@ -107,9 +106,33 @@ Subagent definitions: `.github/agents/_subagents/`
 | Project health            | `QUALITY_SCORE.md`                       |
 | Tech debt tracking        | `docs/exec-plans/tech-debt-tracker.md`   |
 
+## Tech Stack
+
+| Layer          | Technology                                                      |
+| -------------- | --------------------------------------------------------------- |
+| Frontend       | Next.js 15 (App Router), TypeScript 5 (strict), React 19        |
+| Styling        | Tailwind CSS v4, shadcn/ui                                      |
+| Validation     | Zod 4                                                           |
+| Testing        | Vitest, Testing Library                                         |
+| Backend        | Next.js Route Handlers, Azure SQL Database                      |
+| Infrastructure | Azure App Service P1v3 (swedencentral), ACR Standard, Bicep/AVM |
+| CI/CD          | GitHub Actions, OIDC auth, container-based deploy               |
+
+## Validation & Guardrails
+
+See `copilot-instructions.md` for the authoritative validation commands and
+guardrails (Never/Always rules). Those load in every Copilot session.
+
+Additional commands for specific workflows:
+
+```bash
+npm run validate:versions # version manifest sync check
+bicep build infra/bicep/{project}/main.bicep  # Bicep syntax + AVM resolution
+```
+
 ## Key Conventions (Pointers Only)
 
-- **Default region**: `centralus` → details in `azure-defaults` skill
+- **Default region**: `swedencentral` → details in `azure-defaults` skill
 - **Required tags**: Minimum 4, governance may require more → details in `azure-defaults` skill
 - **AVM-first**: Always prefer Azure Verified Modules → details in `azure-defaults` skill
 - **Security baseline**: TLS 1.2, HTTPS-only, managed identity → details in `azure-defaults` skill
@@ -118,11 +141,3 @@ Subagent definitions: `.github/agents/_subagents/`
 
 Read `.github/skills/golden-principles/SKILL.md` for the 10 golden principles
 that govern how agents operate in this repository.
-
-## Validation
-
-```bash
-npm run validate        # All frontmatter and template validators
-npm run lint:md         # Markdown linting
-bicep build main.bicep  # Bicep syntax check
-```

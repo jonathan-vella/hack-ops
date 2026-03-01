@@ -158,7 +158,7 @@ tags: {
   application: 'hackops'             // Application name
   workload: 'hackathon-management'   // Workload classification
   sla: 'non-production'              // SLA tier
-  'backup-policy': 'cosmos-periodic' // Backup policy
+  'backup-policy': 'sql-geo-backup' // Backup policy
   'maint-window': 'anytime'          // Maintenance window
   'technical-contact': technicalContact // Technical contact email
 }
@@ -223,7 +223,7 @@ flowchart TD
 | Azure Policy         | [Overview](https://learn.microsoft.com/azure/governance/policy/overview)                                                   |
 | Azure Resource Graph | [ARG Overview](https://learn.microsoft.com/azure/governance/resource-graph/overview)                                       |
 | Tag Governance       | [Tagging Strategy](https://learn.microsoft.com/azure/cloud-adoption-framework/ready/azure-best-practices/resource-tagging) |
-| Cosmos DB RBAC       | [SQL RBAC](https://learn.microsoft.com/azure/cosmos-db/how-to-setup-rbac)                                                  |
+| SQL AD-only Auth     | [Azure SQL AD-only auth](https://learn.microsoft.com/azure/azure-sql/database/authentication-aad-only-auth-policy)         |
 
 ---
 

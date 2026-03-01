@@ -1,5 +1,5 @@
 ---
-description: "Generate the HackOps Cosmos DB data model reference with TypeScript interfaces and sample documents. Output: docs/data-model.md"
+description: "Generate the HackOps Azure SQL data model reference with TypeScript interfaces and sample documents. Output: docs/data-model.md"
 agent: agent
 tools:
   [
@@ -13,19 +13,19 @@ tools:
 
 # Generate HackOps Data Model
 
-Generate the Cosmos DB data model reference document, including TypeScript interfaces,
-partition key rationale, and sample documents for all 10 containers.
+Generate the Azure SQL data model reference document, including TypeScript interfaces,
+primary key rationale, and sample documents for all 10 tables.
 
 ## Mission
 
 Read the technical plan and produce `docs/data-model.md` — the canonical reference
-for every Cosmos DB container, its schema, and its query patterns.
+for every Azure SQL table, its schema, and its query patterns.
 
 ## Scope & Preconditions
 
 - Source: `.github/prompts/plan-hackOps.prompt.md` — read sections:
-  - `Database` (tech stack table, 10 containers, partition keys table)
-  - `Phase 3` — Database IaC & Schema (container creation, seed script)
+  - `Database` (tech stack table, 10 tables, primary keys table)
+  - `Phase 3` — Database IaC & Schema (table creation, seed script)
   - `Phase 6` through `Phase 10` — field-level details from task descriptions
   - `Key Invariants` — staging pattern, atomic swap, progression gating
 - Output file: `docs/data-model.md`
@@ -34,10 +34,10 @@ for every Cosmos DB container, its schema, and its query patterns.
 
 ### Step 1 — Read source material
 
-Read `.github/prompts/plan-hackOps.prompt.md` fully. Extract the 10 containers and
-their partition keys from the `Database` section:
+Read `.github/prompts/plan-hackOps.prompt.md` fully. Extract the 10 tables and
+their primary keys from the `Database` section:
 
-| Container     | Partition Key  | Purpose               |
+| Table         | Primary Key    | Purpose               |
 | ------------- | -------------- | --------------------- |
 | `hackathons`  | `/id`          | Event lifecycle       |
 | `teams`       | `/hackathonId` | Team roster           |
@@ -54,9 +54,9 @@ Also extract field-level details from Phases 6-10 task descriptions.
 
 ### Step 2 — Design TypeScript interfaces
 
-For each container, write a TypeScript interface that:
+For each table, write a TypeScript interface that:
 
-1. Includes `id: string` and the partition key field
+1. Includes `id: string` and the primary key field
 2. Includes a `_type` discriminant field (e.g., `_type: 'hackathon'`)
 3. Uses strict union types for status/state fields
 4. Reflects all Key Invariants:
@@ -72,7 +72,7 @@ For each container, write a TypeScript interface that:
 
 ### Step 3 — Write sample documents
 
-For each container, provide one realistic sample document as a JSON code block.
+For each table, provide one realistic sample document as a JSON code block.
 The sample must:
 
 - Use plausible example data (avoid `"string"` or `"value"` placeholders)
@@ -81,19 +81,19 @@ The sample must:
 
 ### Step 4 — Document indexing recommendations
 
-For each container, note indexing policy recommendations:
+For each table, note indexing recommendations:
 
-- Default (`/*`) is acceptable for most containers
+- Default indexes are acceptable for most tables
 - Call out any field that should be excluded for cost savings
   (large Markdown fields in `rubrics`, JSON blobs in `submissions`)
 - Note composite indexes required for sorted queries
   (e.g., `leaderboard` sorted by `totalScore DESC`)
 
-### Step 5 — Document cross-container query patterns
+### Step 5 — Document cross-table query patterns
 
-Document the key multi-container patterns the app uses:
+Document the key multi-table patterns the app uses:
 
-| Pattern                     | Containers involved          | Description                                              |
+| Pattern                     | Tables involved              | Description                                              |
 | --------------------------- | ---------------------------- | -------------------------------------------------------- |
 | Leaderboard assembly        | `scores`, `teams`, `hackers` | Join approved scores with team and member display names  |
 | Submission review queue     | `submissions`, `rubrics`     | Load pending submissions with active rubric for grading  |
@@ -105,13 +105,13 @@ Document the key multi-container patterns the app uses:
 Write the complete data model to `docs/data-model.md` with these sections:
 
 ```markdown
-# HackOps — Cosmos DB Data Model
+# HackOps — Azure SQL Data Model
 
 ## Overview
 
-## Container Summary Table
+## Table Summary Table
 
-## Container Definitions
+## Table Definitions
 
 ### hackathons
 
@@ -133,24 +133,24 @@ Write the complete data model to `docs/data-model.md` with these sections:
 
 ### progression
 
-## Cross-Container Query Patterns
+## Cross-Table Query Patterns
 
 ## Indexing Recommendations
 
 ## Key Invariants Encoded in the Schema
 ```
 
-Each container definition section must include:
+Each table definition section must include:
 
 1. TypeScript interface (fenced code block, `typescript` syntax)
-2. Partition key rationale (one paragraph)
+2. Primary key rationale (one paragraph)
 3. Sample document (fenced code block, `json` syntax)
 4. Notes on any special patterns (pointer doc, staging queue, etc.)
 
 ## Output Expectations
 
 - File: `docs/data-model.md`
-- All 10 containers defined
+- All 10 tables defined
 - TypeScript interfaces use strict types (no `any`)
 - Sample documents use plausible values
 - All Key Invariants from the plan are reflected in field types
@@ -158,8 +158,8 @@ Each container definition section must include:
 ## Quality Assurance
 
 - [ ] `docs/data-model.md` exists
-- [ ] All 10 containers have a TypeScript interface
-- [ ] All 10 containers have a sample document
+- [ ] All 10 tables have a TypeScript interface
+- [ ] All 10 tables have a sample document
 - [ ] `submissions` interface includes `state`, `reviewedBy`, `reviewedAt`, `reviewReason`
 - [ ] `rubrics` documents the pointer/versioned pattern
 - [ ] `hackers` uses `eventCode` (plaintext; join endpoint rate-limited)

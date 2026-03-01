@@ -28,7 +28,7 @@ a solo developer. The compute platform must support:
 
 - Node.js 22 LTS runtime
 - GitHub OAuth authentication (built-in preferred)
-- VNet integration for Private Endpoint access to Cosmos DB
+- VNet integration for Private Endpoint access to Azure SQL Database
 - Deployment slots for zero-downtime deployments
 - Always-on for consistent leaderboard SSR latency
 
@@ -65,7 +65,7 @@ by the built-in Easy Auth feature.
   Next.js app into discrete functions.
 - **Static Web Apps**: Cannot serve SSR pages, limited to
   serverless API backends, and does not support VNet integration
-  needed for Private Endpoint access to Cosmos DB.
+  needed for Private Endpoint access to Azure SQL Database.
 
 ## ⚖️ Consequences
 

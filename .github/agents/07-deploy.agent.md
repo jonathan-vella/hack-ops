@@ -291,7 +291,7 @@ pwsh -File deploy.ps1            # Execute (after approval)
 ### Option 2: Direct Azure CLI (Fallback)
 
 ```bash
-az group create --name rg-{project}-{env} --location centralus
+az group create --name rg-{project}-{env} --location swedencentral
 az deployment group create \
   --resource-group rg-{project}-{env} \
   --template-file main.bicep \

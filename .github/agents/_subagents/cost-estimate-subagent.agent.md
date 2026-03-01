@@ -58,9 +58,9 @@ and returns aggregated totals. Use `output_format: "compact"` to reduce response
 // Example: 11 resources in ONE call instead of 11 separate calls
 azure_bulk_estimate({
   resources: [
-    { service_name: "Azure Kubernetes Service", sku: "Standard", region: "centralus" },
-    { service_name: "Virtual Machines", sku: "D2s_v5", region: "centralus", quantity: 2 },
-    { service_name: "Virtual Machines", sku: "D4s_v5", region: "centralus", quantity: 3 },
+    { service_name: "Azure Kubernetes Service", sku: "Standard", region: "swedencentral" },
+    { service_name: "Virtual Machines", sku: "D2s_v5", region: "swedencentral", quantity: 2 },
+    { service_name: "Virtual Machines", sku: "D4s_v5", region: "swedencentral", quantity: 3 },
     // ... all other resources
   ],
   output_format: "compact"
@@ -78,7 +78,8 @@ Common mistakes to avoid:
 
 - "Azure SQL" → use "SQL Database"
 - "App Service" → use "Azure App Service"
-- "Cosmos" → use "Azure Cosmos DB"
+- "Cosmos" → use "Azure Cosmos DB" (if Cosmos is in architecture)
+- "SQL" → use "SQL Database"
 
 ## Output Format
 

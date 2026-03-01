@@ -1,6 +1,6 @@
 /**
  * Test fixtures for HackOps integration/E2E tests.
- * Mirrors the seed data in scripts/seed-cosmos.ts.
+ * Mirrors the seed data used for local SQL Server setup.
  */
 
 export const HACKATHON_ID = "hack-2026-swedenai";
@@ -14,7 +14,7 @@ export const fixtures = {
     id: HACKATHON_ID,
     _type: "hackathon" as const,
     name: "Sweden AI MicroHack 2026",
-    description: "Build AI-powered solutions using Azure OpenAI and Cosmos DB",
+    description: "Build AI-powered solutions using Azure OpenAI and Azure SQL",
     status: "active" as const,
     eventCode: EVENT_CODE,
     teamSize: 5,

@@ -66,16 +66,16 @@ No deployment blockers detected in what-if. One transient CLI TLS transport erro
 
 ## 🏗️ Deployed Resources
 
-| Resource             | Name                                         | Type                                       | Status |
-| -------------------- | -------------------------------------------- | ------------------------------------------ | ------ |
-| 🌐 VNet              | `vnet-hackops-dev`                           | `Microsoft.Network/virtualNetworks`        | ✅     |
-| 🔐 Key Vault         | `kv-hackops-dev-fplrs3`                      | `Microsoft.KeyVault/vaults`                | ✅     |
-| 🗄️ Cosmos DB         | `cosmos-hackops-dev-fplrs3`                  | `Microsoft.DocumentDB/databaseAccounts`    | ✅     |
-| 📊 Log Analytics     | `log-hackops-dev`                            | `Microsoft.OperationalInsights/workspaces` | ✅     |
-| 📈 App Insights      | `appi-hackops-dev`                           | `Microsoft.Insights/components`            | ✅     |
-| 🧠 App Service Plan  | `asp-hackops-dev`                            | `Microsoft.Web/serverfarms`                | ✅     |
-| 🌍 App Service       | `app-hackops-dev`                            | `Microsoft.Web/sites`                      | ✅     |
-| 🔗 Private Endpoints | `pe-kv-hackops-dev`, `pe-cosmos-hackops-dev` | `Microsoft.Network/privateEndpoints`       | ✅     |
+| Resource             | Name                                      | Type                                       | Status |
+| -------------------- | ----------------------------------------- | ------------------------------------------ | ------ |
+| 🌐 VNet              | `vnet-hackops-dev`                        | `Microsoft.Network/virtualNetworks`        | ✅     |
+| 🔐 Key Vault         | `kv-hackops-dev-fplrs3`                   | `Microsoft.KeyVault/vaults`                | ✅     |
+| 🗄️ SQL Database      | `sql-hackops-dev`                         | `Microsoft.Sql/servers/databases`          | ✅     |
+| 📊 Log Analytics     | `log-hackops-dev`                         | `Microsoft.OperationalInsights/workspaces` | ✅     |
+| 📈 App Insights      | `appi-hackops-dev`                        | `Microsoft.Insights/components`            | ✅     |
+| 🧠 App Service Plan  | `asp-hackops-dev`                         | `Microsoft.Web/serverfarms`                | ✅     |
+| 🌍 App Service       | `app-hackops-dev`                         | `Microsoft.Web/sites`                      | ✅     |
+| 🔗 Private Endpoints | `pe-kv-hackops-dev`, `pe-sql-hackops-dev` | `Microsoft.Network/privateEndpoints`       | ✅     |
 
 Legacy resource group cleanup:
 
@@ -91,7 +91,7 @@ Legacy resource group cleanup:
   "appInsightsConnectionString": "InstrumentationKey=f0ca46b4-d497-4042-96ae-abfda0e4ce4c;IngestionEndpoint=https://centralus-2.in.applicationinsights.azure.com/;LiveEndpoint=https://centralus.livediagnostics.monitor.azure.com/;ApplicationId=61bf110c-71b9-483f-a852-4daf7d117b42",
   "appServiceDefaultHostname": "app-hackops-dev.azurewebsites.net",
   "appServicePrincipalId": "6503cb23-fd59-4f0c-8f20-25ce8f5b2804",
-  "cosmosEndpoint": "https://cosmos-hackops-dev-fplrs3.documents.azure.com:443/",
+  "sqlEndpoint": "sql-hackops-dev.database.windows.net",
   "keyVaultUri": "https://kv-hackops-dev-fplrs3.vault.azure.net/",
   "logAnalyticsWorkspaceId": "/subscriptions/00858ffc-dded-4f0f-8bbf-e17fff0d47d9/resourceGroups/rg-hackops-us-dev/providers/Microsoft.OperationalInsights/workspaces/log-hackops-dev",
   "vnetId": "/subscriptions/00858ffc-dded-4f0f-8bbf-e17fff0d47d9/resourceGroups/rg-hackops-us-dev/providers/Microsoft.Network/virtualNetworks/vnet-hackops-dev"
@@ -131,7 +131,7 @@ az deployment group create \
 | -------------------------------------------------------------------------- | ------------- | ------ |
 | Validate app runtime health at `https://app-hackops-dev.azurewebsites.net` | Platform Team | ⬜     |
 | Configure GitHub OAuth callback for Easy Auth in Central US                | Identity Team | ⬜     |
-| Run Step 7 as-built documentation generation                               | InfraOps      | ⬜     |
+| Run Step 7 as-built documentation generation                               | Platform Ops  | ⬜     |
 
 ---
 

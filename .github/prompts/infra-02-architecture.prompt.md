@@ -58,7 +58,7 @@ Evaluate each WAF pillar against the planned architecture:
 | Pillar      | Key focus areas                                         |
 | ----------- | ------------------------------------------------------- |
 | Security    | Private endpoints, managed identity, Easy Auth, TLS 1.2 |
-| Reliability | Serverless Cosmos DB, deployment slots, backup policy   |
+| Reliability | Azure SQL Serverless, deployment slots, backup policy   |
 | Performance | Serverless burst capacity, App Service tier, VNet       |
 | Cost        | Serverless vs provisioned, B1/S1 tiers, free tier usage |
 | Operations  | Log Analytics, App Insights, deployment stacks          |
@@ -72,7 +72,7 @@ Estimate monthly costs for the dev environment:
 | Resource         | SKU/tier   | Estimated monthly cost |
 | ---------------- | ---------- | ---------------------- |
 | App Service Plan | P1v3       | ~$135/mo               |
-| Cosmos DB        | Serverless | ~$1-5/mo (low usage)   |
+| SQL Database     | Serverless | ~$5-10/mo (low usage)  |
 | Key Vault        | Standard   | <$1/mo                 |
 | Log Analytics    | Pay-as-go  | <$5/mo                 |
 | App Insights     | Pay-as-go  | <$5/mo                 |
@@ -87,9 +87,9 @@ approximations requiring verification.
 Document key architecture decisions from the plan:
 
 1. App Service over Container Apps — simpler, no Docker needed
-2. Serverless Cosmos DB — cost-optimal for bursty workloads
+2. Serverless Azure SQL — cost-optimal for bursty workloads
 3. Easy Auth with GitHub OAuth — built-in, no custom auth code
-4. Private Endpoint for Cosmos DB — required security posture
+4. Private Endpoint for Azure SQL — required security posture
 5. Deployment stacks — resource protection and clean rollback
 
 ### Step 5 — Generate document

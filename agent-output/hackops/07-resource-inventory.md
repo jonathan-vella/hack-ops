@@ -55,38 +55,38 @@
 
 ### 💾 Data Services
 
-| Name                      | Type                                                          | SKU        | Configuration                          | Location  | Monthly Cost |
-| ------------------------- | ------------------------------------------------------------- | ---------- | -------------------------------------- | --------- | ------------ |
-| cosmos-hackops-dev-fplrs3 | Microsoft.DocumentDB/databaseAccounts                         | Serverless | NoSQL, local auth disabled, PE-enabled | centralus | $25.16       |
-| hackops-db                | Microsoft.DocumentDB/databaseAccounts/sqlDatabases            | Included   | 1 database                             | centralus | Included     |
-| hackathons                | Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers | Included   | PK `/id`, TTL -1                       | centralus | Included     |
-| teams                     | Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers | Included   | PK `/hackathonId`, TTL -1              | centralus | Included     |
-| hackers                   | Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers | Included   | PK `/hackathonId`, TTL -1              | centralus | Included     |
-| rubrics                   | Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers | Included   | PK `/hackathonId`, TTL -1              | centralus | Included     |
-| rubric-active             | Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers | Included   | PK `/hackathonId`, TTL -1              | centralus | Included     |
-| submissions               | Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers | Included   | PK `/teamId`, TTL -1                   | centralus | Included     |
-| scores                    | Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers | Included   | PK `/teamId`, TTL -1                   | centralus | Included     |
-| challenges                | Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers | Included   | PK `/hackathonId`, TTL -1              | centralus | Included     |
-| progression               | Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers | Included   | PK `/teamId`, TTL -1                   | centralus | Included     |
-| roles                     | Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers | Included   | PK `/odataId`, TTL -1                  | centralus | Included     |
+| Name            | Type                            | SKU      | Configuration                       | Location  | Monthly Cost |
+| --------------- | ------------------------------- | -------- | ----------------------------------- | --------- | ------------ |
+| sql-hackops-dev | Microsoft.Sql/servers           | S2       | 50 DTU, Entra-only auth, PE-enabled | centralus | $75.00       |
+| hackops-db      | Microsoft.Sql/servers/databases | S2       | 1 database                          | centralus | Included     |
+| hackathons      | SQL Table                       | Included | PK `id`, FK constraints             | centralus | Included     |
+| teams           | SQL Table                       | Included | PK `id`, FK `hackathonId`           | centralus | Included     |
+| hackers         | SQL Table                       | Included | PK `id`, FK `hackathonId`           | centralus | Included     |
+| rubrics         | SQL Table                       | Included | PK `id`, FK `hackathonId`           | centralus | Included     |
+| rubric-active   | SQL Table                       | Included | PK `id`, FK `hackathonId`           | centralus | Included     |
+| submissions     | SQL Table                       | Included | PK `id`, FK `teamId`                | centralus | Included     |
+| scores          | SQL Table                       | Included | PK `id`, FK `teamId`                | centralus | Included     |
+| challenges      | SQL Table                       | Included | PK `id`, FK `hackathonId`           | centralus | Included     |
+| progression     | SQL Table                       | Included | PK `id`, FK `teamId`                | centralus | Included     |
+| roles           | SQL Table                       | Included | PK `id`, FK `hackathonId`           | centralus | Included     |
 
 ### 🌐 Networking Resources
 
-| Name                            | Type                                                  | Configuration                                       | Location  |
-| ------------------------------- | ----------------------------------------------------- | --------------------------------------------------- | --------- |
-| vnet-hackops-dev                | Microsoft.Network/virtualNetworks                     | 10.0.0.0/16, 3 subnets                              | centralus |
-| snet-app-dev                    | Microsoft.Network/virtualNetworks/subnets             | 10.0.1.0/24, delegated to Microsoft.Web/serverFarms | centralus |
-| snet-pe-dev                     | Microsoft.Network/virtualNetworks/subnets             | 10.0.2.0/24, private endpoint subnet                | centralus |
-| snet-default-dev                | Microsoft.Network/virtualNetworks/subnets             | 10.0.0.0/24                                         | centralus |
-| nsg-app-dev                     | Microsoft.Network/networkSecurityGroups               | AllowHTTPS(443 inbound)                             | centralus |
-| nsg-pe-dev                      | Microsoft.Network/networkSecurityGroups               | DenyAllInbound                                      | centralus |
-| nsg-default-dev                 | Microsoft.Network/networkSecurityGroups               | DenyAllInbound                                      | centralus |
-| pe-kv-hackops-dev               | Microsoft.Network/privateEndpoints                    | Key Vault private endpoint                          | centralus |
-| pe-cosmos-hackops-dev           | Microsoft.Network/privateEndpoints                    | Cosmos SQL private endpoint                         | centralus |
-| privatelink.vaultcore.azure.net | Microsoft.Network/privateDnsZones                     | Private DNS zone for Key Vault                      | global    |
-| privatelink.documents.azure.com | Microsoft.Network/privateDnsZones                     | Private DNS zone for Cosmos DB                      | global    |
-| link-kv-hackops                 | Microsoft.Network/privateDnsZones/virtualNetworkLinks | VNet link for Key Vault DNS                         | global    |
-| link-cosmos-hackops             | Microsoft.Network/privateDnsZones/virtualNetworkLinks | VNet link for Cosmos DNS                            | global    |
+| Name                             | Type                                                  | Configuration                                       | Location  |
+| -------------------------------- | ----------------------------------------------------- | --------------------------------------------------- | --------- |
+| vnet-hackops-dev                 | Microsoft.Network/virtualNetworks                     | 10.0.0.0/16, 3 subnets                              | centralus |
+| snet-app-dev                     | Microsoft.Network/virtualNetworks/subnets             | 10.0.1.0/24, delegated to Microsoft.Web/serverFarms | centralus |
+| snet-pe-dev                      | Microsoft.Network/virtualNetworks/subnets             | 10.0.2.0/24, private endpoint subnet                | centralus |
+| snet-default-dev                 | Microsoft.Network/virtualNetworks/subnets             | 10.0.0.0/24                                         | centralus |
+| nsg-app-dev                      | Microsoft.Network/networkSecurityGroups               | AllowHTTPS(443 inbound)                             | centralus |
+| nsg-pe-dev                       | Microsoft.Network/networkSecurityGroups               | DenyAllInbound                                      | centralus |
+| nsg-default-dev                  | Microsoft.Network/networkSecurityGroups               | DenyAllInbound                                      | centralus |
+| pe-kv-hackops-dev                | Microsoft.Network/privateEndpoints                    | Key Vault private endpoint                          | centralus |
+| pe-sql-hackops-dev               | Microsoft.Network/privateEndpoints                    | SQL Database private endpoint                       | centralus |
+| privatelink.vaultcore.azure.net  | Microsoft.Network/privateDnsZones                     | Private DNS zone for Key Vault                      | global    |
+| privatelink.database.windows.net | Microsoft.Network/privateDnsZones                     | Private DNS zone for SQL Database                   | global    |
+| link-kv-hackops                  | Microsoft.Network/privateDnsZones/virtualNetworkLinks | VNet link for Key Vault DNS                         | global    |
+| link-sql-hackops                 | Microsoft.Network/privateDnsZones/virtualNetworkLinks | VNet link for SQL DNS                               | global    |
 
 ### 📨 Messaging Resources
 

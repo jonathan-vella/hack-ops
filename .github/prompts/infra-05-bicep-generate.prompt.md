@@ -64,7 +64,7 @@ Create `infra/bicep/hackops/main.bicep`:
    - `networking` → VNet, subnets, NSGs
    - `monitoring` → Log Analytics, App Insights
    - `keyVault` → Key Vault with PE on `snet-pe`
-   - `cosmosDb` → Cosmos DB with 10 containers, PE, SQL role
+   - `sqlDatabase` → Azure SQL Database with 10 tables, PE, role assignment
    - `appService` → ASP, App Service, VNet integration, Easy Auth
 5. Outputs: resource IDs, endpoints, App Service default hostname
 
@@ -74,7 +74,7 @@ Create `infra/bicep/hackops/main.bicepparam`:
 
 - `environment = 'dev'`
 - `projectName = 'hackops'`
-- `location = 'centralus'`
+- `location = 'swedencentral'`
 - `owner = '{deployer}'`
 
 ### Step 4 — Generate module files
@@ -104,11 +104,11 @@ Create each module in `infra/bicep/hackops/modules/`:
 - Private endpoint on `snet-pe`
 - `publicNetworkAccess: 'Disabled'` (prod)
 
-#### cosmos-db.bicep
+#### sql-database.bicep
 
-- AVM module: `document-db/database-account` (0.10.0+)
-- NoSQL API, Serverless capacity
-- 10 containers with partition keys from the plan
+- AVM module: `sql/server` (0.12.0+)
+- Serverless tier, Azure AD authentication
+- 10 tables with primary keys and indexes from the plan
 - Private endpoint on `snet-pe` with configurable DNS zone
 - SQL role assignment for App Service managed identity
 - Connection string stored in Key Vault
@@ -148,7 +148,7 @@ syntax. Fix any errors before completing.
 - `infra/bicep/hackops/modules/networking.bicep`
 - `infra/bicep/hackops/modules/monitoring.bicep`
 - `infra/bicep/hackops/modules/key-vault.bicep`
-- `infra/bicep/hackops/modules/cosmos-db.bicep`
+- `infra/bicep/hackops/modules/sql-database.bicep`
 - `infra/bicep/hackops/modules/app-service.bicep`
 - `infra/bicep/hackops/deploy.ps1`
 - Also create `agent-output/hackops/05-implementation-reference.md`
@@ -163,4 +163,4 @@ syntax. Fix any errors before completing.
 - [ ] Security baseline enforced (managed identity, HTTPS-only,
       private endpoints, no public data-plane access)
 - [ ] `uniqueSuffix` generated once and passed to all modules
-- [ ] Cosmos DB SQL role assignment (not ARM role) for data plane
+- [ ] SQL Database role assignment (db_datareader + db_datawriter) for data plane

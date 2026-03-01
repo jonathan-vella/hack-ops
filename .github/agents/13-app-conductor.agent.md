@@ -41,8 +41,7 @@ tools:
     azure-mcp/get_bestpractices,
     ms-azuretools.vscode-azure-github-copilot/azure_get_auth_context,
     ms-azuretools.vscode-azure-github-copilot/azure_set_auth_context,
-    mcp_context7_resolve-library-id,
-    mcp_context7_query-docs,
+    "context7/*",
     todo,
   ]
 handoffs:
@@ -140,8 +139,8 @@ Triggers on push to `main` (after PR merge):
 | ------------------------------ | --------- | ---------------- |
 | `AZURE_WEBAPP_NAME`            | Infra     | Deploy target    |
 | `AZURE_WEBAPP_PUBLISH_PROFILE` | Azure     | Auth to deploy   |
-| `COSMOS_DB_ENDPOINT`           | Key Vault | Runtime config   |
-| `COSMOS_DB_KEY`                | Key Vault | Runtime config   |
+| `SQL_SERVER`                   | Key Vault | Runtime config   |
+| `SQL_DATABASE`                 | Key Vault | Runtime config   |
 | `NEXT_PUBLIC_APP_URL`          | Config    | Client-side URLs |
 
 ## Orchestration Rules

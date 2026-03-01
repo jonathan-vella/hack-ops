@@ -124,7 +124,7 @@ handoffs:
     send: true
 ---
 
-# InfraOps Conductor Agent
+# HackOps Conductor Agent
 
 Master orchestrator for the 7-step Azure infrastructure development workflow.
 

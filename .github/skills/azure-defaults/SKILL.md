@@ -43,12 +43,12 @@ Only read deeper skills when your current task requires them.
 
 ### Default Regions
 
-| Service             | Default Region  | Reason                              |
-| ------------------- | --------------- | ----------------------------------- |
-| **All resources**   | `centralus`     | Default for HackOps platform        |
-| **Static Web Apps** | `westeurope`    | Not available in centralus          |
-| **Azure OpenAI**    | `swedencentral` | Limited availability — verify first |
-| **Failover**        | `swedencentral` | Alternative region                  |
+| Service             | Default Region  | Reason                               |
+| ------------------- | --------------- | ------------------------------------ |
+| **All resources**   | `swedencentral` | Default for HackOps platform         |
+| **Static Web Apps** | `westeurope`    | Not available in swedencentral       |
+| **Azure OpenAI**    | `swedencentral` | Primary region — verify availability |
+| **Failover**        | `northeurope`   | Alternative region                   |
 
 ### Required Tags (Azure Policy Enforced)
 
@@ -182,5 +182,5 @@ Before completing any agent task, verify:
 - [ ] All 4 required tags included in resource definitions
 - [ ] Unique suffix used for globally unique names
 - [ ] Security baseline settings applied
-- [ ] Region defaults correct (centralus, or exception documented)
+- [ ] Region defaults correct (swedencentral, or exception documented)
 - [ ] Attribution header included with agent name and date

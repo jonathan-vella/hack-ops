@@ -37,7 +37,7 @@ agent-output/{project}/
 
 - **Prefix**: `03-des-adr-` (design) or `07-ab-adr-` (as-built)
 - **Number**: 4-digit sequence (0001, 0002, etc.)
-- **Title**: Lowercase with hyphens (e.g., `use-cosmos-db-for-state`)
+- **Title**: Lowercase with hyphens (e.g., `use-sql-database-for-state`)
 
 ## ADR Template Structure
 
@@ -127,8 +127,8 @@ What is the change that we're proposing and/or doing?
 ### Design Phase ADR
 
 ```text
-Create an ADR documenting our decision to use Azure Cosmos DB
-instead of Azure SQL for the e-commerce catalog service.
+Create an ADR documenting our decision to use Azure SQL Database
+instead of Azure Cosmos DB for the e-commerce catalog service.
 Consider WAF implications and cost trade-offs.
 ```
 
@@ -168,7 +168,7 @@ the architecture assessment above as a formal ADR.
 | Category        | Example Decisions                                    |
 | --------------- | ---------------------------------------------------- |
 | **Compute**     | AKS vs App Service, Container Apps vs Functions      |
-| **Data**        | Cosmos DB vs SQL, Redis vs Table Storage             |
+| **Data**        | SQL Database vs Cosmos DB, Redis vs Table Storage    |
 | **Networking**  | Hub-spoke vs flat, Private Link vs Service Endpoints |
 | **Security**    | Managed Identity vs SPN, Key Vault vs App Config     |
 | **Integration** | Event Grid vs Service Bus, API Management tiers      |

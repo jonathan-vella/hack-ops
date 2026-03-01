@@ -31,7 +31,7 @@ create_label "app"        "0075ca" "Application code (Next.js / TypeScript)"
 create_label "frontend"   "7057ff" "UI pages, components, and styling"
 create_label "backend"    "006b75" "API routes and server-side logic"
 create_label "api"        "1d76db" "REST API endpoints and contracts"
-create_label "database"   "fbca04" "Cosmos DB containers, queries, data model"
+create_label "database"   "fbca04" "Azure SQL tables, queries, data model"
 create_label "auth"       "b60205" "Authentication, authorization, and roles"
 create_label "testing"    "0e8a16" "Unit, integration, and E2E tests"
 

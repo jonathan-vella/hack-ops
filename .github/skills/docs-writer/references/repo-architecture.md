@@ -5,7 +5,7 @@
 ## Workspace Root Structure
 
 ```text
-azure-agentic-infraops/
+hack-ops/
 ├── .github/
 │   ├── agents/              # 8 agent definitions + 3 subagents
 │   │   └── _subagents/      # Validation subagents (lint, what-if, review)
@@ -27,17 +27,17 @@ azure-agentic-infraops/
 
 ### Primary Agents
 
-| Agent              | File                               | Model      | Step | Artifacts                       |
-| ------------------ | ---------------------------------- | ---------- | ---- | ------------------------------- |
-| InfraOps Conductor | `01-conductor.agent.md`            | Opus 4.6   | All  | Orchestration                   |
-| Requirements       | `02-requirements.agent.md`         | Opus 4.6   | 1    | `01-requirements.md`            |
-| Architect          | `03-architect.agent.md`            | Opus 4.6   | 2    | `02-architecture-assessment.md` |
-| Design             | `04-design.agent.md`               | Sonnet 4.5 | 3    | `03-des-*.{py,png,md}`          |
-| Bicep Plan         | `05-bicep-planner.agent.md`        | Opus 4.6   | 4    | `04-implementation-plan.md`     |
-| Bicep Code         | `06-bicep-code-generator.agent.md` | Sonnet 4.5 | 5    | Bicep in `infra/bicep/`         |
-| Deploy             | `07-deploy.agent.md`               | Sonnet 4.5 | 6    | `06-deployment-summary.md`      |
-| As-Built           | `08-as-built.agent.md`             | Sonnet 4.5 | 7    | `07-ab-*.md` docs suite         |
-| Diagnose           | `09-diagnose.agent.md`             | Sonnet 4.5 | —    | Diagnostic reports              |
+| Agent        | File                               | Model      | Step | Artifacts                       |
+| ------------ | ---------------------------------- | ---------- | ---- | ------------------------------- |
+| 01-Conductor | `01-conductor.agent.md`            | Opus 4.6   | All  | Orchestration                   |
+| Requirements | `02-requirements.agent.md`         | Opus 4.6   | 1    | `01-requirements.md`            |
+| Architect    | `03-architect.agent.md`            | Opus 4.6   | 2    | `02-architecture-assessment.md` |
+| Design       | `04-design.agent.md`               | Sonnet 4.5 | 3    | `03-des-*.{py,png,md}`          |
+| Bicep Plan   | `05-bicep-planner.agent.md`        | Opus 4.6   | 4    | `04-implementation-plan.md`     |
+| Bicep Code   | `06-bicep-code-generator.agent.md` | Sonnet 4.5 | 5    | Bicep in `infra/bicep/`         |
+| Deploy       | `07-deploy.agent.md`               | Sonnet 4.5 | 6    | `06-deployment-summary.md`      |
+| As-Built     | `08-as-built.agent.md`             | Sonnet 4.5 | 7    | `07-ab-*.md` docs suite         |
+| Diagnose     | `09-diagnose.agent.md`             | Sonnet 4.5 | —    | Diagnostic reports              |
 
 ### Validation Subagents (in `_subagents/`)
 

@@ -64,7 +64,7 @@
 - [x] Verify tags in `main.bicep` match all required tags from governance constraints
 - [x] Verify SKUs in all modules are in the allowed-SKU lists
 - [x] Verify `networking.bicep` — public access flags, NSG rules, TLS settings
-- [x] Verify `cosmos-db.bicep` — `publicNetworkAccess: 'Disabled'`, local auth disabled, RBAC-only
+- [x] Verify `sql-database.bicep` — `publicNetworkAccess: 'Disabled'`, local auth disabled, Entra-only
 - [x] Verify `key-vault.bicep` — `publicNetworkAccess: 'Disabled'`, purge protection, soft delete
 - [x] Verify `app-service.bicep` — TLS 1.2, HTTPS-only, managed identity, FTPS disabled
 - [x] Verify `monitoring.bicep` — diagnostic settings, log retention
@@ -88,8 +88,8 @@
 - [x] TLS 1.2 enforced — `az webapp show` confirms `minTlsVersion: '1.2'`
 - [x] HTTPS-only — `az webapp show` confirms `httpsOnly: true`
 - [x] Managed identity — `az webapp identity show` returns system-assigned identity
-- [x] No connection strings — `az webapp config appsettings list` has no Cosmos connection strings
-- [x] Cosmos `publicNetworkAccess` — `az cosmosdb show` confirms `Disabled`
+- [x] No connection strings — `az webapp config appsettings list` has no SQL connection strings
+- [x] SQL Database `publicNetworkAccess` — `az sql server show` confirms restricted access
 - [x] Key Vault `publicNetworkAccess` — `az keyvault show` confirms `Disabled`
 - [x] FTPS disabled — `az webapp config show` confirms `ftpsState: 'Disabled'`
 - [x] Update `docs/security-checklist.md` with verification timestamps

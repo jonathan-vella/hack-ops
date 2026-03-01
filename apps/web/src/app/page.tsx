@@ -47,7 +47,7 @@ const FEATURES = [
     icon: ArrowRightIcon,
     title: "Azure-Native",
     description:
-      "Powered by Cosmos DB, App Service, and Application Insights on Azure.",
+      "Powered by Azure SQL, App Service, and Application Insights on Azure.",
   },
 ] as const;
 

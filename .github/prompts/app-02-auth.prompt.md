@@ -36,20 +36,19 @@ enforce access and `auditLog()` to record reviewer actions.
   — read `Phase 5: Authentication & Authorization Middleware`
 - **API contract**: `packages/shared/types/api-contract.ts`
   — `EasyAuthPrincipal`, `UserRole` types
-- **Data model**: `docs/data-model.md` — `roles` container
-  schema, `config` container (primary admin)
+- **Data model**: `docs/data-model.md` — `roles` table
+  schema, `config` table (primary admin)
 - **Env config**: `docs/environment-config.md` — dev auth
   bypass variables (`DEV_USER_*`)
 - **Skills**: Read `hackops-domain` (roles matrix),
-  `zod-validation` (boundary parsing), `cosmos-db-sdk`
-  (container queries)
+  `zod-validation` (boundary parsing)
 
 ## Workflow
 
 ### Step 1 — Read context
 
 1. `packages/shared/types/api-contract.ts` — auth types
-2. `docs/data-model.md` — `roles` and `config` containers
+2. `docs/data-model.md` — `roles` and `config` tables
 3. `docs/environment-config.md` — Easy Auth header contract
 4. `docs/prd.md` — roles matrix and primary admin rules
 5. `.github/skills/hackops-domain/SKILL.md` — business rules
@@ -71,7 +70,7 @@ Create/update `apps/web/src/lib/auth.ts`:
 
 Create `apps/web/src/lib/roles.ts`:
 
-1. Look up user in `roles` container by `githubUserId` +
+1. Look up user in `roles` table by `githubUserId` +
    `hackathonId`
 2. Return `UserRole` (`admin` | `coach` | `hacker`) or `null`
 3. Cache role within the request lifecycle (not globally)
@@ -127,7 +126,7 @@ Create `apps/web/src/lib/validation/middleware.ts`:
 Create `apps/web/src/lib/audit.ts`:
 
 1. Writes audit records with `reviewedBy`, `reviewedAt`,
-   `reviewReason` to the relevant container
+   `reviewReason` to the relevant table
 2. Used by submission approve/reject and score override
 3. Accept `action`, `userId`, `resourceId`, `reason` params
 
@@ -135,7 +134,7 @@ Create `apps/web/src/lib/audit.ts`:
 
 In role management logic (or a guard helper):
 
-1. Look up primary admin in `config` container
+1. Look up primary admin in `config` table
 2. Reject any attempt to demote or remove the primary admin
 3. Return 403 with clear error message
 

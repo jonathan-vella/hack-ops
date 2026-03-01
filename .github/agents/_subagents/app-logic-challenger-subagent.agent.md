@@ -15,7 +15,7 @@ You are a **BUSINESS LOGIC ADVERSARIAL SUBAGENT** called by a parent agent
 
 Your job is to find business rule violations, API contract drift, data model
 integrity issues, edge-case gaps, and test coverage holes in the HackOps
-Next.js + Cosmos DB application.
+Next.js + Azure SQL Database application.
 
 ## Inputs
 
@@ -72,8 +72,8 @@ automatically when test files exist in `scope_paths`.
 
 ### Data Model Integrity
 
-- [ ] Cosmos DB partition keys are correctly set for each container
-- [ ] Cross-partition queries are minimized (leaderboard reads should be single-partition)
+- [ ] SQL foreign keys and indexes are correctly defined for each table
+- [ ] Cross-table joins are minimized (leaderboard reads should use optimized queries)
 - [ ] Document references (hackathonId in team, teamId in submission) are validated on write
 - [ ] Orphan prevention: Deleting a hackathon cascades or blocks if teams exist
 - [ ] Orphan prevention: Deleting a team handles in-flight submissions
@@ -87,7 +87,7 @@ automatically when test files exist in `scope_paths`.
 - [ ] Clock skew: Timestamps use server-side UTC, not client-provided times
 - [ ] Large payloads: Rubric with 50+ criteria, hackathon with 100+ hackers
 - [ ] Event lifecycle: Operations on archived hackathons are properly rejected
-- [ ] Partial failures: If Cosmos write fails mid-operation, is state consistent?
+- [ ] Partial failures: If SQL write fails mid-operation, is state consistent?
 
 ### Test Coverage Gaps
 
@@ -95,13 +95,13 @@ automatically when test files exist in `scope_paths`.
 - [ ] Error-path tests exist (invalid input, unauthorized, not found)
 - [ ] Business rule tests cover edge cases listed above
 - [ ] No tests rely on hard-coded IDs or timestamps that could become stale
-- [ ] Integration tests verify Cosmos DB queries return expected shapes
+- [ ] Integration tests verify SQL queries return expected shapes
 - [ ] No tests mock away the exact logic they should be testing
 
 ## Adversarial Review Workflow
 
 1. **Read the API contract** — `docs/api-contract.md` and type definitions
-2. **Read the data model** — `docs/data-model.md` and Cosmos container definitions
+2. **Read the data model** — `docs/data-model.md` and SQL table definitions
 3. **Read the PRD** — business rules from `docs/prd.md` are the source of truth
 4. **Read the code under review** — all files in `scope_paths`
 5. **Trace each business rule** — from PRD requirement → API route → DB operation

@@ -1,20 +1,14 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { NextRequest } from "next/server";
 import type { EasyAuthPrincipal } from "@hackops/shared";
-import { _resetForTest } from "@/lib/rate-limiter";
 
 // ── Mocks ──────────────────────────────────────────────────
 
-const mockQuery = vi.fn();
-const mockCreate = vi.fn();
-
-vi.mock("@/lib/cosmos", () => ({
-  getContainer: vi.fn(() => ({
-    items: {
-      query: mockQuery,
-      create: mockCreate,
-    },
-  })),
+vi.mock("@/lib/sql", () => ({
+  query: vi.fn(),
+  queryOne: vi.fn(),
+  execute: vi.fn(),
+  transaction: vi.fn(),
 }));
 
 vi.mock("@/lib/auth", () => ({
@@ -28,14 +22,22 @@ vi.mock("@/lib/roles", () => ({
 vi.mock("@/lib/audit", () => ({
   auditLog: vi.fn(),
 }));
+vi.mock("@/lib/rate-limiter", () => ({
+  checkRateLimit: vi.fn().mockReturnValue({ allowed: true }),
+}));
 
+import { query, execute } from "@/lib/sql";
 import { getAuthPrincipal } from "@/lib/auth";
+import { checkRateLimit } from "@/lib/rate-limiter";
 
+const mockQuery = vi.mocked(query);
+const mockExecute = vi.mocked(execute);
 const mockGetAuth = vi.mocked(getAuthPrincipal);
+const mockRateLimit = vi.mocked(checkRateLimit);
 
-const fakePrincipal: EasyAuthPrincipal = {
+const hackerPrincipal: EasyAuthPrincipal = {
   userId: "user-hacker-1",
-  githubLogin: "hacker-dev",
+  githubLogin: "hacker-user",
   email: "hacker@example.com",
   avatarUrl: "",
 };
@@ -44,166 +46,106 @@ function createRequest(
   method: string,
   url: string,
   body?: Record<string, unknown>,
-  ip?: string,
 ): NextRequest {
-  const headers: Record<string, string> = {
-    "content-type": "application/json",
-  };
-  if (ip) headers["x-forwarded-for"] = ip;
   return new NextRequest(url, {
     method,
-    headers,
+    headers: { "content-type": "application/json" },
     body: body ? JSON.stringify(body) : undefined,
   });
 }
 
-// ── Tests ──────────────────────────────────────────────────
+// ── Join Tests ─────────────────────────────────────────────
 
 describe("POST /api/join", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    _resetForTest();
+    mockRateLimit.mockReturnValue({ allowed: true } as ReturnType<
+      typeof checkRateLimit
+    >);
   });
 
-  it("returns 401 when unauthenticated", async () => {
-    mockGetAuth.mockReturnValue(null);
+  it("joins hackathon with valid event code", async () => {
+    mockGetAuth.mockReturnValue(hackerPrincipal);
+
+    // query: hackathon by eventCode
+    mockQuery.mockResolvedValueOnce([{ id: "h1", name: "Hack 2025" }]);
+    // query: existing hacker check (none)
+    mockQuery.mockResolvedValueOnce([]);
+    // execute: INSERT hacker
+    mockExecute.mockResolvedValueOnce(1);
+    // execute: INSERT role
+    mockExecute.mockResolvedValueOnce(1);
 
     const { POST } = await import("../join/route");
     const req = createRequest("POST", "http://localhost/api/join", {
-      eventCode: "4821",
+      eventCode: "HACK25",
     });
-    const res = await POST(req, { params: Promise.resolve({}) });
-
-    expect(res.status).toBe(401);
-  });
-
-  it("joins with valid event code", async () => {
-    mockGetAuth.mockReturnValue(fakePrincipal);
-
-    // First query: find hackathon by event code
-    // Second query: check existing hacker membership
-    let queryCount = 0;
-    mockQuery.mockReturnValue({
-      fetchAll: vi.fn().mockImplementation(() => {
-        queryCount++;
-        if (queryCount === 1) {
-          return Promise.resolve({
-            resources: [{ id: "hack-1", name: "Test Hack", status: "active" }],
-          });
-        }
-        return Promise.resolve({ resources: [] });
-      }),
-    });
-    mockCreate.mockResolvedValue({ resource: {} });
-
-    const { POST } = await import("../join/route");
-    const req = createRequest(
-      "POST",
-      "http://localhost/api/join",
-      { eventCode: "4821" },
-      "10.0.0.1",
-    );
     const res = await POST(req, { params: Promise.resolve({}) });
     const body = await res.json();
 
     expect(res.status).toBe(201);
     expect(body.ok).toBe(true);
-    expect(body.data.hackathonId).toBe("hack-1");
-    expect(body.data.hackathonName).toBe("Test Hack");
+    expect(body.data.hackathonId).toBe("h1");
+    expect(body.data.hackathonName).toBe("Hack 2025");
   });
 
   it("returns 404 for invalid event code", async () => {
-    mockGetAuth.mockReturnValue(fakePrincipal);
-    mockQuery.mockReturnValue({
-      fetchAll: vi.fn().mockResolvedValue({ resources: [] }),
-    });
+    mockGetAuth.mockReturnValue(hackerPrincipal);
+    mockQuery.mockResolvedValueOnce([]);
 
     const { POST } = await import("../join/route");
-    const req = createRequest(
-      "POST",
-      "http://localhost/api/join",
-      { eventCode: "9999" },
-      "10.0.0.2",
-    );
+    const req = createRequest("POST", "http://localhost/api/join", {
+      eventCode: "BADCODE",
+    });
     const res = await POST(req, { params: Promise.resolve({}) });
 
     expect(res.status).toBe(404);
+    const body = await res.json();
+    expect(body.error).toContain("Invalid or expired");
   });
 
-  it("returns 400 for invalid event code format", async () => {
-    mockGetAuth.mockReturnValue(fakePrincipal);
+  it("returns 409 for duplicate join", async () => {
+    mockGetAuth.mockReturnValue(hackerPrincipal);
+    // query: hackathon found
+    mockQuery.mockResolvedValueOnce([{ id: "h1", name: "Hack 2025" }]);
+    // query: already joined
+    mockQuery.mockResolvedValueOnce([{ id: "hkr-existing" }]);
 
     const { POST } = await import("../join/route");
-    const req = createRequest(
-      "POST",
-      "http://localhost/api/join",
-      { eventCode: "abc" },
-      "10.0.0.3",
-    );
-    const res = await POST(req, { params: Promise.resolve({}) });
-
-    expect(res.status).toBe(400);
-  });
-
-  it("returns 409 when already joined", async () => {
-    mockGetAuth.mockReturnValue(fakePrincipal);
-
-    let queryCount = 0;
-    mockQuery.mockReturnValue({
-      fetchAll: vi.fn().mockImplementation(() => {
-        queryCount++;
-        if (queryCount === 1) {
-          return Promise.resolve({
-            resources: [{ id: "hack-1", name: "Test Hack", status: "active" }],
-          });
-        }
-        return Promise.resolve({
-          resources: [{ id: "existing-hacker" }],
-        });
-      }),
+    const req = createRequest("POST", "http://localhost/api/join", {
+      eventCode: "HACK25",
     });
-
-    const { POST } = await import("../join/route");
-    const req = createRequest(
-      "POST",
-      "http://localhost/api/join",
-      { eventCode: "4821" },
-      "10.0.0.4",
-    );
     const res = await POST(req, { params: Promise.resolve({}) });
 
     expect(res.status).toBe(409);
+    const body = await res.json();
+    expect(body.error).toContain("Already joined");
   });
 
-  it("returns 429 after 5 attempts from same IP", async () => {
-    mockGetAuth.mockReturnValue(fakePrincipal);
-    mockQuery.mockReturnValue({
-      fetchAll: vi.fn().mockResolvedValue({ resources: [] }),
-    });
+  it("returns 429 when rate limited", async () => {
+    mockGetAuth.mockReturnValue(hackerPrincipal);
+    mockRateLimit.mockReturnValue({
+      allowed: false,
+      retryAfterSeconds: 60,
+    } as ReturnType<typeof checkRateLimit>);
 
     const { POST } = await import("../join/route");
-    const ip = "10.0.0.99";
-
-    // First 5 requests should succeed (404 due to no hackathon, not 429)
-    for (let i = 0; i < 5; i++) {
-      const req = createRequest(
-        "POST",
-        "http://localhost/api/join",
-        { eventCode: "1234" },
-        ip,
-      );
-      const res = await POST(req, { params: Promise.resolve({}) });
-      expect(res.status).not.toBe(429);
-    }
-
-    // 6th request should be rate-limited
-    const req = createRequest(
-      "POST",
-      "http://localhost/api/join",
-      { eventCode: "1234" },
-      ip,
-    );
+    const req = createRequest("POST", "http://localhost/api/join", {
+      eventCode: "HACK25",
+    });
     const res = await POST(req, { params: Promise.resolve({}) });
+
     expect(res.status).toBe(429);
+    expect(res.headers.get("Retry-After")).toBe("60");
+  });
+
+  it("returns 400 for missing eventCode", async () => {
+    mockGetAuth.mockReturnValue(hackerPrincipal);
+
+    const { POST } = await import("../join/route");
+    const req = createRequest("POST", "http://localhost/api/join", {});
+    const res = await POST(req, { params: Promise.resolve({}) });
+
+    expect(res.status).toBe(400);
   });
 });

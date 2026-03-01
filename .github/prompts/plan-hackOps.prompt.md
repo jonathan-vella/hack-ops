@@ -33,7 +33,7 @@ HackOps manages the complete lifecycle of a MicroHack event:
 
 **Roles:** Admin (full control), Coach (validate/score), Hacker (team-scoped submission), Anonymous (blocked entirely)
 
-**Data:** 10 Cosmos DB containers (teams, hackers, scores, submissions, rubrics, config, hackathons, roles, challenges, progression)
+**Data:** 10 Azure SQL Database tables (teams, hackers, scores, submissions, rubrics, config, hackathons, roles, challenges, progression)
 
 **API surface:** ~16 REST endpoints, all authenticated except `/api/health`
 
@@ -58,7 +58,7 @@ HackOps manages the complete lifecycle of a MicroHack event:
 
 | Layer       | Choice                                 | Justification                                                                                                                                                                   |
 | ----------- | -------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Compute** | Azure App Service (Linux, Node 22 LTS) | Mature PaaS with built-in Easy Auth for GitHub OAuth, VNet integration for Cosmos DB private connectivity, always-on for consistent latency. P1v3 minimum for all environments. |
+| **Compute** | Azure App Service (Linux, Node 22 LTS) | Mature PaaS with built-in Easy Auth for GitHub OAuth, VNet integration for Azure SQL private connectivity, always-on for consistent latency. P1v3 minimum for all environments. |
 | **Plan**    | `asp-hackops-{env}-{suffix}`           | Single plan hosts the Next.js app (SSR + API routes in one deployment unit).                                                                                                    |
 
 _Alternatives considered_: **Container Apps** — more modern but adds Docker build complexity for a solo dev with no container requirement. **Azure Functions** — cold-start latency unacceptable for a live leaderboard. App Service is the simplest path that meets all constraints.
@@ -79,36 +79,36 @@ _Alternatives considered_: **Fluent UI** — natural Azure branding fit but heav
 | Choice                                  | Justification                                                                                                                                       |
 | --------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Next.js API Routes** (Route Handlers) | ~16 endpoints co-located with the frontend in a single deployment. No separate server process. Middleware for auth, role checks, and audit logging. |
-| **TypeScript**                          | Type safety across the full stack. Shared types for Cosmos DB documents, API request/response shapes, and rubric schemas.                           |
-| **`@azure/cosmos` SDK v4**              | Official SDK for Cosmos DB NoSQL. Supports managed identity auth via `@azure/identity`.                                                             |
+| **TypeScript**                          | Type safety across the full stack. Shared types for SQL table records, API request/response shapes, and rubric schemas.                             |
+| **`mssql`**                             | SQL Server client for Node.js. Supports Azure SQL Database with managed identity auth via `@azure/identity`.                                        |
 | **Zod**                                 | Runtime validation at API boundaries (parse at boundaries principle). Validates submissions, rubric schemas, event codes.                           |
 
 _Alternatives considered_: **Separate Express/Fastify API** — cleaner separation but doubles deployment complexity for a solo dev. Next.js Route Handlers provide the same middleware chain capability with simpler infra. If the API surface grows beyond ~25 endpoints, consider extracting to a standalone service.
 
 ### Database
 
-| Choice                         | Justification                                                                                                                                                                         |
-| ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Cosmos DB NoSQL (Core API)** | Best SDK support, native serverless SKU, cheapest for low-throughput workloads, Private Endpoint support.                                                                             |
-| **Serverless capacity mode**   | 2–3 parallel events × 4–5 teams × 5 hackers = ~75 concurrent users max. Serverless pricing (~$0.25/100K RUs) is dramatically cheaper than provisioned for bursty, event-driven usage. |
-| **10 containers**              | `teams`, `hackers`, `scores`, `submissions`, `rubrics`, `config`, `hackathons`, `roles`, `challenges`, `progression` — each with a defined partition key.                             |
+| Choice                 | Justification                                                                                                                                                          |
+| ---------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Azure SQL Database** | Managed relational database with built-in security, Private Endpoint support, and native T-SQL query capabilities.                                                     |
+| **Serverless tier**    | 2–3 parallel events × 4–5 teams × 5 hackers = ~75 concurrent users max. Serverless pricing (auto-pause, pay-per-use) is cost-effective for bursty, event-driven usage. |
+| **10 tables**          | `teams`, `hackers`, `scores`, `submissions`, `rubrics`, `config`, `hackathons`, `roles`, `challenges`, `progression` — each with a defined primary key and indexes.    |
 
-**Partition keys:**
+**Primary keys and indexes:**
 
-| Container     | Partition Key  | Purpose               |
-| ------------- | -------------- | --------------------- |
-| `hackathons`  | `/id`          | Event lifecycle       |
-| `teams`       | `/hackathonId` | Team roster           |
-| `hackers`     | `/hackathonId` | Hacker profiles       |
-| `scores`      | `/teamId`      | Approved scores       |
-| `submissions` | `/teamId`      | Staging queue         |
-| `rubrics`     | `/id`          | Scoring rubrics       |
-| `config`      | `/id`          | App config            |
-| `roles`       | `/hackathonId` | Role assignments      |
-| `challenges`  | `/hackathonId` | Challenge definitions |
-| `progression` | `/teamId`      | Unlock state          |
+| Table         | Primary Key                 | Purpose               |
+| ------------- | --------------------------- | --------------------- |
+| `hackathons`  | `id`                        | Event lifecycle       |
+| `teams`       | `id` (index: `hackathonId`) | Team roster           |
+| `hackers`     | `id` (index: `hackathonId`) | Hacker profiles       |
+| `scores`      | `id` (index: `teamId`)      | Approved scores       |
+| `submissions` | `id` (index: `teamId`)      | Staging queue         |
+| `rubrics`     | `id`                        | Scoring rubrics       |
+| `config`      | `id`                        | App config            |
+| `roles`       | `id` (index: `hackathonId`) | Role assignments      |
+| `challenges`  | `id` (index: `hackathonId`) | Challenge definitions |
+| `progression` | `id` (index: `teamId`)      | Unlock state          |
 
-_Alternatives considered_: **Provisioned throughput** — predictable cost but overkill at this scale. **MongoDB API** — familiar syntax but Core API has better Azure integration (change feed, Bicep support, managed identity).
+_Alternatives considered_: **Provisioned DTU model** — predictable cost but overkill at this scale. **Cosmos DB** — flexible NoSQL but relational model better fits the structured hackathon data with cross-entity joins.
 
 ### Infrastructure as Code
 
@@ -121,7 +121,7 @@ _Alternatives considered_: **Provisioned throughput** — predictable cost but o
 
 | Resource         | Module                                             | Min Version |
 | ---------------- | -------------------------------------------------- | ----------- |
-| Cosmos DB        | `br/public:avm/res/document-db/database-account`   | `0.10.0`    |
+| SQL Database     | `br/public:avm/res/sql/server`                     | `0.12.0`    |
 | App Service Plan | `br/public:avm/res/web/serverfarm`                 | `0.4.0`     |
 | App Service      | `br/public:avm/res/web/site`                       | `0.12.0`    |
 | Key Vault        | `br/public:avm/res/key-vault/vault`                | `0.11.0`    |
@@ -142,11 +142,11 @@ _Alternatives considered_: **Provisioned throughput** — predictable cost but o
 
 | Service          | Purpose                                                                                               | Naming                             |
 | ---------------- | ----------------------------------------------------------------------------------------------------- | ---------------------------------- |
-| Key Vault        | GitHub OAuth secret, Cosmos DB connection string (fallback), app secrets                              | `kv-hackops-{env}-{suffix}`        |
-| Managed Identity | App Service → Cosmos DB (data plane), App Service → Key Vault (secrets)                               | System-assigned on App Service     |
+| Key Vault        | GitHub OAuth secret, SQL Database connection string (fallback), app secrets                           | `kv-hackops-{env}-{suffix}`        |
+| Managed Identity | App Service → Azure SQL (data plane), App Service → Key Vault (secrets)                               | System-assigned on App Service     |
 | VNet + Subnets   | Private connectivity: `snet-app-{env}` (App Service integration), `snet-pe-{env}` (private endpoints) | `vnet-hackops-{env}-{suffix}`      |
-| Private Endpoint | Cosmos DB `Sql` group ID → `privatelink.documents.azure.com`                                          | `pe-cosmos-hackops-{env}-{suffix}` |
-| Private DNS Zone | Resolve Cosmos DB FQDN to private IP within VNet                                                      | `privatelink.documents.azure.com`  |
+| Private Endpoint | Azure SQL `sqlServer` group ID → `privatelink.database.windows.net`                                   | `pe-sql-hackops-{env}-{suffix}`    |
+| Private DNS Zone | Resolve Azure SQL FQDN to private IP within VNet                                                      | `privatelink.database.windows.net` |
 | Log Analytics    | Central log sink for all diagnostics                                                                  | `log-hackops-{env}-{suffix}`       |
 | App Insights     | APM, distributed tracing, custom events for audit trail                                               | `appi-hackops-{env}-{suffix}`      |
 
@@ -161,17 +161,17 @@ var uniqueSuffix = take(uniqueString(resourceGroup().id), 6)
 
 The suffix is generated **once** in `main.bicep` and passed to **all** modules as a required parameter.
 
-| Resource         | Name Pattern                       | Example                                       |
-| ---------------- | ---------------------------------- | --------------------------------------------- |
-| Resource Group   | `rg-hackops-{env}`                 | `rg-hackops-dev` (no suffix — RG is the seed) |
-| App Service Plan | `asp-hackops-{env}-{suffix}`       | `asp-hackops-dev-x7k2m9`                      |
-| App Service      | `app-hackops-{env}-{suffix}`       | `app-hackops-dev-x7k2m9`                      |
-| Cosmos DB        | `cosmos-hackops-{env}-{suffix}`    | `cosmos-hackops-dev-x7k2m9`                   |
-| Key Vault        | `kv-hackops-{env}-{suffix}`        | `kv-hackops-dev-x7k2m9` (24-char limit)       |
-| Log Analytics    | `log-hackops-{env}-{suffix}`       | `log-hackops-dev-x7k2m9`                      |
-| App Insights     | `appi-hackops-{env}-{suffix}`      | `appi-hackops-dev-x7k2m9`                     |
-| VNet             | `vnet-hackops-{env}-{suffix}`      | `vnet-hackops-dev-x7k2m9`                     |
-| Private Endpoint | `pe-cosmos-hackops-{env}-{suffix}` | `pe-cosmos-hackops-dev-x7k2m9`                |
+| Resource         | Name Pattern                    | Example                                       |
+| ---------------- | ------------------------------- | --------------------------------------------- |
+| Resource Group   | `rg-hackops-{env}`              | `rg-hackops-dev` (no suffix — RG is the seed) |
+| App Service Plan | `asp-hackops-{env}-{suffix}`    | `asp-hackops-dev-x7k2m9`                      |
+| App Service      | `app-hackops-{env}-{suffix}`    | `app-hackops-dev-x7k2m9`                      |
+| SQL Database     | `sql-hackops-{env}-{suffix}`    | `sql-hackops-dev-x7k2m9`                      |
+| Key Vault        | `kv-hackops-{env}-{suffix}`     | `kv-hackops-dev-x7k2m9` (24-char limit)       |
+| Log Analytics    | `log-hackops-{env}-{suffix}`    | `log-hackops-dev-x7k2m9`                      |
+| App Insights     | `appi-hackops-{env}-{suffix}`   | `appi-hackops-dev-x7k2m9`                     |
+| VNet             | `vnet-hackops-{env}-{suffix}`   | `vnet-hackops-dev-x7k2m9`                     |
+| Private Endpoint | `pe-sql-hackops-{env}-{suffix}` | `pe-sql-hackops-dev-x7k2m9`                   |
 
 **Length-constrained resources** (Key Vault = 24 chars, Storage = 24 chars) use truncation:
 
@@ -186,7 +186,7 @@ kv-{take(projectName, 7)}-{take(env, 3)}-{suffix}  →  kv-hackops-dev-x7k2m9 (2
 | Decision                            | Trade-off                                                                       |
 | ----------------------------------- | ------------------------------------------------------------------------------- |
 | Next.js API routes vs. separate API | Simpler infra, but tighter coupling. Acceptable at current scale.               |
-| Serverless Cosmos DB                | No guaranteed throughput, but burst limit (1K RU/s) exceeds needs.              |
+| Serverless Azure SQL                | Auto-pause after idle period, but resumes within ~1 minute on first connection. |
 | App Service vs. Container Apps      | Misses scale-to-zero, but avoids Docker complexity for solo dev.                |
 | Single App Service                  | All eggs in one basket. Mitigated by deployment slots for zero-downtime deploy. |
 | shadcn/ui vs. Fluent UI             | Less "Azure-branded" but faster to build, lighter bundle, more flexible.        |
@@ -199,22 +199,22 @@ kv-{take(projectName, 7)}-{take(env, 3)}-{suffix}  →  kv-hackops-dev-x7k2m9 (2
 
 ### Phase 1: Monorepo Scaffold & Dev Environment
 
-**Goal**: Working Next.js app running locally with TypeScript, Tailwind, shadcn/ui, and Cosmos DB emulator connected.
+**Goal**: Working Next.js app running locally with TypeScript, Tailwind, shadcn/ui, and local SQL Server (Docker) connected.
 
-**Exit criteria**: `npm run dev` shows a hello-world page; API route returns `{ status: "ok" }` from Cosmos DB emulator.
+**Exit criteria**: `npm run dev` shows a hello-world page; API route returns `{ status: "ok" }` from local SQL Server (Docker).
 
 **Steps**:
 
 1. Create monorepo root at project level using **Turborepo** with `apps/web/` for the Next.js app and `packages/shared/` for shared TypeScript types. Install `turbo` as a dev dependency and configure `turbo.json` with pipelines for `build`, `lint`, `type-check`, and `test`
 2. Initialize Next.js 15 (App Router) in `apps/web/` with TypeScript, Tailwind CSS 4, ESLint
 3. Install and configure shadcn/ui (init + first components: `Button`, `Card`, `Table`, `Badge`, `Dialog`)
-4. Install `@azure/cosmos`, `@azure/identity`, `zod`, and dev dependencies
-5. Create shared types package at `packages/shared/types/` — Cosmos DB document interfaces for all 10 containers
-6. Add Cosmos DB emulator connection to local dev config (environment variables via `.env.local`)
+4. Install `mssql`, `@azure/identity`, `zod`, and dev dependencies
+5. Create shared types package at `packages/shared/types/` — SQL table record interfaces for all 10 tables
+6. Add local SQL Server (Docker) connection to local dev config (environment variables via `.env.local`)
 7. Add Azurite configuration for any blob storage needs (JSON file uploads)
-8. Create a seed script (`scripts/seed-cosmos.ts`) that creates all 10 containers with partition keys and inserts sample data
-9. Update `.devcontainer/devcontainer.json` to include Cosmos DB emulator and Azurite containers
-10. **Cosmos DB emulator smoke test**: verify `@azure/cosmos` SDK v4 connects to the emulator, CRUD operations succeed on all 10 containers, and change feed subscription works. This gates Phase 1 exit — if the emulator doesn't work with the chosen SDK, surface the issue before writing any data layer code
+8. Create a seed script (`scripts/seed-sql.ts`) that creates all 10 tables with primary keys/indexes and inserts sample data
+9. Update `.devcontainer/devcontainer.json` to include SQL Server container and Azurite containers
+10. **SQL Server smoke test**: verify `mssql` client connects to local SQL Server (Docker), CRUD operations succeed on all 10 tables. This gates Phase 1 exit — if the local SQL Server doesn't work with the chosen client, surface the issue before writing any data layer code
 
 **Folder structure**:
 
@@ -229,7 +229,7 @@ apps/
         api/                  # Route Handlers (~16 endpoints)
           health/route.ts
       lib/                    # Shared utilities
-        cosmos.ts             # Cosmos DB client singleton
+        sql.ts                # SQL Database client singleton
         auth.ts               # Auth helpers
         validation/           # Zod schemas
       components/             # shadcn/ui + custom components
@@ -237,7 +237,7 @@ apps/
     public/
     tailwind.config.ts
     next.config.ts
-    .env.local                # Local dev config (emulator endpoints)
+    .env.local                # Local dev config (SQL Server endpoints)
     .env.example              # Template for required env vars
 packages/
   shared/
@@ -257,13 +257,13 @@ infra/
   bicep/
     hackops/                  # IaC for the project
 scripts/
-  seed-cosmos.ts              # Dev data seeder
+  seed-sql.ts                  # Dev data seeder
 ```
 
 **Gotchas**:
 
-- Cosmos DB emulator uses a self-signed cert; set `NODE_TLS_REJECT_UNAUTHORIZED=0` in dev only
-- Use `@azure/cosmos` connection string auth for emulator, managed identity for deployed environments — abstract behind a factory function in `cosmos.ts`
+- Local SQL Server (Docker) may need `trustServerCertificate: true` in dev only
+- Use `mssql` connection string auth for local SQL Server, managed identity for deployed environments — abstract behind a factory function in `sql.ts`
 
 ---
 
@@ -276,11 +276,11 @@ scripts/
 **Steps**:
 
 1. Run governance discovery REST API against the target subscription and all inherited management group policies
-2. Classify discovered policies by effect (`Deny`, `Audit`, `Modify`, `DeployIfNotExists`) and map to planned resources (VNet, Cosmos DB, App Service, Key Vault)
+2. Classify discovered policies by effect (`Deny`, `Audit`, `Modify`, `DeployIfNotExists`) and map to planned resources (VNet, Azure SQL Database, App Service, Key Vault)
 3. Document all constraints in `agent-output/hackops/04-governance-constraints.json` (machine-readable) and `agent-output/hackops/04-governance-constraints.md` (human-readable)
-4. Identify any `Deny` policies that would block planned SKUs (Serverless Cosmos DB, P1v3 App Service) or configurations (public access settings, TLS versions)
+4. Identify any `Deny` policies that would block planned SKUs (Serverless Azure SQL, P1v3 App Service) or configurations (public access settings, TLS versions)
 5. Determine required tags beyond the 4-tag baseline (`Environment`, `Project`, `Owner`, `CostCenter`) — enterprise policies often enforce additional tags
-6. Document allowed regions and verify `centralus` is permitted for all planned resource types
+6. Document allowed regions and verify `swedencentral` is permitted for all planned resource types
 7. If Azure connectivity is unavailable, create a placeholder constraints file documenting that governance discovery is pending and must complete before any `az deployment` command
 
 **Output**: `agent-output/hackops/04-governance-constraints.json` — consumed by all subsequent IaC phases as the single source of truth for policy compliance.
@@ -321,34 +321,34 @@ scripts/
 
 ### Phase 3: Database IaC & Schema
 
-**Goal**: Cosmos DB account deployed with all 10 containers, connected via Private Endpoint, accessible only from the VNet.
+**Goal**: Azure SQL Database deployed with all 10 tables, connected via Private Endpoint, accessible only from the VNet.
 
-**Exit criteria**: Cosmos DB accessible from VNet; all containers created with correct partition keys; `publicNetworkAccess: 'Disabled'`.
+**Exit criteria**: Azure SQL Database accessible from VNet; all tables created with correct primary keys and indexes; `publicNetworkAccess: 'Disabled'`.
 
 **Steps**:
 
-1. Create module `modules/cosmos-db.bicep` using AVM module `br/public:avm/res/document-db/database-account:0.10.0`
-2. Configure: NoSQL API, Serverless capacity, `centralus`, system-assigned managed identity
-3. Configure **backup policy**: Periodic (free, default — 2 copies every 4 hours, 8-hour retention). Sufficient for hackathon-scoped event data where RTO/RPO targets are relaxed
-4. Define all 10 containers with partition keys (see table in Database section above)
-5. Create Private Endpoint for Cosmos DB on `snet-pe`. **Private DNS Zone is configurable**: accept an optional `existingPrivateDnsZoneId` parameter — if provided, link the PE to the existing zone; if omitted, create `privatelink.documents.azure.com` in the project resource group. This supports both self-contained deployments and enterprise hub-spoke DNS architectures
-6. Add Cosmos DB connection string as Key Vault secret (for fallback; prefer managed identity)
-7. Add **Cosmos DB SQL role assignment** (data-plane RBAC, NOT an ARM role assignment): App Service managed identity → Built-in Data Contributor (role definition ID `00000000-0000-0000-0000-000000000002`). This uses the `Microsoft.DocumentDB/databaseAccounts/sqlRoleAssignments` resource type, which is required for data-plane operations (read/write documents). The control-plane role `Cosmos DB Account Reader` is insufficient
+1. Create module `modules/sql-database.bicep` using AVM module `br/public:avm/res/sql/server:0.12.0`
+2. Configure: Serverless tier, `swedencentral`, system-assigned managed identity, Azure AD authentication
+3. Configure **backup policy**: Azure SQL automated backups (default — point-in-time restore, 7-day retention). Sufficient for hackathon-scoped event data where RTO/RPO targets are relaxed
+4. Define all 10 tables with primary keys and indexes (see table in Database section above)
+5. Create Private Endpoint for Azure SQL on `snet-pe`. **Private DNS Zone is configurable**: accept an optional `existingPrivateDnsZoneId` parameter — if provided, link the PE to the existing zone; if omitted, create `privatelink.database.windows.net` in the project resource group. This supports both self-contained deployments and enterprise hub-spoke DNS architectures
+6. Add SQL Database connection string as Key Vault secret (for fallback; prefer managed identity)
+7. Add **SQL Database role assignment**: App Service managed identity → db_datareader + db_datawriter roles on the target database. Use `Microsoft.Sql/servers/databases` resource type for granting access
 
 **Policy considerations** (sourced from Phase 1.5 governance discovery):
 
 - `publicNetworkAccess: 'Disabled'` — mandatory by policy assumption; verify in `04-governance-constraints.json`
-- Private Endpoint group ID: `Sql` (Core/NoSQL API)
-- Serverless SKU may need policy exemption if "allowed SKUs" policy is narrowly scoped — check governance constraints
-- Verify `centralus` supports Cosmos DB Serverless (it does as of 2025, but confirm against governance allowed-regions list)
+- Private Endpoint group ID: `sqlServer`
+- Serverless SQL tier may need policy exemption if "allowed SKUs" policy is narrowly scoped — check governance constraints
+- Verify `swedencentral` supports Azure SQL Serverless (it does as of 2025, but confirm against governance allowed-regions list)
 
 ---
 
 ### Phase 4: Compute IaC & Deployment
 
-**Goal**: App Service deployed with VNet integration, Easy Auth configured for GitHub OAuth, connected to Cosmos DB via private endpoint.
+**Goal**: App Service deployed with VNet integration, Easy Auth configured for GitHub OAuth, connected to Azure SQL Database via private endpoint.
 
-**Exit criteria**: App Service reachable via HTTPS; GitHub OAuth login works; API routes can query Cosmos DB.
+**Exit criteria**: App Service reachable via HTTPS; GitHub OAuth login works; API routes can query Azure SQL Database.
 
 **Steps**:
 
@@ -358,7 +358,7 @@ scripts/
 4. Configure App Settings via Key Vault references: `@Microsoft.KeyVault(SecretUri=...)`
 5. Configure Easy Auth (GitHub OAuth provider): client ID + client secret stored in Key Vault
 6. Set `APPLICATIONINSIGHTS_CONNECTION_STRING` from App Insights output
-7. Add role assignments: App Service identity → Key Vault Secrets User (ARM RBAC), → Cosmos DB Built-in Data Contributor (SQL role assignment — see Phase 3 step 7)
+7. Add role assignments: App Service identity → Key Vault Secrets User (ARM RBAC), → SQL Database db_datareader + db_datawriter (see Phase 3 step 7)
 8. Configure deployment slots: `staging` slot for zero-downtime deployments
 9. Set `WEBSITE_VNET_ROUTE_ALL=1` to force all outbound traffic through VNet
 
@@ -380,14 +380,14 @@ scripts/
 **Steps**:
 
 1. Create `src/lib/auth.ts` — parse Easy Auth headers (`X-MS-CLIENT-PRINCIPAL`), decode base64 JWT, extract GitHub identity (userId, login, email, avatar)
-2. Create `src/lib/roles.ts` — role resolution: look up user in `roles` container by GitHub userId + hackathonId; return `Admin | Coach | Hacker | Anonymous`
+2. Create `src/lib/roles.ts` — role resolution: look up user in `roles` table by GitHub userId + hackathonId; return `Admin | Coach | Hacker | Anonymous`
 3. Create `src/proxy.ts` — Next.js proxy that intercepts all `/api/*` routes (except `/api/health`): validate auth headers, resolve role, attach to request context
 4. **Configure CORS** — whitelist the App Service origin (`https://app-hackops-{env}-{suffix}.azurewebsites.net`) and `localhost:3000` for dev. Block all other origins. Set in `next.config.ts` headers or via middleware
 5. **Add rate limiting** — in-memory rate limiter (e.g., `Map<IP, {count, resetAt}>`) at 100 requests/min/IP for API routes. Returns `429 Too Many Requests` with `Retry-After` header. For production scale, consider Azure API Management or App Service IP restrictions
 6. **Centralized Zod validation middleware** — create `src/lib/validation/middleware.ts` that wraps route handlers with automatic request body parsing via Zod schemas. Invalid payloads return 400 with structured error response. Parse at boundaries, not in business logic
 7. Create role guard helper: `requireRole('Admin', 'Coach')` — returns 403 if insufficient permissions
 8. Create `src/lib/audit.ts` — audit logger that writes `reviewedBy`, `reviewedAt`, `reviewReason` to submissions on any reviewer action
-9. Implement primary admin protection — lookup in `config` container; reject demotion attempts
+9. Implement primary admin protection — lookup in `config` table; reject demotion attempts
 
 **Local dev**: Easy Auth doesn't work locally. Create a dev auth bypass in `src/lib/auth.ts` that reads `DEV_USER_ROLE` and `DEV_USER_ID` from environment variables when `NODE_ENV=development`.
 
@@ -402,9 +402,9 @@ scripts/
 **Steps**:
 
 1. **Hackathon CRUD** — `POST/GET/PATCH /api/hackathons` — create, list, update lifecycle state (`draft → active → archived`)
-2. **Event code** — on hackathon creation, **auto-generate** a 4-digit numeric code (`1000`–`9999`). Validate uniqueness against all active hackathons before persisting — reject and regenerate on collision. Store as plaintext in `hackathons` container.
-3. **Hacker onboarding** — `POST /api/join` — accept event code + GitHub identity, verify code match, rate-limit to 5 attempts/min/IP, create hacker record in `hackers` container
-4. **Team assignment** — `POST /api/hackathons/{id}/assign-teams` — Fisher-Yates shuffle all unassigned hackers, distribute into teams of `teamSize` (configurable). Store in `teams` container.
+2. **Event code** — on hackathon creation, **auto-generate** a 4-digit numeric code (`1000`–`9999`). Validate uniqueness against all active hackathons before persisting — reject and regenerate on collision. Store as plaintext in `hackathons` table.
+3. **Hacker onboarding** — `POST /api/join` — accept event code + GitHub identity, verify code match, rate-limit to 5 attempts/min/IP, create hacker record in `hackers` table
+4. **Team assignment** — `POST /api/hackathons/{id}/assign-teams` — Fisher-Yates shuffle all unassigned hackers, distribute into teams of `teamSize` (configurable). Store in `teams` table.
 5. **Manual reassignment** — `PATCH /api/teams/{id}/reassign` — admin-only, move hacker between teams
 6. **Zod schemas** for all request/response bodies in `src/lib/validation/`
 
@@ -432,7 +432,7 @@ scripts/
 1. **Rubric CRUD** — `POST/GET/PATCH /api/rubrics` — create rubric with Markdown-driven criteria (categories, max points, descriptions). Only one can be `active` at a time. Uses a **pointer + versioned docs** pattern: rubric versions are stored as separate documents (`rubric-v1`, `rubric-v2`, etc.) and a small pointer document indicates the active version. Atomic swap = update the pointer document only. Consumers always read the pointer first, then fetch the referenced version — no partial reads during updates.
 2. **Submission endpoint** — `POST /api/submissions` — accept form data OR JSON file upload. Validate against active rubric schema (Zod). Hackers can only submit for their own team (403 otherwise). Submission enters `pending` state.
 3. **Review queue** — `GET /api/submissions?status=pending&hackathonId={id}` (Admin, Coach — hackathon-scoped). List pending submissions with team info, challenge info, and submitted evidence.
-4. **Approve/Reject** — `PATCH /api/submissions/:id` — set status to `approved` or `rejected`. On approval: copy validated scores to `scores` container (immutable). Write audit fields (`reviewedBy`, `reviewedAt`, `reviewReason`).
+4. **Approve/Reject** — `PATCH /api/submissions/:id` — set status to `approved` or `rejected`. On approval: copy validated scores to `scores` table (immutable). Write audit fields (`reviewedBy`, `reviewedAt`, `reviewReason`).
 5. **Score override** — `PATCH /api/scores/:id/override` (Admin only) — modify an approved score with mandatory reason. Audit logged.
 6. **Rubric-driven UI components** — `<RubricForm>` renders scoring form dynamically from active rubric JSON. No hardcoded score fields.
 
@@ -464,7 +464,7 @@ scripts/
 **Steps**:
 
 1. **Challenge definition** — `POST /api/challenges` (Admin) — create ordered challenges for a hackathon. Each has `order`, `title`, `description` (Markdown), `maxScore`.
-2. **Progression tracking** — `progression` container stores `{ teamId, hackathonId, currentChallenge, unlockedAt[] }`. Challenge 1 auto-unlocked on hackathon start.
+2. **Progression tracking** — `progression` table stores `{ teamId, hackathonId, currentChallenge, unlockedAt[] }`. Challenge 1 auto-unlocked on hackathon start.
 3. **Gate middleware** — on submission, check `progression` — if challenge order > `currentChallenge`, return 403.
 4. **Auto-unlock trigger** — on submission approval, if challenge matches `currentChallenge`, increment and write unlock timestamp to `progression`.
 5. **Challenge UI** — team dashboard shows challenges with lock/unlock state, completed checkmark, progress bar.
@@ -483,7 +483,7 @@ scripts/
 2. **Audit trail viewer** — `GET /api/audit/:hackathonId` — paginated, filterable log of all reviewer actions. Admin-only page at `/admin/audit`.
 3. **Hackathon lifecycle UI** — Admin dashboard at `/admin/hackathons` — create, launch (sets state to `active`, enables event code), archive (freezes leaderboard, disables submissions).
 4. **Team management UI** — `/admin/teams` — view teams, drag-and-drop reassignment, view per-team submission status.
-5. **Config management** — `/admin/config` — app-wide settings (leaderboard refresh interval, max team size, etc.) stored in `config` container.
+5. **Config management** — `/admin/config` — app-wide settings (leaderboard refresh interval, max team size, etc.) stored in `config` table.
 
 ---
 
@@ -534,5 +534,5 @@ scripts/
 | Repo validation | `npm run validate`                                                                                                       |
 | Markdown lint   | `npm run lint:md`                                                                                                        |
 | What-if         | `az deployment group what-if -g rg-hackops-dev -f infra/bicep/hackops/main.bicep -p infra/bicep/hackops/main.bicepparam` |
-| Local dev       | `npm run dev` → Cosmos DB emulator + Next.js dev server                                                                  |
+| Local dev       | `npm run dev` → local SQL Server (Docker) + Next.js dev server                                                           |
 | Auth flow       | Deploy to dev → navigate to app → GitHub OAuth redirect → role assigned                                                  |

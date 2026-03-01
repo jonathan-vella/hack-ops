@@ -333,7 +333,7 @@ constraints dictate otherwise.
 
 > Azure SQL provides referential integrity via foreign keys,
 > relational joins, and ACID transactions — advantages over
-> Cosmos DB NoSQL for this workload. See ADR-0004.
+> Azure SQL Database for this workload (see ADR-0004 for migration rationale).
 
 ### Key Invariants for Infrastructure
 

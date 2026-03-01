@@ -57,17 +57,17 @@ flowchart LR
 | Log Analytics        | `br/public:avm/res/operational-insights/workspace` | `0.9.0`  | `0.15.0` | ✅     |
 | Application Insights | `br/public:avm/res/insights/component`             | `0.4.0`  | `0.7.1`  | ✅     |
 | Key Vault            | `br/public:avm/res/key-vault/vault`                | `0.11.0` | `0.13.3` | ✅     |
-| Cosmos DB Account    | `br/public:avm/res/document-db/database-account`   | `0.10.0` | `0.19.0` | ✅     |
+| SQL Database         | `br/public:avm/res/sql/server`                     | `0.11.0` | `0.14.0` | ✅     |
 | App Service Plan     | `br/public:avm/res/web/serverfarm`                 | `0.4.0`  | `0.7.0`  | ✅     |
 | App Service          | `br/public:avm/res/web/site`                       | `0.12.0` | `0.22.0` | ✅     |
 
 **Non-AVM resources** (native Bicep — approved in implementation plan):
 
-| Resource                      | Justification                                                                    |
-| ----------------------------- | -------------------------------------------------------------------------------- |
-| Private DNS Zone (KV)         | No AVM module exists; straightforward 3-resource pattern                         |
-| Private DNS Zone (Cosmos)     | No AVM module exists; same pattern as Key Vault DNS zone                         |
-| Cosmos DB SQL Role Assignment | Data-plane RBAC; not an ARM role — requires native `sqlRoleAssignments` resource |
+| Resource               | Justification                                            |
+| ---------------------- | -------------------------------------------------------- |
+| Private DNS Zone (KV)  | No AVM module exists; straightforward 3-resource pattern |
+| Private DNS Zone (SQL) | No AVM module exists; same pattern as Key Vault DNS zone |
+| SQL AD-only Auth       | Entra-only authentication enforced by governance policy  |
 
 ### Version Decision
 
@@ -85,7 +85,7 @@ latest versions are noted above for future upgrades.
 | operational-insights/workspace | `0.9.0`  | Plan spec; `dailyQuotaGb` supported         |
 | insights/component             | `0.4.0`  | Plan spec; `workspaceResourceId` supported  |
 | key-vault/vault                | `0.11.0` | Plan spec; includes `privateEndpoints`      |
-| document-db/database-account   | `0.10.0` | Plan spec; includes `sqlDatabases` + PE     |
+| sql/server                     | `0.11.0` | Plan spec; includes database + PE           |
 | web/serverfarm                 | `0.4.0`  | Plan spec; Linux + reserved supported       |
 | web/site                       | `0.12.0` | Plan spec; `managedIdentities` + VNet integ |
 
@@ -128,16 +128,15 @@ latest versions are noted above for future upgrades.
 </details>
 
 <details>
-<summary><strong>Cosmos DB (document-db/database-account)</strong></summary>
+<summary><strong>SQL Database (sql/server)</strong></summary>
 
-| Parameter             | AVM Type | Notes                                      |
-| --------------------- | -------- | ------------------------------------------ |
-| `capabilitiesToAdd`   | `array`  | `['EnableServerless']` for serverless mode |
-| `disableLocalAuth`    | `bool`   | `true` — Modify policy enforces this       |
-| `publicNetworkAccess` | `string` | `'Disabled'` — private endpoint only       |
-| `sqlDatabases`        | `array`  | Database + containers defined inline       |
-| `privateEndpoints`    | `array`  | PE with service `'Sql'` (capital S)        |
-| `networkRestrictions` | `object` | Wraps public access + ACL bypass settings  |
+| Parameter                   | AVM Type | Notes                                    |
+| --------------------------- | -------- | ---------------------------------------- |
+| `azureADOnlyAuthentication` | `bool`   | `true` — governance policy enforces this |
+| `publicNetworkAccess`       | `string` | `'Disabled'` — private endpoint only     |
+| `databases`                 | `array`  | Database definitions with SKU            |
+| `privateEndpoints`          | `array`  | PE with service `'sqlServer'`            |
+| `administrators`            | `object` | UAMI as Entra admin                      |
 
 </details>
 
@@ -180,7 +179,7 @@ Use `APPLICATIONINSIGHTS_CONNECTION_STRING` instead.
 | Log Analytics        | swedencentral | None          | ✅ Proceed  |
 | Application Insights | swedencentral | None          | ✅ Proceed  |
 | Key Vault            | swedencentral | None          | ✅ Proceed  |
-| Cosmos DB (NoSQL)    | swedencentral | None          | ✅ Proceed  |
+| SQL Database (GP_S)  | swedencentral | None          | ✅ Proceed  |
 | App Service (Linux)  | swedencentral | None          | ✅ Proceed  |
 | Private DNS Zones    | global        | Always global | ✅ Expected |
 
@@ -193,9 +192,9 @@ Based on [Azure Defaults Skill](../../.github/skills/azure-defaults/SKILL.md):
 - [x] Log Analytics `dailyQuotaGb` uses `int` type (not string) → set to `1`
 - [x] App Service uses `APPLICATIONINSIGHTS_CONNECTION_STRING` (not deprecated instrumentation key)
 - [x] Key Vault `softDeleteRetentionInDays` is immutable after creation → hardcode `90`
-- [x] Cosmos DB `capabilitiesToAdd: ['EnableServerless']` (not `capacityMode` property)
-- [x] Cosmos DB private endpoint service is `'Sql'` (capital S, not lowercase)
-- [x] Cosmos DB `disableLocalAuth: true` set explicitly (Modify policy enforces, but explicit is safer)
+- [x] SQL Database `azureADOnlyAuthentication: true` (governance policy enforces AD-only)
+- [x] SQL Database private endpoint service is `'sqlServer'`
+- [x] SQL Database `publicNetworkAccess: 'Disabled'` set explicitly
 - [x] Private DNS Zones use `location: 'global'` (not region-specific)
 - [x] Key Vault name ≤24 chars → `kv-{6chars}-{env}-{suffix}` = max 21 chars ✅
 - [x] No hyphens in Storage Account names (N/A — no Storage Account in architecture)
@@ -230,7 +229,7 @@ Cross-referencing `04-governance-constraints.json` (21 policies):
 | `application`       | Variable    | `projectName` param                            |
 | `workload`          | Hardcoded   | `'hackathon-management'`                       |
 | `sla`               | Conditional | `'non-production'` (dev) / `'standard'` (prod) |
-| `backup-policy`     | Hardcoded   | `'cosmos-periodic'`                            |
+| `backup-policy`     | Hardcoded   | `'sql-geo-backup'`                             |
 | `maint-window`      | Conditional | `'anytime'` (dev) / `'weekends-only'` (prod)   |
 | `technical-contact` | Parameter   | `technicalContact` param                       |
 
@@ -238,11 +237,11 @@ Cross-referencing `04-governance-constraints.json` (21 policies):
 
 ### Modify Policies → Compliance Actions
 
-| Policy                        | Effect | Action                                                                                  |
-| ----------------------------- | ------ | --------------------------------------------------------------------------------------- |
-| Cosmos DB Local Auth Modify   | Modify | Set `disableLocalAuth: true` explicitly; policy auto-enforces but explicit avoids drift |
-| Tag Inheritance (9 tags)      | Modify | Tags on RG propagate to children — no code change needed                                |
-| Storage Blob Anonymous Access | Modify | N/A — no Storage Account in architecture                                                |
+| Policy                        | Effect | Action                                                                                    |
+| ----------------------------- | ------ | ----------------------------------------------------------------------------------------- |
+| SQL AD-only Auth Deny         | Deny   | Set `azureADOnlyAuthentication: true` explicitly; governance policy enforces AD-only auth |
+| Tag Inheritance (9 tags)      | Modify | Tags on RG propagate to children — no code change needed                                  |
+| Storage Blob Anonymous Access | Modify | N/A — no Storage Account in architecture                                                  |
 
 ### Audit Policies → Best-Effort Compliance
 

@@ -36,9 +36,9 @@ assigned automatically using Fisher-Yates shuffle.
 - **API contract**: `packages/shared/types/api-contract.ts`
   — `HackathonsAPI`, `TeamsAPI`, `JoinAPI` namespaces
 - **Data model**: `docs/data-model.md` — `hackathons`, `teams`,
-  `hackers` containers
+  `hackers` tables
 - **Skills**: Read `hackops-domain` (Fisher-Yates, event codes),
-  `zod-validation`, `cosmos-db-sdk`
+  `zod-validation`
 
 ## Workflow
 
@@ -47,7 +47,7 @@ assigned automatically using Fisher-Yates shuffle.
 1. `packages/shared/types/api-contract.ts` — hackathon,
    team, join types
 2. `docs/data-model.md` — `hackathons`, `teams`, `hackers`
-   container schemas and partition keys
+   table schemas and primary keys
 3. `docs/api-contract.md` — endpoint reference for Phase 6
 4. `.github/skills/hackops-domain/SKILL.md` — Fisher-Yates
    algorithm, event code rules, team balance rules
@@ -81,7 +81,7 @@ apps/web/src/app/api/hackathons/[id]/route.ts   # GET, PATCH
   accept `{ eventCode }` + caller's GitHub identity.
   Verify code matches an active hackathon. Rate-limit to
   5 attempts/min/IP. Create hacker record in `hackers`
-  container. Auto-assign `hacker` role in `roles` container.
+  table. Auto-assign `hacker` role in `roles` table.
 
 File: `apps/web/src/app/api/join/route.ts`
 
@@ -91,7 +91,7 @@ File: `apps/web/src/app/api/join/route.ts`
   Fisher-Yates shuffle all unassigned hackers for this
   hackathon. Distribute into teams of `teamSize`
   (from hackathon record). Use `ceil(teamSize/2)` minimum
-  per team to prevent runt teams. Store in `teams` container
+  per team to prevent runt teams. Store in `teams` table
   with embedded members array.
 
 File: `apps/web/src/app/api/hackathons/[id]/assign-teams/route.ts`

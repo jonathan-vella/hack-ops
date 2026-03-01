@@ -28,18 +28,18 @@ transparent progression, and a full audit trail — not massive scale.
 
 ## Tech Stack
 
-| Layer             | Technology                                           |
-| ----------------- | ---------------------------------------------------- |
-| **Frontend**      | Next.js 15 (App Router), Tailwind CSS 4, shadcn/ui   |
-| **Backend**       | Next.js Route Handlers, TypeScript, Zod              |
-| **Database**      | Cosmos DB NoSQL (Serverless), 10 containers          |
-| **Auth**          | Azure App Service Easy Auth — GitHub OAuth only      |
-| **Compute**       | Azure App Service (Linux, Node 22 LTS)               |
-| **IaC**           | Bicep + Azure Verified Modules (AVM), GitHub Actions |
-| **Observability** | Application Insights, Log Analytics                  |
-| **Secrets**       | Azure Key Vault — zero hardcoded values              |
+| Layer             | Technology                                             |
+| ----------------- | ------------------------------------------------------ |
+| **Frontend**      | Next.js 15 (App Router), Tailwind CSS 4, shadcn/ui     |
+| **Backend**       | Next.js Route Handlers, TypeScript, Zod                |
+| **Database**      | Azure SQL Database (Serverless GP_S_Gen5_2), 11 tables |
+| **Auth**          | Azure App Service Easy Auth — GitHub OAuth only        |
+| **Compute**       | Azure App Service (Linux, Node 22 LTS)                 |
+| **IaC**           | Bicep + Azure Verified Modules (AVM), GitHub Actions   |
+| **Observability** | Application Insights, Log Analytics                    |
+| **Secrets**       | Azure Key Vault — zero hardcoded values                |
 
-All database traffic flows over a **Private Endpoint** — Cosmos DB is
+All database traffic flows over a **Private Endpoint** — Azure SQL Database is
 never exposed to the public internet.
 
 ---
@@ -113,14 +113,14 @@ keeps the token budget tight — Golden Principle #8: "Context is scarce."
 
 ## Key Design Documents
 
-| Document                                    | Purpose                                  |
-| ------------------------------------------- | ---------------------------------------- |
-| [PRD](prd.md)                               | Product requirements — source of truth   |
-| [API Contract](api-contract.md)             | 26-endpoint REST API specification       |
-| [Data Model](data-model.md)                 | Cosmos DB container and partition design |
-| [UI Pages](ui-pages.md)                     | Frontend page specifications             |
-| [Environment Config](environment-config.md) | Environment variables and Key Vault      |
-| [HackOps User Guide](hackops-user-guide.md) | Step-by-step runbook                     |
+| Document                                    | Purpose                                |
+| ------------------------------------------- | -------------------------------------- |
+| [PRD](prd.md)                               | Product requirements — source of truth |
+| [API Contract](api-contract.md)             | 26-endpoint REST API specification     |
+| [Data Model](data-model.md)                 | SQL Database tables and schema design  |
+| [UI Pages](ui-pages.md)                     | Frontend page specifications           |
+| [Environment Config](environment-config.md) | Environment variables and Key Vault    |
+| [HackOps User Guide](hackops-user-guide.md) | Step-by-step runbook                   |
 
 ---
 

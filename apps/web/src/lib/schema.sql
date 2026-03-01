@@ -1,6 +1,5 @@
 -- -----------------------------------------------------------------------
 -- HackOps — Azure SQL Database Schema
--- Replaces Cosmos DB NoSQL containers (see ADR-0004).
 -- Run this DDL after database creation via sqlcmd or Azure Data Studio.
 -- -----------------------------------------------------------------------
 
@@ -176,7 +175,7 @@ CREATE TABLE progressions (
   currentChallenge    INT             NOT NULL DEFAULT 1,
   -- JSON array of {challengeId, unlockedAt}
   unlockedChallenges  NVARCHAR(MAX)   NOT NULL DEFAULT '[]',
-  -- Row version for optimistic concurrency (replaces Cosmos _etag)
+  -- Row version for optimistic concurrency
   rowVersion          ROWVERSION      NOT NULL,
 
   INDEX IX_progressions_teamId_hackathonId (teamId, hackathonId)

@@ -36,9 +36,9 @@ submissions, and approved scores feed the leaderboard.
 - **API contract**: `packages/shared/types/api-contract.ts`
   — `RubricsAPI`, `SubmissionsAPI`, `ScoresAPI` namespaces
 - **Data model**: `docs/data-model.md` — `rubrics`, `submissions`,
-  `scores` containers with partition keys
+  `scores` table schemas and primary keys
 - **Skills**: Read `hackops-domain` (pointer+versioned rubric
-  pattern, scoring authority), `cosmos-db-sdk` (atomic ops)
+  pattern, scoring authority)
 
 ## Workflow
 
@@ -47,7 +47,7 @@ submissions, and approved scores feed the leaderboard.
 1. `packages/shared/types/api-contract.ts` — rubric,
    submission, score types
 2. `docs/data-model.md` — `rubrics`, `submissions`, `scores`
-   containers
+   tables
 3. `docs/api-contract.md` — Phase 7 endpoints
 4. `.github/skills/hackops-domain/SKILL.md` — pointer+version
    rubric pattern, scoring rules
@@ -97,7 +97,7 @@ File: `apps/web/src/app/api/submissions/route.ts`
 - `PATCH /api/submissions/:id` (Admin, Coach) — set status to
   `approved` or `rejected`. Coach enters rubric scores
   (`CategoryScore[]`) on approval.
-  - On approval: copy validated scores to `scores` container
+  - On approval: copy validated scores to `scores` table
     (immutable record). Write audit fields (`reviewedBy`,
     `reviewedAt`, `reviewReason`).
   - On rejection: write `rejectedBy`, `rejectedAt`,
@@ -131,7 +131,7 @@ Create Zod schemas for all request bodies. Key validations:
    - Rubric create and activate (pointer swap)
    - Submission by correct team member (allowed)
    - Submission by wrong team (403)
-   - Approve with scores → scores container write
+   - Approve with scores → scores table write
    - Reject with reason → audit logged
    - Score override (admin only, with reason)
    - Concurrent rubric reads during pointer swap
@@ -154,7 +154,7 @@ Create Zod schemas for all request bodies. Key validations:
 - [ ] Pointer + versioned docs pattern implemented for rubrics
 - [ ] Only one rubric active at a time (atomic swap)
 - [ ] Hackers can only submit for their own team
-- [ ] Approved scores are immutable in `scores` container
+- [ ] Approved scores are immutable in `scores` table
 - [ ] Score override preserves original score in audit trail
 - [ ] Coach review queue is hackathon-scoped
 - [ ] All reviewer actions audit-logged (who, when, why)

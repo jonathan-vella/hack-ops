@@ -1,24 +1,24 @@
 import { NextResponse } from "next/server";
 import type { HealthAPI } from "@hackops/shared";
 
-// Pre-warm Cosmos connection eagerly at module load
-let cosmosPrewarmed = false;
+// Pre-warm SQL connection pool eagerly at module load
+let sqlPrewarmed = false;
 const startedAt = Date.now();
 const WARMUP_PERIOD_MS = 60_000;
 
-async function prewarmCosmos(): Promise<void> {
-  if (cosmosPrewarmed || !process.env.COSMOS_ENDPOINT) return;
+async function prewarmSql(): Promise<void> {
+  if (sqlPrewarmed || !process.env.SQL_SERVER) return;
   try {
-    const { getContainer } = await import("@/lib/cosmos");
-    getContainer("hackathons");
-    cosmosPrewarmed = true;
+    const { query } = await import("@/lib/sql");
+    await query("SELECT 1 AS ok");
+    sqlPrewarmed = true;
   } catch {
     // Swallow — warmup is best-effort
   }
 }
 
 // Fire-and-forget at module load
-void prewarmCosmos();
+void prewarmSql();
 
 /**
  * Health check endpoint consumed by Azure App Service Health Check.
@@ -47,22 +47,21 @@ export async function GET() {
     return NextResponse.json(body, { status: 200 });
   }
 
-  // ── Cosmos DB connectivity ────────────────────────────────────
-  if (process.env.COSMOS_ENDPOINT) {
+  // ── SQL Database connectivity ──────────────────────────────────
+  if (process.env.SQL_SERVER) {
     const start = Date.now();
     try {
-      const { getContainer } = await import("@/lib/cosmos");
-      const container = getContainer("hackathons");
-      await container.items.query("SELECT VALUE 1").fetchNext();
+      const { query } = await import("@/lib/sql");
+      await query("SELECT 1 AS ok");
       checks.push({
-        name: "cosmos-db",
+        name: "sql-database",
         status: "ok",
         responseTimeMs: Date.now() - start,
       });
     } catch (err) {
       overall = "unhealthy";
       checks.push({
-        name: "cosmos-db",
+        name: "sql-database",
         status: "unhealthy",
         responseTimeMs: Date.now() - start,
         error: err instanceof Error ? err.message : "Unknown error",

@@ -21,7 +21,7 @@ Generate architecture diagrams and Architecture Decision Records
 
 Read the architecture assessment and technical plan, then produce
 visual diagrams (VNet topology, private endpoints, App Service to
-Cosmos DB flow) and ADRs for key decisions.
+Azure SQL flow) and ADRs for key decisions.
 
 ## Scope & Preconditions
 
@@ -44,7 +44,7 @@ Cosmos DB flow) and ADRs for key decisions.
 1. Read `agent-output/hackops/02-architecture-assessment.md`
 2. Read `agent-output/hackops/01-requirements.md`
 3. Read `.github/prompts/plan-hackOps.prompt.md` — `Tech Stack
-   Recommendation` and Phases 2-4 for resource topology
+Recommendation` and Phases 2-4 for resource topology
 4. Read `.github/skills/azure-diagrams/SKILL.md` for diagram
    conventions
 5. Read `.github/skills/azure-adr/SKILL.md` for ADR template
@@ -59,12 +59,12 @@ Create `agent-output/hackops/03-des-diagram.py` using the Python
    - `snet-pe` (10.0.0.64/27) — Private Endpoints
    - `snet-spare` (10.0.0.96/27) — Reserved
 2. **Compute**: App Service on `snet-app` with Easy Auth
-3. **Data**: Cosmos DB connected via Private Endpoint on `snet-pe`
+3. **Data**: Azure SQL Database connected via Private Endpoint on `snet-pe`
 4. **Security**: Key Vault on `snet-pe`, NSGs on each subnet
 5. **Monitoring**: Log Analytics + App Insights receiving diagnostics
-6. **DNS**: Private DNS Zone resolving Cosmos DB FQDN
+6. **DNS**: Private DNS Zone resolving Azure SQL FQDN
 7. **Data flow**: User → App Service → (VNet) → Private Endpoint →
-   Cosmos DB; App Service → Key Vault (secrets)
+   Azure SQL; App Service → Key Vault (secrets)
 
 Run the Python script to generate `03-des-diagram.png`.
 
@@ -72,10 +72,10 @@ Run the Python script to generate `03-des-diagram.png`.
 
 Create ADRs for key infrastructure decisions:
 
-1. **ADR-001: Serverless Cosmos DB over Provisioned**
+1. **ADR-001: Serverless Azure SQL over Provisioned**
    - Context: ~75 concurrent users, bursty event-driven usage
-   - Decision: Serverless capacity mode
-   - Consequences: No guaranteed throughput, 1K RU/s burst limit
+   - Decision: Serverless tier (auto-pause, pay-per-use)
+   - Consequences: Auto-pause delay on cold start (~1 min)
 
 2. **ADR-002: App Service over Container Apps**
    - Context: Solo dev, no container requirement, Easy Auth needed
@@ -89,7 +89,8 @@ Create ADRs for key infrastructure decisions:
      fallback to Entra ID with external identities if blocked
 
 Save as:
-- `agent-output/hackops/03-des-adr-001-serverless-cosmos.md`
+
+- `agent-output/hackops/03-des-adr-001-serverless-sql.md`
 - `agent-output/hackops/03-des-adr-002-app-service-compute.md`
 - `agent-output/hackops/03-des-adr-003-easy-auth-github.md`
 
@@ -104,7 +105,7 @@ Save as:
 
 - `agent-output/hackops/03-des-diagram.py` — diagram source
 - `agent-output/hackops/03-des-diagram.png` — rendered diagram
-- `agent-output/hackops/03-des-adr-001-serverless-cosmos.md`
+- `agent-output/hackops/03-des-adr-001-serverless-sql.md`
 - `agent-output/hackops/03-des-adr-002-app-service-compute.md`
 - `agent-output/hackops/03-des-adr-003-easy-auth-github.md`
 

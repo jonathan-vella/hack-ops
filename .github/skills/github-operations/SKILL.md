@@ -3,7 +3,7 @@ name: github-operations
 description: Handles GitHub issues, pull requests, repositories, Actions, releases, and API tasks using MCP-first workflows with gh CLI fallback for advanced operations.
 license: MIT
 metadata:
-  author: azure-agentic-infraops
+  author: hack-ops
   version: "3.0"
   category: github
 ---
@@ -17,10 +17,10 @@ Manage all GitHub operations using MCP tools (preferred) and GitHub CLI (fallbac
 
 ## Reference Files (Load on Demand)
 
-| File | When to Load |
-| ---- | ------------ |
-| `references/mcp-tools.md` | Creating/managing issues and pull requests via MCP |
-| `references/gh-cli.md` | Actions, releases, repos, secrets, API — CLI fallback |
+| File                      | When to Load                                          |
+| ------------------------- | ----------------------------------------------------- |
+| `references/mcp-tools.md` | Creating/managing issues and pull requests via MCP    |
+| `references/gh-cli.md`    | Actions, releases, repos, secrets, API — CLI fallback |
 
 ---
 
@@ -46,19 +46,19 @@ Follow this protocol for every GitHub task:
 
 ## Decision Matrix
 
-| Operation | Tool | Reference |
-| --------- | ---- | --------- |
+| Operation                 | Tool                                                    | Reference                 |
+| ------------------------- | ------------------------------------------------------- | ------------------------- |
 | Create/read/update issues | MCP (`mcp_github_issue_write`, `mcp_github_issue_read`) | `references/mcp-tools.md` |
-| Search issues | MCP (`mcp_github_search_issues`) | `references/mcp-tools.md` |
-| Create/merge/review PRs | MCP (`mcp_github_create_pull_request`, etc.) | `references/mcp-tools.md` |
-| List/search PRs | MCP (`mcp_github_list_pull_requests`, etc.) | `references/mcp-tools.md` |
-| Repo create/clone/fork | `gh repo` | `references/gh-cli.md` |
-| Workflow run/list/watch | `gh workflow`, `gh run` | `references/gh-cli.md` |
-| Releases | `gh release` | `references/gh-cli.md` |
-| Secrets & variables | `gh secret`, `gh variable` | `references/gh-cli.md` |
-| REST/GraphQL API | `gh api` | `references/gh-cli.md` |
-| Labels | `gh label` | `references/gh-cli.md` |
-| Search code/repos | `gh search` | `references/gh-cli.md` |
+| Search issues             | MCP (`mcp_github_search_issues`)                        | `references/mcp-tools.md` |
+| Create/merge/review PRs   | MCP (`mcp_github_create_pull_request`, etc.)            | `references/mcp-tools.md` |
+| List/search PRs           | MCP (`mcp_github_list_pull_requests`, etc.)             | `references/mcp-tools.md` |
+| Repo create/clone/fork    | `gh repo`                                               | `references/gh-cli.md`    |
+| Workflow run/list/watch   | `gh workflow`, `gh run`                                 | `references/gh-cli.md`    |
+| Releases                  | `gh release`                                            | `references/gh-cli.md`    |
+| Secrets & variables       | `gh secret`, `gh variable`                              | `references/gh-cli.md`    |
+| REST/GraphQL API          | `gh api`                                                | `references/gh-cli.md`    |
+| Labels                    | `gh label`                                              | `references/gh-cli.md`    |
+| Search code/repos         | `gh search`                                             | `references/gh-cli.md`    |
 
 ---
 

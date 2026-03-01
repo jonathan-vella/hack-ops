@@ -61,11 +61,11 @@
 
 ### Requirement 1: Network and Data Plane Isolation
 
-| Control | Requirement                 | Implementation                                          | Status |
-| ------- | --------------------------- | ------------------------------------------------------- | ------ |
-| NS-1    | Isolate critical data plane | Cosmos and Key Vault private endpoints in `snet-pe-dev` | ✅     |
-| NS-2    | Restrict public exposure    | `publicNetworkAccess: Disabled` on Cosmos and Key Vault | ✅     |
-| NS-3    | Controlled subnet policy    | Dedicated subnet delegation and NSGs                    | ✅     |
+| Control | Requirement                 | Implementation                                                | Status |
+| ------- | --------------------------- | ------------------------------------------------------------- | ------ |
+| NS-1    | Isolate critical data plane | SQL Database and Key Vault private endpoints in `snet-pe-dev` | ✅     |
+| NS-2    | Restrict public exposure    | `publicNetworkAccess: Disabled` on SQL Database and Key Vault | ✅     |
+| NS-3    | Controlled subnet policy    | Dedicated subnet delegation and NSGs                          | ✅     |
 
 <details>
 <summary><strong>📎 Evidence</strong></summary>
@@ -74,7 +74,7 @@
 
 | Evidence Item                             | Type                  | Date Collected |
 | ----------------------------------------- | --------------------- | -------------- |
-| `az cosmosdb show` output                 | Runtime configuration | 2026-02-26     |
+| `az sql db show` output                   | Runtime configuration | 2026-02-26     |
 | `az keyvault show` output                 | Runtime configuration | 2026-02-26     |
 | `az network private-endpoint list` output | Runtime configuration | 2026-02-26     |
 
@@ -90,10 +90,10 @@
 
 ### Requirement 3: Cryptography and Transport
 
-| Control | Requirement             | Implementation                     | Status |
-| ------- | ----------------------- | ---------------------------------- | ------ |
-| DP-1    | Encrypt data in transit | TLS 1.2 enforced on app and Cosmos | ✅     |
-| DP-2    | HTTPS-only frontdoor    | App Service `httpsOnly: true`      | ✅     |
+| Control | Requirement             | Implementation                           | Status |
+| ------- | ----------------------- | ---------------------------------------- | ------ |
+| DP-1    | Encrypt data in transit | TLS 1.2 enforced on app and SQL Database | ✅     |
+| DP-2    | HTTPS-only frontdoor    | App Service `httpsOnly: true`            | ✅     |
 
 ---
 
@@ -125,7 +125,7 @@ pie title Compliance Gaps by Severity
 | Control                | Evidence Type | Location                                                                            | Last Collected |
 | ---------------------- | ------------- | ----------------------------------------------------------------------------------- | -------------- |
 | Network isolation      | CLI export    | `az network private-endpoint list`                                                  | 2026-02-26     |
-| Data protection        | CLI export    | `az cosmosdb show`                                                                  | 2026-02-26     |
+| Data protection        | CLI export    | `az sql db show`                                                                    | 2026-02-26     |
 | Key management         | CLI export    | `az keyvault show`                                                                  | 2026-02-26     |
 | Monitoring posture     | CLI export    | `az monitor log-analytics workspace show`, `az monitor app-insights component show` | 2026-02-26     |
 | Deployment attestation | Artifact      | `06-deployment-summary.md`                                                          | 2026-02-26     |
@@ -146,7 +146,7 @@ pie title Compliance Gaps by Severity
 
 | Finding                                                      | Owner         | Due Date   | Status  |
 | ------------------------------------------------------------ | ------------- | ---------- | ------- |
-| Execute DR restore/failover drill                            | InfraOps      | 2026-03-30 | ⬜ Todo |
+| Execute DR restore/failover drill                            | Platform Ops  | 2026-03-30 | ⬜ Todo |
 | Define and enable P1/P2 alert rules and action groups        | Platform Team | 2026-03-20 | ⬜ Todo |
 | Capture and archive `authsettingsV2` proof for audit package | Security/GRC  | 2026-03-12 | ⬜ Todo |
 

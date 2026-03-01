@@ -13,7 +13,7 @@ All automated tests run in CI on every pull request.
 ```text
         ╱  E2E  ╲         ← Playwright (planned)
        ╱─────────╲
-      ╱ Integration╲      ← Vitest + Cosmos emulator
+      ╯ Integration╲      ← Vitest + local SQL Server
      ╱───────────────╲
     ╱    Unit Tests    ╲   ← Vitest + jsdom
    ╱─────────────────────╲
@@ -45,31 +45,32 @@ Configured in [apps/web/vitest.config.ts](../apps/web/vitest.config.ts):
 | Branches | 80%       | 86%     |
 
 Coverage includes `src/lib/**/*.ts` and `src/app/api/**/*.ts`.
-Excluded: test files, `cosmos.ts` (infra), hooks (client-only), validation barrel.
+Excluded: test files, `db.ts` (infra), hooks (client-only), validation barrel.
 
 ## What to Mock
 
 | Dependency      | Mock Strategy                                     |
 | --------------- | ------------------------------------------------- |
-| Cosmos DB       | `vi.mock("@/lib/cosmos")` — return mock container |
+| SQL Database    | `vi.mock("@/lib/db")` — return mock query results |
 | Auth principal  | `vi.mock("@/lib/auth")` — return test principal   |
 | Role resolution | `vi.mock("@/lib/roles")` — return desired role    |
 | Audit logger    | `vi.mock("@/lib/audit")` — spy on calls           |
 | `NextRequest`   | Construct with test URL and headers               |
 
-## What to Test Against Emulator
+## What to Test Against Local SQL Server
 
-Integration tests that validate real Cosmos DB behavior
-(partition key routing, cross-partition queries, upsert
-semantics) should use the Cosmos DB emulator:
+Integration tests that validate real SQL Database behavior
+(joins, foreign keys, transactions, optimistic concurrency)
+should use a local SQL Server container:
 
 ```bash
-# Start emulator (Docker)
-docker run -p 8081:8081 -p 10250-10255:10250-10255 \
-  mcr.microsoft.com/cosmosdb/linux/azure-cosmos-emulator:latest
+# Start SQL Server (Docker)
+docker run -d -p 1433:1433 \
+  -e ACCEPT_EULA=Y -e MSSQL_SA_PASSWORD='HackOps@Dev123' \
+  mcr.microsoft.com/mssql/server:2022-latest
 
 # Seed test data (TODO: replace with SQL seeder — see Phase I)
-# npx tsx scripts/seed-cosmos.ts  # archived
+# npx tsx scripts/seed-sql.ts  # TODO: create SQL seeder (see Phase I)
 ```
 
 ## Test Organization

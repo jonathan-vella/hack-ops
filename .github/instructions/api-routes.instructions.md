@@ -5,9 +5,9 @@ applyTo: "**/app/api/**"
 
 # API Route Conventions
 
-> Library-specific patterns (Next.js route handlers, Zod validation, Cosmos DB
-> operations) are maintained in dedicated skills: `nextjs-patterns`,
-> `zod-validation`, and `cosmos-db-sdk`. This instruction defines the
+> Library-specific patterns (Next.js route handlers, Zod validation, SQL
+> operations) are maintained in dedicated skills: `nextjs-patterns`
+> and `zod-validation`. This instruction defines the
 > **orchestration invariants** that combine them.
 
 ## Canonical Type Source
@@ -31,7 +31,7 @@ Never define domain types or Zod schemas inside route files.
 export async function POST(request: Request) {
   // 1. Auth guard — requireAuth + requireRole
   // 2. Validate input — Zod safeParse (see zod-validation skill)
-  // 3. Business logic — delegate to service layer (see cosmos-db-sdk skill)
+  // 3. Business logic — delegate to service layer (uses @/lib/sql)
   // 4. Audit log — auditLog() call
   // 5. Response — NextResponse.json (see nextjs-patterns skill)
 }
@@ -84,7 +84,7 @@ await auditLog({
   action: "hackathon.created", // domain.verb
   actorId: user.id,
   resourceId: resource.id,
-  hackathonId: hackathonId, // partition key for Cosmos DB
+  hackathonId: hackathonId,
   metadata: {}, // optional extra context
 });
 ```
@@ -125,19 +125,17 @@ Agents MUST cross-check this instruction's patterns against live documentation a
 
 ### Verification Steps
 
-1. Call `resolve-library-id` for `next.js`, `zod`, and `@azure/cosmos` to get their current library IDs
+1. Call `resolve-library-id` for `next.js` and `zod` to get their current library IDs
 2. Call `query-docs` with the Next.js ID and topic `"NextResponse json route handler API"` (set tokens to 3000)
 3. Call `query-docs` with the Zod ID and topic `"safeParse error issues validation"` (set tokens to 3000)
-4. Call `query-docs` with the Cosmos ID and topic `"container items create upsert"` (set tokens to 3000)
-5. Compare the returned documentation against this instruction's hardcoded patterns
-6. If any pattern has changed (different API signature, renamed method, new
+4. Compare the returned documentation against this instruction's hardcoded patterns
+5. If any pattern has changed (different API signature, renamed method, new
    required parameter), flag the discrepancy to the user before proceeding
 
 ### What to Cross-Check
 
 - `NextResponse.json()` generic type parameter support
 - `safeParse` result shape (`success`, `data`, `error.issues`)
-- `container.items.create()` return type and `resource` property
 - `requireAuth` / `requireRole` patterns (these are project-specific — skip
   Context7 for auth, just verify the library APIs they depend on)
 

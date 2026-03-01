@@ -32,12 +32,12 @@ findings for any drift.
 
 ## Library Validation Matrix
 
-| #   | Library          | Package         | Key files                                                        |
-| --- | ---------------- | --------------- | ---------------------------------------------------------------- |
-| 1   | Next.js 16       | `next`          | `src/app/api/**/route.ts`, `src/proxy.ts`, `src/app/**/page.tsx` |
-| 2   | Zod 4            | `zod`           | `src/lib/validation/*.ts`                                        |
-| 3   | Cosmos DB SDK v4 | `@azure/cosmos` | `src/lib/cosmos.ts`, all route handlers with queries             |
-| 4   | shadcn/ui        | `shadcn/ui`     | `src/components/**/*.tsx`, `src/components/ui/**/*.tsx`          |
+| #   | Library    | Package     | Key files                                                        |
+| --- | ---------- | ----------- | ---------------------------------------------------------------- |
+| 1   | Next.js 16 | `next`      | `src/app/api/**/route.ts`, `src/proxy.ts`, `src/app/**/page.tsx` |
+| 2   | Zod 4      | `zod`       | `src/lib/validation/*.ts`                                        |
+| 3   | mssql      | `mssql`     | `src/lib/sql.ts`, all route handlers with queries                |
+| 4   | shadcn/ui  | `shadcn/ui` | `src/components/**/*.tsx`, `src/components/ui/**/*.tsx`          |
 
 ## Workflow
 
@@ -50,7 +50,7 @@ Call `resolve-library-id` for each library:
 
 1. `next.js` — query: "Next.js App Router route handler"
 2. `zod` — query: "Zod schema validation"
-3. `@azure/cosmos` — query: "Azure Cosmos DB Node.js SDK"
+3. `mssql` — query: "mssql Node.js SQL Server client"
 4. `shadcn/ui` — query: "shadcn ui React components"
 
 Record each resolved library ID for subsequent queries.
@@ -69,10 +69,10 @@ For each resolved library, call `query-docs` with 8000 tokens:
 - `"safeParse parse validation import path zod v4"`
 - `"z.object z.enum z.string z.number coerce iso datetime"`
 
-**Cosmos DB SDK (2 queries):**
+**mssql (2 queries):**
 
-- `"CosmosClient constructor database container init"`
-- `"query items parameterized query bulk operations fetchAll"`
+- `"mssql ConnectionPool connect config SQL Server"`
+- `"mssql query request input parameters prepared statement"`
 
 **shadcn/ui (2 queries):**
 
@@ -94,9 +94,9 @@ Read the following files to extract current patterns:
 - `src/lib/validation/index.ts` — check import path
 - Any 3 validation schema files — check `z.object`, `z.enum`, `safeParse` usage
 
-**Cosmos DB patterns:**
+**mssql patterns:**
 
-- `src/lib/cosmos.ts` — check `CosmosClient` constructor, `getContainer`
+- `src/lib/sql.ts` — check `ConnectionPool` constructor, `query`, `execute`
 - Any 2 route handlers with `.query()` calls — check query API shape
 
 **shadcn/ui patterns:**
@@ -125,13 +125,13 @@ patterns from Step 3. Check these specific invariants:
 - [ ] `z.number().int()` chain is valid
 - [ ] `z.string().min().max()` chain is valid
 
-**Cosmos DB invariants:**
+**mssql invariants:**
 
-- [ ] `CosmosClient` constructor accepts `{ endpoint, key }` for emulator
-- [ ] `DefaultAzureCredential` from `@azure/identity` for production
-- [ ] `container.items.query({ query, parameters })` signature is current
-- [ ] `.fetchAll()` returns `{ resources }` shape
-- [ ] Parameterized queries use `@param` syntax
+- [ ] `ConnectionPool` constructor accepts `{ server, database, user, password }` for local dev
+- [ ] `DefaultAzureCredential` from `@azure/identity` for production authentication
+- [ ] `request.query()` or `request.input().query()` signature is current
+- [ ] Query results accessed via `recordset` property
+- [ ] Parameterized queries use `request.input('param', type, value)` syntax
 
 **shadcn/ui invariants:**
 
@@ -164,7 +164,7 @@ Produce a single structured report in this format:
 - **Findings:**
   - (list any mismatches or confirmations)
 
-## Cosmos DB SDK v4
+## mssql
 
 - **Status:** PASS | FAIL
 - **Library ID:** (resolved ID)

@@ -45,7 +45,7 @@ Auth — no OAuth flow implementation, token refresh, or session
 management code.
 
 Role resolution is handled in application code after
-authentication, using the `roles` Cosmos DB container.
+authentication, using the `roles` SQL table.
 
 ## 🔄 Alternatives Considered
 

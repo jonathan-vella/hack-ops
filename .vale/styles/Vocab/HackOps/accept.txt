@@ -1,4 +1,4 @@
-InfraOps
+HackOps
 Bicep
 AVM
 WAF

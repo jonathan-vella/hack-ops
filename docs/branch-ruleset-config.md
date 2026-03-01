@@ -5,7 +5,7 @@
 ## Overview
 
 This document provides the exact `gh api` commands to configure branch
-rulesets for the `azure-agentic-infraops` repository. These rules
+rulesets for the `hack-ops` repository. These rules
 enforce quality gates before merging to `main`.
 
 ## Required Status Checks
@@ -26,7 +26,7 @@ The following CI jobs must pass before a PR can merge:
 gh api \
   --method POST \
   -H "Accept: application/vnd.github+json" \
-  /repos/jonathan-vella/azure-agentic-infraops/rulesets \
+  /repos/jonathan-vella/hack-ops/rulesets \
   -f name="main-protection" \
   -f target="branch" \
   -f enforcement="active" \
@@ -52,7 +52,7 @@ Force-pushes are blocked by default when a ruleset with
 gh api \
   --method POST \
   -H "Accept: application/vnd.github+json" \
-  /repos/jonathan-vella/azure-agentic-infraops/rulesets \
+  /repos/jonathan-vella/hack-ops/rulesets \
   -f name="main-no-force-push" \
   -f target="branch" \
   -f enforcement="active" \
@@ -83,7 +83,7 @@ gh api \
 After configuring, verify with:
 
 ```bash
-gh api /repos/jonathan-vella/azure-agentic-infraops/rulesets \
+gh api /repos/jonathan-vella/hack-ops/rulesets \
   --jq '.[] | {name, enforcement, rules: [.rules[].type]}'
 ```
 

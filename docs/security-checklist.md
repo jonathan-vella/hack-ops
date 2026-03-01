@@ -4,17 +4,17 @@
 
 ## Transport and Encryption
 
-- [x] **TLS 1.2 minimum** — enforced at App Service and Cosmos DB
+- [x] **TLS 1.2 minimum** — enforced at App Service and Azure SQL Database
 - [x] **HTTPS-only** — HTTP redirects to HTTPS, no plain-text endpoints
-- [x] **Cosmos DB connection** — uses HTTPS endpoint with key or managed identity
+- [x] **SQL Database connection** — uses TDS endpoint with managed identity (Entra-only auth)
 
 ## Identity and Access
 
-- [x] **Managed Identity** — App Service uses system-assigned managed identity for Cosmos DB access
+- [x] **Managed Identity** — App Service uses system-assigned managed identity for Azure SQL Database access
 - [x] **Easy Auth** — Azure AD / Entra ID authentication via App Service Authentication
 - [x] **Role-based access** — 4 roles enforced at API layer: `admin`, `coach`, `hacker`, `viewer`
 - [x] **Primary admin protection** — built-in admin cannot be deleted or demoted
-- [x] **No public Cosmos DB endpoint** — accessible only via managed identity from App Service
+- [x] **No public SQL Database endpoint** — accessible only via managed identity from App Service
 
 ## Input Validation
 
@@ -37,18 +37,18 @@
 
 ## Audit Trail
 
-- [x] **Audit logging** — all write operations logged to `audit` container
+- [x] **Audit logging** — all write operations logged to `audit_log` table
 - [x] **Principal tracking** — audit entries include actor identity from Easy Auth headers
 - [x] **Immutable records** — audit entries are append-only, no delete/update API exposed
 
 ## Data Protection
 
-- [x] **Cosmos DB encryption at rest** — enabled by default (service-managed keys)
+- [x] **SQL Database encryption at rest** — TDE enabled by default (service-managed keys)
 - [x] **No PII in logs** — structured logging excludes sensitive fields
-- [x] **Partition isolation** — hackathon data partitioned by hackathonId, preventing cross-tenant leakage
+- [x] **Hackathon scoping** — hackathon data scoped by hackathonId foreign keys, preventing cross-tenant leakage
 
 ## Deployment Security
 
 - [x] **OIDC for CI/CD** — GitHub Actions uses federated credentials, no long-lived secrets
 - [x] **Staging slot validation** — deployments go to staging slot before production swap
-- [x] **Environment separation** — dev and prod use separate App Service instances and Cosmos accounts
+- [x] **Environment separation** — dev and prod use separate App Service instances and SQL Database servers

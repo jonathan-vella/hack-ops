@@ -37,7 +37,7 @@ Structure diagnostic reports as:
 ## Diagnostic Report: {resource-name}
 
 **Assessment Date**: {date}
-**Assessed By**: InfraOps Diagnose Agent
+**Assessed By**: HackOps Diagnose Agent
 **Overall Health**: 🟢 Healthy | 🟡 Degraded | 🔴 Unhealthy
 
 ### Findings Summary

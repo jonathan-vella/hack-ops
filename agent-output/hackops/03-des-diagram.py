@@ -8,7 +8,7 @@ import os
 
 from diagrams import Cluster, Diagram, Edge
 from diagrams.azure.compute import AppServices
-from diagrams.azure.database import CosmosDb
+from diagrams.azure.database import SQLDatabases
 from diagrams.azure.identity import ManagedIdentities
 from diagrams.azure.network import DNSZones, Subnets, VirtualNetworks
 from diagrams.azure.security import KeyVaults
@@ -50,17 +50,17 @@ with Diagram(
                 n_web_app = AppServices("app-hackops-dev\nNode 22 / Next.js 15")
 
             with Cluster("snet-pe (10.0.0.64/27)"):
-                n_data_cosmos = CosmosDb("cosmos-hackops-dev\nServerless NoSQL")
+                n_data_sql = SQLDatabases("sql-hackops-dev\nServerless GP")
                 n_sec_kv = KeyVaults("kv-hackops-dev")
 
         n_id_msi = ManagedIdentities("System MSI")
-        n_net_dns = DNSZones("privatelink\n.documents\n.azure.com")
+        n_net_dns = DNSZones("privatelink\n.database\n.windows.net")
 
     # Runtime data flow
     n_edge_user >> Edge(label="HTTPS + Easy Auth", color="darkgreen") >> n_web_app
 
-    # App Service → Cosmos DB via Private Endpoint
-    n_web_app >> Edge(label="SDK v4 (private)", color="blue") >> n_data_cosmos
+    # App Service → SQL Database via Private Endpoint
+    n_web_app >> Edge(label="mssql (private)", color="blue") >> n_data_sql
 
     # App Service → Key Vault for secrets
     n_web_app >> Edge(label="secrets", color="orange", style="dashed") >> n_sec_kv
@@ -69,7 +69,7 @@ with Diagram(
     n_web_app >> Edge(label="identity", color="gray", style="dotted") >> n_id_msi
 
     # DNS resolution
-    n_data_cosmos >> Edge(label="DNS", color="purple", style="dotted") >> n_net_dns
+    n_data_sql >> Edge(label="DNS", color="purple", style="dotted") >> n_net_dns
 
     # Telemetry
     n_web_app >> Edge(label="telemetry", color="gray", style="dashed") >> n_ops_appi

@@ -292,7 +292,7 @@ Include attribution header from the template file (do not hardcode).
 - [ ] **Every dollar figure** in 02 and 03 artifacts traces back to `cost-estimate-subagent` response — no hardcoded prices
 - [ ] Line-item totals sum correctly to reported monthly total
 - [ ] H2 headings match azure-artifacts templates exactly
-- [ ] Region selection justified (default: centralus)
+- [ ] Region selection justified (default: swedencentral)
 - [ ] AVM modules recommended where available
 - [ ] Trade-offs explicitly documented
 - [ ] Approval gate presented before handoff

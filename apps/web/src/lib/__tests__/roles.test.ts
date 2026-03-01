@@ -1,7 +1,9 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 
-vi.mock("../cosmos", () => ({
-  getContainer: vi.fn(),
+vi.mock("../sql", () => ({
+  query: vi.fn(),
+  queryOne: vi.fn(),
+  execute: vi.fn(),
 }));
 
 import {
@@ -10,27 +12,24 @@ import {
   getDevRole,
   isGlobalAdmin,
 } from "../roles";
-import { getContainer } from "../cosmos";
+import { queryOne } from "../sql";
 
-const mockGetContainer = vi.mocked(getContainer);
-
-function mockQuery(resources: unknown[]) {
-  const fetchAll = vi.fn().mockResolvedValue({ resources });
-  const query = vi.fn().mockReturnValue({ fetchAll });
-  mockGetContainer.mockReturnValue({ items: { query } } as never);
-}
+const mockQueryOne = vi.mocked(queryOne);
 
 describe("resolveRole", () => {
   beforeEach(() => vi.clearAllMocks());
 
   it("returns the role when found", async () => {
-    mockQuery([{ role: "coach", isPrimaryAdmin: false }]);
+    mockQueryOne.mockResolvedValueOnce({
+      role: "coach",
+      isPrimaryAdmin: false,
+    });
     const role = await resolveRole("user-1", "hack-1");
     expect(role).toBe("coach");
   });
 
   it("returns null when no role exists", async () => {
-    mockQuery([]);
+    mockQueryOne.mockResolvedValueOnce(null);
     const role = await resolveRole("user-2", "hack-1");
     expect(role).toBeNull();
   });
@@ -40,12 +39,12 @@ describe("isPrimaryAdmin", () => {
   beforeEach(() => vi.clearAllMocks());
 
   it("returns true when user is primary admin", async () => {
-    mockQuery([{ isPrimaryAdmin: true }]);
+    mockQueryOne.mockResolvedValueOnce({ isPrimaryAdmin: true });
     expect(await isPrimaryAdmin("user-1", "hack-1")).toBe(true);
   });
 
   it("returns false when user is not primary admin", async () => {
-    mockQuery([]);
+    mockQueryOne.mockResolvedValueOnce(null);
     expect(await isPrimaryAdmin("user-2", "hack-1")).toBe(false);
   });
 });
@@ -86,12 +85,12 @@ describe("isGlobalAdmin", () => {
   });
 
   it("returns true when user has admin role in any hackathon", async () => {
-    mockQuery([{ role: "admin" }]);
+    mockQueryOne.mockResolvedValueOnce({ role: "admin" });
     expect(await isGlobalAdmin("user-1")).toBe(true);
   });
 
   it("returns false when user has no admin role", async () => {
-    mockQuery([]);
+    mockQueryOne.mockResolvedValueOnce(null);
     expect(await isGlobalAdmin("user-2")).toBe(false);
   });
 
@@ -104,7 +103,7 @@ describe("isGlobalAdmin", () => {
   it("does not bypass in development when dev role is not admin", async () => {
     vi.stubEnv("NODE_ENV", "development");
     vi.stubEnv("DEV_USER_ROLE", "coach");
-    mockQuery([]);
+    mockQueryOne.mockResolvedValueOnce(null);
     expect(await isGlobalAdmin("user-3")).toBe(false);
   });
 });

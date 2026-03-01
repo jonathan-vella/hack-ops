@@ -49,9 +49,9 @@
       "allowedRange": "^5.7.0",
       "location": "root,apps/web,packages/shared"
     },
-    "@azure/cosmos": {
-      "minVersion": "4.9.1",
-      "allowedRange": "^4.9.1",
+    "mssql": {
+      "minVersion": "11.0.1",
+      "allowedRange": "^11.0.1",
       "location": "apps/web"
     },
     "@azure/identity": {

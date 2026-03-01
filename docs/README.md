@@ -1,8 +1,8 @@
-# Agentic InfraOps Documentation
+# HackOps Documentation
 
-> Azure infrastructure engineered by AI agents and skills | [Current Version](../VERSION.md)
+> Azure hackathon management platform | [Current Version](../VERSION.md)
 
-Transform Azure infrastructure requirements into deploy-ready Bicep code using coordinated
+Transform the HackOps platform requirements into deployable code using coordinated
 AI agents and reusable skills, aligned with Azure Well-Architected Framework (WAF) and
 Azure Verified Modules (AVM).
 
@@ -10,7 +10,7 @@ Azure Verified Modules (AVM).
 
 This project now implements the **Conductor pattern** from VS Code 1.109:
 
-- **InfraOps Conductor**: Master orchestrator with mandatory human approval gates
+- **01-Conductor**: Master orchestrator with mandatory human approval gates
 - **Validation Subagents**: TDD-style Bicep validation (lint → what-if → review)
 - **New Frontmatter**: `user-invokable`, `agents` list, model fallbacks
 - **Skills GA**: Skills are now generally available with enhanced discovery
@@ -25,7 +25,7 @@ See the [conductor agent](../.github/agents/01-conductor.agent.md) for orchestra
 | [HackOps User Guide](hackops-user-guide.md)     | Step-by-step runbook          |
 | [PRD](prd.md)                                   | Product Requirements Document |
 | [API Contract](api-contract.md)                 | 26-endpoint REST API spec     |
-| [Data Model](data-model.md)                     | Cosmos DB containers & schema |
+| [Data Model](data-model.md)                     | SQL Database tables & schema  |
 | [UI Pages](ui-pages.md)                         | Page inventory & route map    |
 | [Environment Config](environment-config.md)     | Env vars & Key Vault refs     |
 | [Dev Containers](dev-containers.md)             | Docker setup and alternatives |
@@ -44,9 +44,9 @@ See `AGENTS.md` at the repo root for the lightweight map.
 
 ### Conductor (Master Orchestrator)
 
-| Agent                | Persona    | Purpose                                                |
-| -------------------- | ---------- | ------------------------------------------------------ |
-| `InfraOps Conductor` | 🎼 Maestro | Orchestrates all 7 steps with mandatory approval gates |
+| Agent          | Persona    | Purpose                                                |
+| -------------- | ---------- | ------------------------------------------------------ |
+| `01-Conductor` | 🎼 Maestro | Orchestrates all 7 steps with mandatory approval gates |
 
 ### Primary Agents (User-Invokable)
 
@@ -103,7 +103,7 @@ See `AGENTS.md` at the repo root for the lightweight map.
 
 ---
 
-## Skills (20)
+## Skills (19)
 
 Skills are reusable capabilities that agents invoke or that activate automatically based on prompts.
 
@@ -149,13 +149,13 @@ Skills are reusable capabilities that agents invoke or that activate automatical
 
 ### App-Dev / HackOps (Category 4)
 
-| Skill                | Purpose                                          | Triggers                                 |
-| -------------------- | ------------------------------------------------ | ---------------------------------------- |
-| `hackops-domain`     | HackOps business rules, roles, lifecycle states  | "hackops", "hackathon rules", "scoring"  |
-| `nextjs-patterns`    | Next.js 15+ App Router patterns and conventions  | "next.js", "app router", "route handler" |
-| ~~`cosmos-db-sdk`~~  | ~~Cosmos DB SDK~~ — archived (SQL migration)     | Moved to `archive/skills/cosmos-db-sdk/` |
-| `shadcn-ui-patterns` | shadcn/ui components + Tailwind CSS v4 patterns  | "shadcn", "ui component", "tailwind"     |
-| `zod-validation`     | Zod 4 schema patterns for API + form validation  | "zod", "schema", "validate request"      |
+| Skill                | Purpose                                         | Triggers                                 |
+| -------------------- | ----------------------------------------------- | ---------------------------------------- |
+| `hackops-domain`     | HackOps business rules, roles, lifecycle states | "hackops", "hackathon rules", "scoring"  |
+| `nextjs-patterns`    | Next.js 15+ App Router patterns and conventions | "next.js", "app router", "route handler" |
+| ~~`cosmos-db-sdk`~~  | ~~Cosmos DB SDK~~ — archived (SQL migration)    | Moved to `archive/skills/cosmos-db-sdk/` |
+| `shadcn-ui-patterns` | shadcn/ui components + Tailwind CSS v4 patterns | "shadcn", "ui component", "tailwind"     |
+| `zod-validation`     | Zod 4 schema patterns for API + form validation | "zod", "schema", "validate request"      |
 
 ---
 
@@ -190,7 +190,7 @@ prompt examples in `docs/prompt-guide/`:
 ## Project Structure
 
 ```text
-azure-agentic-infraops/
+hack-ops/
 ├── AGENTS.md             # Lightweight map (start here)
 ├── QUALITY_SCORE.md      # Project health grades
 ├── .github/

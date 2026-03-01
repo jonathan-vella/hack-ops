@@ -37,9 +37,9 @@ Challenge N+1.
 - **API contract**: `packages/shared/types/api-contract.ts`
   — `ChallengesAPI`, `ProgressionAPI` namespaces
 - **Data model**: `docs/data-model.md` — `challenges` and
-  `progression` containers
+  `progression` tables
 - **Skills**: Read `hackops-domain` (gating rules, auto-unlock),
-  `cosmos-db-sdk` (conditional writes)
+  `zod-validation`
 
 ## Workflow
 
@@ -47,8 +47,8 @@ Challenge N+1.
 
 1. `packages/shared/types/api-contract.ts` — challenge and
    progression types
-2. `docs/data-model.md` — `challenges` (partition: `hackathonId`)
-   and `progression` (partition: `teamId`) containers
+2. `docs/data-model.md` — `challenges` (primary key: `hackathonId`)
+   and `progression` (primary key: `teamId`) tables
 3. `docs/api-contract.md` — Phase 9 endpoints
 4. `.github/skills/hackops-domain/SKILL.md` — gating invariants
 

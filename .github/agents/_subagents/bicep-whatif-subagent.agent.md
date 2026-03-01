@@ -91,7 +91,7 @@ az deployment group what-if \
 
 ```bash
 az deployment sub what-if \
-  --location centralus \
+  --location swedencentral \
   --template-file infra/bicep/{project}/main.bicep
 ```
 

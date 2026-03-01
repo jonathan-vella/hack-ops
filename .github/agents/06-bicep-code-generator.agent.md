@@ -230,7 +230,7 @@ Build templates in dependency order.
 **Round 3 — Application Resources:**
 
 - Compute (App Service, Container Apps, Functions)
-- Data (SQL, Cosmos, Storage)
+- Data (SQL, Storage)
 - Messaging (Service Bus, Event Grid)
 
 **Round 4 — Integration:**
@@ -310,7 +310,7 @@ infra/bicep/{project}/
 targetScope = 'subscription'  // or 'resourceGroup'
 
 // Parameters
-param location string = 'centralus'
+param location string = 'swedencentral'
 param environment string = 'dev'
 param projectName string
 param owner string

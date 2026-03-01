@@ -1,11 +1,11 @@
 blank_issues_enabled: true
 contact_links:
   - name: 📚 Documentation
-    url: https://github.com/jonathan-vella/azure-agentic-infraops/tree/main/docs
+    url: https://github.com/jonathan-vella/hack-ops/tree/main/docs
     about: Check the documentation before opening an issue
   - name: 💬 GitHub Discussions
-    url: https://github.com/jonathan-vella/azure-agentic-infraops/discussions
+    url: https://github.com/jonathan-vella/hack-ops/discussions
     about: Ask questions and share ideas in Discussions
-  - name: 🔧 Agentic InfraOps Workflow
-    url: https://github.com/jonathan-vella/azure-agentic-infraops/blob/main/docs/reference/workflow.md
-    about: Learn about the 7-step agentic workflow
+  - name: 🔧 HackOps Workflow
+    url: https://github.com/jonathan-vella/hack-ops/blob/main/docs/hackops-user-guide.md
+    about: Learn about the HackOps agentic workflow

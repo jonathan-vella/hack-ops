@@ -62,16 +62,16 @@ Query the target subscription for Azure Policies:
    `DeployIfNotExists`
 3. Map policies to planned resources:
    - VNet, NSG, Subnets
-   - Cosmos DB (Serverless)
+   - Azure SQL Database (Serverless)
    - App Service Plan + App Service
    - Key Vault
    - Log Analytics + App Insights
    - Private Endpoint + Private DNS Zone
 4. Identify `Deny` policies that could block:
-   - Serverless Cosmos DB SKU
+   - Serverless Azure SQL tier
    - P1v3 App Service tier
    - `publicNetworkAccess` settings
-   - Allowed regions (verify `centralus`)
+   - Allowed regions (verify `swedencentral`)
 5. Discover required tags beyond the 4-tag baseline
 6. Check allowed resource types and SKU restrictions
 
@@ -108,7 +108,7 @@ Create `agent-output/hackops/04-implementation-plan.md` with:
    - `modules/networking.bicep` — VNet, subnets, NSGs
    - `modules/monitoring.bicep` — Log Analytics, App Insights
    - `modules/key-vault.bicep` — Key Vault with private endpoint
-   - `modules/cosmos-db.bicep` — Cosmos DB with containers, PE
+   - `modules/sql-database.bicep` — Azure SQL Database with tables, PE
    - `modules/app-service.bicep` — ASP, App Service, Easy Auth
    - `deploy.ps1` — deployment script
 3. **Deployment phases**: Foundation → Database → Compute

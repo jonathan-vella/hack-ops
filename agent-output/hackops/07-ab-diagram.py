@@ -40,10 +40,10 @@ def main() -> None:
     add_box(ax, 0.66, 0.61, 0.26, 0.1, "Log Analytics\nlaw-hackops-dev", "#f2e6ff")
 
     add_box(ax, 0.33, 0.45, 0.22, 0.12, "VNet\nvnet-hackops-dev", "#eaf7ea")
-    add_box(ax, 0.66, 0.45, 0.26, 0.12, "Cosmos DB\ncosmos-hackops-dev-fplrs3", "#ffeacc")
+    add_box(ax, 0.66, 0.45, 0.26, 0.12, "SQL Database\nsql-hackops-dev", "#ffeacc")
     add_box(ax, 0.66, 0.28, 0.26, 0.12, "Key Vault\nkv-hackops-dev-fplrs3", "#ffeacc")
 
-    add_box(ax, 0.33, 0.24, 0.22, 0.12, "Private Endpoints\npe-cosmos / pe-kv", "#fff8cc")
+    add_box(ax, 0.33, 0.24, 0.22, 0.12, "Private Endpoints\npe-sql / pe-kv", "#fff8cc")
     add_box(ax, 0.33, 0.07, 0.22, 0.1, "Private DNS Zones\nprivatelink.*", "#fff8cc")
 
     arrow(ax, 0.23, 0.74, 0.33, 0.74)

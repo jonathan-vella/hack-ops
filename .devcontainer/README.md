@@ -1,8 +1,8 @@
-# Development Container for Agentic InfraOps
+# Development Container for HackOps
 
 > **[Version](../VERSION.md)**
 
-This devcontainer provides a **complete, pre-configured development environment** for Agentic InfraOps.
+This devcontainer provides a **complete, pre-configured development environment** for HackOps.
 It includes all required tools, extensions, and configurations to build Azure infrastructure with AI agents.
 
 **Base Image:** `mcr.microsoft.com/devcontainers/base:ubuntu-24.04`
@@ -93,9 +93,9 @@ cd ../../infra/bicep/ && tree -L 2
 
 ### Pre-configured Environment Variables
 
-| Variable                  | Value       | Purpose                                        |
-| ------------------------- | ----------- | ---------------------------------------------- |
-| `AZURE_DEFAULTS_LOCATION` | `centralus` | Default Azure region (matches repo guidelines) |
+| Variable                  | Value           | Purpose                                        |
+| ------------------------- | --------------- | ---------------------------------------------- |
+| `AZURE_DEFAULTS_LOCATION` | `swedencentral` | Default Azure region (matches repo guidelines) |
 
 ### Azure Credentials Mount
 

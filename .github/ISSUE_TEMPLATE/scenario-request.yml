@@ -1,5 +1,5 @@
 name: New Scenario Request
-description: Propose a new demo scenario for the Agentic InfraOps repository
+description: Propose a new feature or enhancement for the HackOps platform
 title: "[Scenario]: "
 labels: ["scenario", "enhancement"]
 assignees: []
@@ -9,9 +9,9 @@ body:
       value: |
         ## 📋 New Scenario Request
 
-        Propose a new demo scenario that showcases Agentic InfraOps capabilities.
-        Good scenarios demonstrate real-world Azure infrastructure patterns that
-        benefit from AI-assisted development.
+        Propose a new feature or enhancement for the HackOps platform.
+        Good proposals describe real-world hackathon management scenarios that
+        benefit platform participants — hackers, coaches, and admins.
 
   - type: input
     id: scenario-name

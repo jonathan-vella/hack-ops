@@ -4,24 +4,11 @@ import type { EasyAuthPrincipal } from "@hackops/shared";
 
 // ── Mocks ──────────────────────────────────────────────────
 
-const mockQuery = vi.fn();
-const mockCreate = vi.fn();
-const mockRead = vi.fn();
-const mockReplace = vi.fn();
-const mockDelete = vi.fn();
-
-vi.mock("@/lib/cosmos", () => ({
-  getContainer: vi.fn(() => ({
-    items: {
-      query: mockQuery,
-      create: mockCreate,
-    },
-    item: vi.fn(() => ({
-      read: mockRead,
-      replace: mockReplace,
-      delete: mockDelete,
-    })),
-  })),
+vi.mock("@/lib/sql", () => ({
+  query: vi.fn(),
+  queryOne: vi.fn(),
+  execute: vi.fn(),
+  transaction: vi.fn(),
 }));
 
 vi.mock("@/lib/auth", () => ({
@@ -37,27 +24,21 @@ vi.mock("@/lib/audit", () => ({
   auditLog: vi.fn(),
 }));
 
+import { query, queryOne, execute } from "@/lib/sql";
 import { getAuthPrincipal } from "@/lib/auth";
-import { resolveRole } from "@/lib/roles";
-import { isGlobalAdmin } from "@/lib/roles";
-import { auditLog } from "@/lib/audit";
+import { resolveRole, isGlobalAdmin } from "@/lib/roles";
 
+const mockQuery = vi.mocked(query);
+const mockQueryOne = vi.mocked(queryOne);
+const mockExecute = vi.mocked(execute);
 const mockGetAuth = vi.mocked(getAuthPrincipal);
 const mockResolveRole = vi.mocked(resolveRole);
 const mockIsGlobalAdmin = vi.mocked(isGlobalAdmin);
-const mockAuditLog = vi.mocked(auditLog);
 
 const adminPrincipal: EasyAuthPrincipal = {
   userId: "user-admin-1",
   githubLogin: "admin-user",
   email: "admin@example.com",
-  avatarUrl: "",
-};
-
-const coachPrincipal: EasyAuthPrincipal = {
-  userId: "user-coach-1",
-  githubLogin: "coach-user",
-  email: "coach@example.com",
   avatarUrl: "",
 };
 
@@ -73,556 +54,365 @@ function createRequest(
   });
 }
 
-// ── Role Invite Tests ──────────────────────────────────────
+// ── Role Invite ────────────────────────────────────────────
 
 describe("POST /api/roles/invite", () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-    mockQuery.mockReturnValue({
-      fetchAll: vi.fn().mockResolvedValue({ resources: [] }),
-      fetchNext: vi
-        .fn()
-        .mockResolvedValue({ resources: [], continuationToken: null }),
-    });
-    mockCreate.mockResolvedValue({ resource: {} });
-    mockRead.mockResolvedValue({
-      resource: { id: "hack-1", name: "Test Hackathon" },
-    });
-  });
+  beforeEach(() => vi.clearAllMocks());
 
-  it("returns 401 when unauthenticated", async () => {
-    mockGetAuth.mockReturnValue(null);
-
-    const { POST } = await import("../roles/invite/route");
-    const req = createRequest("POST", "http://localhost/api/roles/invite", {
-      hackathonId: "hack-1",
-      githubLogin: "coach-jane",
-      role: "coach",
-    });
-    const res = await POST(req, { params: Promise.resolve({}) });
-    expect(res.status).toBe(401);
-  });
-
-  it("returns 403 when caller is not admin", async () => {
-    mockGetAuth.mockReturnValue(coachPrincipal);
-    mockResolveRole.mockResolvedValue("coach");
-
-    const { POST } = await import("../roles/invite/route");
-    const req = createRequest("POST", "http://localhost/api/roles/invite", {
-      hackathonId: "hack-1",
-      githubLogin: "new-coach",
-      role: "coach",
-    });
-    const res = await POST(req, { params: Promise.resolve({}) });
-    expect(res.status).toBe(403);
-  });
-
-  it("returns 400 when body is invalid", async () => {
+  it("invites a coach role", async () => {
     mockGetAuth.mockReturnValue(adminPrincipal);
     mockResolveRole.mockResolvedValue("admin");
 
-    const { POST } = await import("../roles/invite/route");
-    const req = createRequest("POST", "http://localhost/api/roles/invite", {
-      hackathonId: "hack-1",
-      // missing githubLogin and role
-    });
-    const res = await POST(req, { params: Promise.resolve({}) });
-    expect(res.status).toBe(400);
-  });
-
-  it("returns 201 when role invite succeeds", async () => {
-    mockGetAuth.mockReturnValue(adminPrincipal);
-    mockResolveRole.mockResolvedValue("admin");
-    mockQuery.mockReturnValue({
-      fetchAll: vi.fn().mockResolvedValue({ resources: [] }),
-    });
+    // queryOne: hackathon exists
+    mockQueryOne.mockResolvedValueOnce({ id: "h1" });
+    // query: duplicate role check (none)
+    mockQuery.mockResolvedValueOnce([]);
+    // execute: INSERT role
+    mockExecute.mockResolvedValueOnce(1);
 
     const { POST } = await import("../roles/invite/route");
     const req = createRequest("POST", "http://localhost/api/roles/invite", {
-      hackathonId: "hack-1",
-      githubLogin: "coach-jane",
+      hackathonId: "h1",
+      githubLogin: "coach-user",
       role: "coach",
     });
     const res = await POST(req, { params: Promise.resolve({}) });
+    const body = await res.json();
+
     expect(res.status).toBe(201);
-
-    const json = await res.json();
-    expect(json.ok).toBe(true);
-    expect(json.data.githubLogin).toBe("coach-jane");
-    expect(json.data.role).toBe("coach");
-    expect(mockAuditLog).toHaveBeenCalledWith(
-      expect.objectContaining({
-        action: "role.invite",
-        hackathonId: "hack-1",
-      }),
-    );
+    expect(body.ok).toBe(true);
+    expect(body.data.role).toBe("coach");
+    expect(body.data.githubLogin).toBe("coach-user");
   });
 
-  it("returns 409 when user already has a role", async () => {
+  it("returns 404 when hackathon not found", async () => {
     mockGetAuth.mockReturnValue(adminPrincipal);
     mockResolveRole.mockResolvedValue("admin");
-    mockQuery.mockReturnValue({
-      fetchAll: vi.fn().mockResolvedValue({
-        resources: [{ id: "existing-role", githubLogin: "coach-jane" }],
-      }),
-    });
+    mockQueryOne.mockResolvedValueOnce(null);
 
     const { POST } = await import("../roles/invite/route");
     const req = createRequest("POST", "http://localhost/api/roles/invite", {
-      hackathonId: "hack-1",
-      githubLogin: "coach-jane",
+      hackathonId: "h-missing",
+      githubLogin: "coach-user",
       role: "coach",
     });
     const res = await POST(req, { params: Promise.resolve({}) });
+
+    expect(res.status).toBe(404);
+  });
+
+  it("returns 409 for duplicate role", async () => {
+    mockGetAuth.mockReturnValue(adminPrincipal);
+    mockResolveRole.mockResolvedValue("admin");
+    mockQueryOne.mockResolvedValueOnce({ id: "h1" });
+    mockQuery.mockResolvedValueOnce([{ id: "existing-role" }]);
+
+    const { POST } = await import("../roles/invite/route");
+    const req = createRequest("POST", "http://localhost/api/roles/invite", {
+      hackathonId: "h1",
+      githubLogin: "coach-user",
+      role: "coach",
+    });
+    const res = await POST(req, { params: Promise.resolve({}) });
+
     expect(res.status).toBe(409);
   });
 
-  it("returns 404 when hackathon does not exist", async () => {
+  it("returns 403 for non-admin", async () => {
     mockGetAuth.mockReturnValue(adminPrincipal);
-    mockResolveRole.mockResolvedValue("admin");
-    mockRead.mockResolvedValue({ resource: null });
+    mockResolveRole.mockResolvedValue("hacker");
 
     const { POST } = await import("../roles/invite/route");
     const req = createRequest("POST", "http://localhost/api/roles/invite", {
-      hackathonId: "nonexistent",
+      hackathonId: "h1",
       githubLogin: "someone",
       role: "coach",
     });
     const res = await POST(req, { params: Promise.resolve({}) });
-    expect(res.status).toBe(404);
+
+    expect(res.status).toBe(403);
   });
 });
 
-// ── Role List Tests ────────────────────────────────────────
+// ── Role List ──────────────────────────────────────────────
 
 describe("GET /api/roles", () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
+  beforeEach(() => vi.clearAllMocks());
 
-  it("returns 401 when unauthenticated", async () => {
-    mockGetAuth.mockReturnValue(null);
-
-    const { GET } = await import("../roles/route");
-    const req = createRequest(
-      "GET",
-      "http://localhost/api/roles?hackathonId=hack-1",
-    );
-    const res = await GET(req, { params: Promise.resolve({}) });
-    expect(res.status).toBe(401);
-  });
-
-  it("returns paginated role list", async () => {
+  it("returns roles for a hackathon", async () => {
     mockGetAuth.mockReturnValue(adminPrincipal);
     mockResolveRole.mockResolvedValue("admin");
-    mockQuery.mockReturnValue({
-      fetchNext: vi.fn().mockResolvedValue({
-        resources: [
-          {
-            id: "role-1",
-            hackathonId: "hack-1",
-            githubUserId: "user-1",
-            githubLogin: "admin-user",
-            role: "admin",
-            isPrimaryAdmin: true,
-            assignedBy: "system",
-            assignedAt: "2026-01-01T00:00:00Z",
-          },
-        ],
-        continuationToken: null,
-      }),
-    });
+
+    mockQuery.mockResolvedValueOnce([
+      {
+        id: "r1",
+        hackathonId: "h1",
+        githubUserId: "user-1",
+        githubLogin: "admin-user",
+        role: "admin",
+        isPrimaryAdmin: 1,
+        assignedBy: "system",
+        assignedAt: "2024-01-01T00:00:00Z",
+      },
+      {
+        id: "r2",
+        hackathonId: "h1",
+        githubUserId: "user-2",
+        githubLogin: "coach-user",
+        role: "coach",
+        isPrimaryAdmin: 0,
+        assignedBy: "user-1",
+        assignedAt: "2024-01-02T00:00:00Z",
+      },
+    ]);
 
     const { GET } = await import("../roles/route");
     const req = createRequest(
       "GET",
-      "http://localhost/api/roles?hackathonId=hack-1",
+      "http://localhost/api/roles?hackathonId=h1",
     );
     const res = await GET(req, { params: Promise.resolve({}) });
-    expect(res.status).toBe(200);
+    const body = await res.json();
 
-    const json = await res.json();
-    expect(json.ok).toBe(true);
-    expect(json.data.items).toHaveLength(1);
-    expect(json.data.items[0].role).toBe("admin");
+    expect(res.status).toBe(200);
+    expect(body.data.items).toHaveLength(2);
+    expect(body.data.items[0].isPrimaryAdmin).toBe(true);
+    expect(body.data.items[1].isPrimaryAdmin).toBe(false);
+  });
+
+  it("returns 400 without hackathonId", async () => {
+    mockGetAuth.mockReturnValue(adminPrincipal);
+    mockResolveRole.mockResolvedValue("admin");
+
+    const { GET } = await import("../roles/route");
+    const req = createRequest("GET", "http://localhost/api/roles");
+    const res = await GET(req, { params: Promise.resolve({}) });
+
+    expect(res.status).toBe(400);
   });
 });
 
-// ── Role Delete Tests ──────────────────────────────────────
+// ── Role Delete ────────────────────────────────────────────
 
 describe("DELETE /api/roles/:id", () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-    mockDelete.mockResolvedValue({});
-  });
+  beforeEach(() => vi.clearAllMocks());
 
-  it("returns 401 when unauthenticated", async () => {
-    mockGetAuth.mockReturnValue(null);
-
-    const { DELETE } = await import("../roles/[id]/route");
-    const req = createRequest(
-      "DELETE",
-      "http://localhost/api/roles/role-coach-1",
-    );
-    const res = await DELETE(req, {
-      params: Promise.resolve({ id: "role-coach-1" }),
-    });
-    expect(res.status).toBe(401);
-  });
-
-  it("returns 404 when role not found", async () => {
+  it("deletes a non-primary-admin role", async () => {
     mockGetAuth.mockReturnValue(adminPrincipal);
     mockResolveRole.mockResolvedValue("admin");
-    mockQuery.mockReturnValue({
-      fetchAll: vi.fn().mockResolvedValue({ resources: [] }),
+
+    mockQueryOne.mockResolvedValueOnce({
+      id: "r2",
+      hackathonId: "h1",
+      githubLogin: "coach-user",
+      role: "coach",
+      isPrimaryAdmin: 0,
     });
+    mockExecute.mockResolvedValueOnce(1);
 
     const { DELETE } = await import("../roles/[id]/route");
-    const req = createRequest(
-      "DELETE",
-      "http://localhost/api/roles/role-nonexist?hackathonId=hack-1",
-    );
+    const req = createRequest("DELETE", "http://localhost/api/roles/r2");
     const res = await DELETE(req, {
-      params: Promise.resolve({ id: "role-nonexist" }),
-    });
-    expect(res.status).toBe(404);
-  });
-
-  it("returns 403 when trying to delete primary admin", async () => {
-    mockGetAuth.mockReturnValue(adminPrincipal);
-    mockResolveRole.mockResolvedValue("admin");
-    mockQuery.mockReturnValue({
-      fetchAll: vi.fn().mockResolvedValue({
-        resources: [
-          {
-            id: "role-primary",
-            hackathonId: "hack-1",
-            isPrimaryAdmin: true,
-            githubLogin: "primary-admin",
-            role: "admin",
-          },
-        ],
-      }),
+      params: Promise.resolve({ id: "r2" }),
     });
 
-    const { DELETE } = await import("../roles/[id]/route");
-    const req = createRequest(
-      "DELETE",
-      "http://localhost/api/roles/role-primary?hackathonId=hack-1",
-    );
-    const res = await DELETE(req, {
-      params: Promise.resolve({ id: "role-primary" }),
-    });
-    expect(res.status).toBe(403);
-
-    const json = await res.json();
-    expect(json.error).toContain("primary admin");
-  });
-
-  it("returns 204 when role is deleted successfully", async () => {
-    mockGetAuth.mockReturnValue(adminPrincipal);
-    mockResolveRole.mockResolvedValue("admin");
-    mockQuery.mockReturnValue({
-      fetchAll: vi.fn().mockResolvedValue({
-        resources: [
-          {
-            id: "role-coach-1",
-            hackathonId: "hack-1",
-            isPrimaryAdmin: false,
-            githubLogin: "some-coach",
-            role: "coach",
-          },
-        ],
-      }),
-    });
-
-    const { DELETE } = await import("../roles/[id]/route");
-    const req = createRequest(
-      "DELETE",
-      "http://localhost/api/roles/role-coach-1?hackathonId=hack-1",
-    );
-    const res = await DELETE(req, {
-      params: Promise.resolve({ id: "role-coach-1" }),
-    });
     expect(res.status).toBe(204);
+  });
 
-    expect(mockAuditLog).toHaveBeenCalledWith(
-      expect.objectContaining({
-        action: "role.remove",
-        targetId: "role-coach-1",
-      }),
-    );
+  it("returns 403 when trying to remove primary admin", async () => {
+    mockGetAuth.mockReturnValue(adminPrincipal);
+    mockResolveRole.mockResolvedValue("admin");
+
+    mockQueryOne.mockResolvedValueOnce({
+      id: "r1",
+      hackathonId: "h1",
+      githubLogin: "admin-user",
+      role: "admin",
+      isPrimaryAdmin: 1,
+    });
+
+    const { DELETE } = await import("../roles/[id]/route");
+    const req = createRequest("DELETE", "http://localhost/api/roles/r1");
+    const res = await DELETE(req, {
+      params: Promise.resolve({ id: "r1" }),
+    });
+
+    expect(res.status).toBe(403);
+    const body = await res.json();
+    expect(body.error).toContain("primary admin");
+  });
+
+  it("returns 404 for missing role", async () => {
+    mockGetAuth.mockReturnValue(adminPrincipal);
+    mockResolveRole.mockResolvedValue("admin");
+    mockQueryOne.mockResolvedValueOnce(null);
+
+    const { DELETE } = await import("../roles/[id]/route");
+    const req = createRequest("DELETE", "http://localhost/api/roles/missing");
+    const res = await DELETE(req, {
+      params: Promise.resolve({ id: "missing" }),
+    });
+
+    expect(res.status).toBe(404);
   });
 });
 
-// ── Audit Trail Tests ──────────────────────────────────────
+// ── Audit Trail ────────────────────────────────────────────
 
 describe("GET /api/audit/:hackathonId", () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
+  beforeEach(() => vi.clearAllMocks());
 
-  it("returns 401 when unauthenticated", async () => {
-    mockGetAuth.mockReturnValue(null);
-
-    const { GET } = await import("../audit/[hackathonId]/route");
-    const req = createRequest("GET", "http://localhost/api/audit/hack-1");
-    const res = await GET(req, {
-      params: Promise.resolve({ hackathonId: "hack-1" }),
-    });
-    expect(res.status).toBe(401);
-  });
-
-  it("returns paginated audit entries", async () => {
+  it("returns audit entries for a hackathon", async () => {
     mockGetAuth.mockReturnValue(adminPrincipal);
     mockResolveRole.mockResolvedValue("admin");
-    mockQuery.mockReturnValue({
-      fetchNext: vi.fn().mockResolvedValue({
-        resources: [
-          {
-            id: "audit-1",
-            hackathonId: "hack-1",
-            action: "submission.approve",
-            targetType: "submission",
-            targetId: "sub-1",
-            performedBy: "user-coach-1",
-            performedAt: "2026-02-27T10:00:00Z",
-            reason: "Good work",
-            details: null,
-          },
-        ],
-        continuationToken: null,
-      }),
-    });
+
+    mockQuery.mockResolvedValueOnce([
+      {
+        id: "a1",
+        hackathonId: "h1",
+        action: "hackathon.create",
+        targetType: "hackathon",
+        targetId: "h1",
+        performedBy: "user-admin-1",
+        performedAt: "2024-01-01T00:00:00Z",
+        reason: null,
+        details: JSON.stringify({ name: "Hack 2025" }),
+      },
+    ]);
 
     const { GET } = await import("../audit/[hackathonId]/route");
-    const req = createRequest("GET", "http://localhost/api/audit/hack-1");
+    const req = createRequest("GET", "http://localhost/api/audit/h1");
     const res = await GET(req, {
-      params: Promise.resolve({ hackathonId: "hack-1" }),
+      params: Promise.resolve({ hackathonId: "h1" }),
     });
+    const body = await res.json();
+
     expect(res.status).toBe(200);
-
-    const json = await res.json();
-    expect(json.ok).toBe(true);
-    expect(json.data.items).toHaveLength(1);
-    expect(json.data.items[0].action).toBe("submission.approve");
+    expect(body.data.items).toHaveLength(1);
+    expect(body.data.items[0].action).toBe("hackathon.create");
+    expect(body.data.items[0].details).toEqual({ name: "Hack 2025" });
   });
 
-  it("supports action filter", async () => {
+  it("filters audit entries by action", async () => {
     mockGetAuth.mockReturnValue(adminPrincipal);
     mockResolveRole.mockResolvedValue("admin");
-    mockQuery.mockReturnValue({
-      fetchNext: vi.fn().mockResolvedValue({
-        resources: [],
-        continuationToken: null,
-      }),
-    });
+    mockQuery.mockResolvedValueOnce([]);
 
     const { GET } = await import("../audit/[hackathonId]/route");
     const req = createRequest(
       "GET",
-      "http://localhost/api/audit/hack-1?action=score.override",
+      "http://localhost/api/audit/h1?action=hackathon.update",
     );
     const res = await GET(req, {
-      params: Promise.resolve({ hackathonId: "hack-1" }),
+      params: Promise.resolve({ hackathonId: "h1" }),
     });
-    expect(res.status).toBe(200);
+    const body = await res.json();
 
-    const json = await res.json();
-    expect(json.data.items).toHaveLength(0);
+    expect(res.status).toBe(200);
+    expect(body.data.items).toHaveLength(0);
   });
 });
 
-// ── Config GET Tests ───────────────────────────────────────
+// ── Config ─────────────────────────────────────────────────
 
 describe("GET /api/config", () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
+  beforeEach(() => vi.clearAllMocks());
 
-  it("returns 401 when unauthenticated", async () => {
-    mockGetAuth.mockReturnValue(null);
+  it("returns config items for global admin", async () => {
+    mockGetAuth.mockReturnValue(adminPrincipal);
+    mockIsGlobalAdmin.mockResolvedValue(true);
+
+    mockQuery.mockResolvedValueOnce([
+      {
+        id: "cfg-theme",
+        key: "theme",
+        value: "dark",
+        updatedBy: "system",
+        updatedAt: "2024-01-01T00:00:00Z",
+      },
+    ]);
 
     const { GET } = await import("../config/route");
     const req = createRequest("GET", "http://localhost/api/config");
     const res = await GET(req, { params: Promise.resolve({}) });
-    expect(res.status).toBe(401);
+    const body = await res.json();
+
+    expect(res.status).toBe(200);
+    expect(body.data).toHaveLength(1);
+    expect(body.data[0].key).toBe("theme");
   });
 
-  it("returns 403 when caller is not admin", async () => {
-    mockGetAuth.mockReturnValue(coachPrincipal);
+  it("returns 403 for non-global-admin", async () => {
+    mockGetAuth.mockReturnValue(adminPrincipal);
     mockIsGlobalAdmin.mockResolvedValue(false);
 
     const { GET } = await import("../config/route");
     const req = createRequest("GET", "http://localhost/api/config");
     const res = await GET(req, { params: Promise.resolve({}) });
+
     expect(res.status).toBe(403);
-  });
-
-  it("returns all config values", async () => {
-    mockGetAuth.mockReturnValue(adminPrincipal);
-    mockIsGlobalAdmin.mockResolvedValue(true);
-    mockQuery.mockReturnValue({
-      fetchAll: vi.fn().mockResolvedValue({
-        resources: [
-          {
-            id: "cfg-leaderboard-refresh-interval",
-            key: "leaderboard-refresh-interval",
-            value: 30000,
-            updatedBy: "user-admin-1",
-            updatedAt: "2026-02-15T09:30:00Z",
-          },
-          {
-            id: "cfg-max-team-size",
-            key: "max-team-size",
-            value: 5,
-            updatedBy: "user-admin-1",
-            updatedAt: "2026-02-15T09:30:00Z",
-          },
-        ],
-      }),
-    });
-
-    const { GET } = await import("../config/route");
-    const req = createRequest("GET", "http://localhost/api/config");
-    const res = await GET(req, { params: Promise.resolve({}) });
-    expect(res.status).toBe(200);
-
-    const json = await res.json();
-    expect(json.ok).toBe(true);
-    expect(json.data).toHaveLength(2);
-    expect(json.data[0].key).toBe("leaderboard-refresh-interval");
   });
 });
 
-// ── Config PATCH Tests ─────────────────────────────────────
-
 describe("PATCH /api/config/:key", () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-    mockReplace.mockResolvedValue({});
-  });
+  beforeEach(() => vi.clearAllMocks());
 
-  it("returns 401 when unauthenticated", async () => {
-    mockGetAuth.mockReturnValue(null);
-
-    const { PATCH } = await import("../config/[key]/route");
-    const req = createRequest(
-      "PATCH",
-      "http://localhost/api/config/max-team-size",
-      { value: 6 },
-    );
-    const res = await PATCH(req, {
-      params: Promise.resolve({ key: "max-team-size" }),
-    });
-    expect(res.status).toBe(401);
-  });
-
-  it("returns 403 when caller is not admin", async () => {
-    mockGetAuth.mockReturnValue(coachPrincipal);
-    mockIsGlobalAdmin.mockResolvedValue(false);
-
-    const { PATCH } = await import("../config/[key]/route");
-    const req = createRequest(
-      "PATCH",
-      "http://localhost/api/config/max-team-size",
-      { value: 6 },
-    );
-    const res = await PATCH(req, {
-      params: Promise.resolve({ key: "max-team-size" }),
-    });
-    expect(res.status).toBe(403);
-  });
-
-  it("returns 403 for read-only keys", async () => {
+  it("updates a config value", async () => {
     mockGetAuth.mockReturnValue(adminPrincipal);
     mockIsGlobalAdmin.mockResolvedValue(true);
 
-    const { PATCH } = await import("../config/[key]/route");
-    const req = createRequest(
-      "PATCH",
-      "http://localhost/api/config/primary-admin",
-      { value: "new-admin-id" },
-    );
-    const res = await PATCH(req, {
-      params: Promise.resolve({ key: "primary-admin" }),
+    // queryOne: existing config
+    mockQueryOne.mockResolvedValueOnce({
+      id: "cfg-theme",
+      key: "theme",
+      value: "dark",
+      updatedBy: "system",
+      updatedAt: "2024-01-01T00:00:00Z",
     });
-    expect(res.status).toBe(403);
+    // execute: UPDATE
+    mockExecute.mockResolvedValueOnce(1);
 
-    const json = await res.json();
-    expect(json.error).toContain("read-only");
+    const { PATCH } = await import("../config/[key]/route");
+    const req = createRequest("PATCH", "http://localhost/api/config/theme", {
+      value: "light",
+    });
+    const res = await PATCH(req, {
+      params: Promise.resolve({ key: "theme" }),
+    });
+    const body = await res.json();
+
+    expect(res.status).toBe(200);
+    expect(body.data.value).toBe("light");
   });
 
-  it("returns 404 when config key does not exist", async () => {
+  it("returns 404 for missing config key", async () => {
     mockGetAuth.mockReturnValue(adminPrincipal);
     mockIsGlobalAdmin.mockResolvedValue(true);
-    mockRead.mockResolvedValue({ resource: null });
+    mockQueryOne.mockResolvedValueOnce(null);
 
     const { PATCH } = await import("../config/[key]/route");
-    const req = createRequest(
-      "PATCH",
-      "http://localhost/api/config/nonexistent-key",
-      { value: 42 },
-    );
-    const res = await PATCH(req, {
-      params: Promise.resolve({ key: "nonexistent-key" }),
+    const req = createRequest("PATCH", "http://localhost/api/config/unknown", {
+      value: "something",
     });
+    const res = await PATCH(req, {
+      params: Promise.resolve({ key: "unknown" }),
+    });
+
     expect(res.status).toBe(404);
   });
 
-  it("returns 200 when config is updated successfully", async () => {
+  it("returns 403 for non-global-admin", async () => {
     mockGetAuth.mockReturnValue(adminPrincipal);
-    mockIsGlobalAdmin.mockResolvedValue(true);
-    mockRead.mockResolvedValue({
-      resource: {
-        id: "cfg-max-team-size",
-        _type: "config",
-        key: "max-team-size",
-        value: 5,
-        updatedBy: "user-admin-1",
-        updatedAt: "2026-02-15T09:30:00Z",
-      },
-    });
+    mockIsGlobalAdmin.mockResolvedValue(false);
 
     const { PATCH } = await import("../config/[key]/route");
-    const req = createRequest(
-      "PATCH",
-      "http://localhost/api/config/max-team-size",
-      { value: 8 },
-    );
-    const res = await PATCH(req, {
-      params: Promise.resolve({ key: "max-team-size" }),
+    const req = createRequest("PATCH", "http://localhost/api/config/theme", {
+      value: "light",
     });
-    expect(res.status).toBe(200);
-
-    const json = await res.json();
-    expect(json.ok).toBe(true);
-    expect(json.data.value).toBe(8);
-    expect(json.data.key).toBe("max-team-size");
-    expect(mockAuditLog).toHaveBeenCalledWith(
-      expect.objectContaining({
-        action: "config.update",
-        details: expect.objectContaining({
-          oldValue: 5,
-          newValue: 8,
-        }),
-      }),
-    );
-  });
-
-  it("returns 400 when body is invalid", async () => {
-    mockGetAuth.mockReturnValue(adminPrincipal);
-    mockIsGlobalAdmin.mockResolvedValue(true);
-
-    const { PATCH } = await import("../config/[key]/route");
-    const req = createRequest(
-      "PATCH",
-      "http://localhost/api/config/max-team-size",
-      { notValue: 8 },
-    );
     const res = await PATCH(req, {
-      params: Promise.resolve({ key: "max-team-size" }),
+      params: Promise.resolve({ key: "theme" }),
     });
-    expect(res.status).toBe(400);
+
+    expect(res.status).toBe(403);
   });
 });

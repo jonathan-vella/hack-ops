@@ -74,7 +74,7 @@ Create in `.github/prompts/` — these drive the creation of all Phase A documen
 | -------------------------------------- | ---------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `doc-prd-generator.prompt.md`          | `docs/prd.md`                                                    | Reads `plan-hackOps.prompt.md` (Phases 5-10, Application Summary, Key Invariants) and generates the full PRD with user stories and acceptance criteria. References the `hackops-domain` skill for business rule accuracy. |
 | `doc-api-contract-generator.prompt.md` | `packages/shared/types/api-contract.ts` + `docs/api-contract.md` | Reads the plan's ~16 endpoints across Phases 6-10 and generates both TypeScript type definitions (source of truth) and a human-readable markdown reference.                                                               |
-| `doc-data-model-generator.prompt.md`   | `docs/data-model.md`                                             | Reads the 10 container definitions and partition keys, generates TypeScript interfaces with sample documents.                                                                                                             |
+| `doc-data-model-generator.prompt.md`   | `docs/data-model.md`                                             | Reads the 10 table definitions and primary keys, generates TypeScript interfaces with sample documents.                                                                                                                   |
 
 Each prompt includes `agent: agent` and `tools:` for file creation and workspace search. They read `plan-hackOps.prompt.md` as their primary input.
 
@@ -98,7 +98,7 @@ Each prompt includes `agent: agent` and `tools:` for file creation and workspace
 
 - **Create via**: `doc-data-model-generator.prompt.md`
 - **Output**: `docs/data-model.md`
-- **Content**: All 10 Cosmos DB containers: TypeScript interface definitions, partition key rationale, indexing policy recommendations, cross-container query patterns, sample documents
+- **Content**: All 10 Azure SQL Database tables: TypeScript interface definitions, primary key rationale, indexing recommendations, cross-table query patterns, sample documents
 - **Patterns**: Pointer + versioned docs for rubrics, staging → approved flow for submissions, progression unlock model
 
 ### A4. UI Page Inventory
@@ -188,14 +188,14 @@ Create in `.github/agents/`:
 > 13-App Conductor (orchestration + CI/CD). Original plan below for
 > historical reference.
 
-| #   | File                           | Name                  | Purpose                                                                                                                    | Model                           |
-| --- | ------------------------------ | --------------------- | -------------------------------------------------------------------------------------------------------------------------- | ------------------------------- |
-| 11  | `11-app-scaffolder.agent.md`   | `11-App Scaffolder`   | Turborepo + Next.js 15 + packages/shared scaffold, dev environment setup, Cosmos DB emulator config                        | Claude Opus 4.6                 |
-| 12  | `12-api-builder.agent.md`      | `12-API Builder`      | Generates API route handlers with Zod validation, role guards, audit logging — reads API contract types as source of truth | Claude Opus 4.6 / GPT-5.3-Codex |
-| 13  | `13-frontend-builder.agent.md` | `13-Frontend Builder` | Pages, layouts, shadcn/ui components, Tailwind styling — reads UI page inventory as source of truth                        | Claude Opus 4.6 / GPT-5.3-Codex |
-| 14  | `14-test-writer.agent.md`      | `14-Test Writer`      | Unit tests (Vitest), integration tests (API routes against emulator), E2E stubs — reads acceptance criteria from PRD       | GPT-5.3-Codex                   |
-| 15  | `15-app-deployer.agent.md`     | `15-App Deployer`     | GitHub Actions workflows for app CI/CD, App Service zip deploy, slot swaps                                                 | Claude Opus 4.6                 |
-| 16  | `16-app-conductor.agent.md`    | `16-App Conductor`    | Orchestrates app-dev workflow (agents 11-15 + subagents) with approval gates. Separate from infra Conductor (01).          | Claude Opus 4.6                 |
+| #   | File                           | Name                  | Purpose                                                                                                                      | Model                           |
+| --- | ------------------------------ | --------------------- | ---------------------------------------------------------------------------------------------------------------------------- | ------------------------------- |
+| 11  | `11-app-scaffolder.agent.md`   | `11-App Scaffolder`   | Turborepo + Next.js 15 + packages/shared scaffold, dev environment setup, local SQL Server (Docker) config                   | Claude Opus 4.6                 |
+| 12  | `12-api-builder.agent.md`      | `12-API Builder`      | Generates API route handlers with Zod validation, role guards, audit logging — reads API contract types as source of truth   | Claude Opus 4.6 / GPT-5.3-Codex |
+| 13  | `13-frontend-builder.agent.md` | `13-Frontend Builder` | Pages, layouts, shadcn/ui components, Tailwind styling — reads UI page inventory as source of truth                          | Claude Opus 4.6 / GPT-5.3-Codex |
+| 14  | `14-test-writer.agent.md`      | `14-Test Writer`      | Unit tests (Vitest), integration tests (API routes against local SQL Server), E2E stubs — reads acceptance criteria from PRD | GPT-5.3-Codex                   |
+| 15  | `15-app-deployer.agent.md`     | `15-App Deployer`     | GitHub Actions workflows for app CI/CD, App Service zip deploy, slot swaps                                                   | Claude Opus 4.6                 |
+| 16  | `16-app-conductor.agent.md`    | `16-App Conductor`    | Orchestrates app-dev workflow (agents 11-15 + subagents) with approval gates. Separate from infra Conductor (01).            | Claude Opus 4.6                 |
 
 **Subagents** (in `.github/agents/_subagents/`):
 
@@ -212,7 +212,7 @@ Each agent follows the existing frontmatter schema, references skills via **Read
 | Agent               | Additional skill references                                                                                 |
 | ------------------- | ----------------------------------------------------------------------------------------------------------- |
 | 11-App Scaffolder   | `microsoft-docs` (verify Next.js on App Service patterns)                                                   |
-| 12-API Builder      | `microsoft-code-reference` (verify @azure/cosmos SDK), `hackops-domain`, `cosmos-db-sdk`, `zod-validation`  |
+| 12-API Builder      | `microsoft-code-reference` (verify mssql client), `hackops-domain`, `zod-validation`                        |
 | 13-Frontend Builder | `microsoft-code-reference` (verify Next.js APIs), `hackops-domain`, `nextjs-patterns`, `shadcn-ui-patterns` |
 | 14-Test Writer      | `hackops-domain` (business rule acceptance criteria)                                                        |
 | 15-App Deployer     | `microsoft-docs` (verify App Service deployment)                                                            |
@@ -223,17 +223,17 @@ Create a **separate** `16-app-conductor.agent.md` that orchestrates only the app
 
 **App-dev workflow** (orchestrated by 16-App Conductor):
 
-| Step | Agent               | Output                                         | Gate     | Exit Criteria                                         |
-| ---- | ------------------- | ---------------------------------------------- | -------- | ----------------------------------------------------- |
-| A1   | 11-App Scaffolder   | `apps/web/`, `packages/shared/`, `turbo.json`  | Approval | `npm run build` succeeds, Cosmos DB emulator connects |
-| A2   | 12-API Builder      | `src/lib/auth.ts`, `src/proxy.ts`, role guards | Approval | Role guard unit tests pass                            |
-| A3   | 12-API Builder      | Hackathon, team, join API routes               | Validate | `tsc --noEmit` passes, endpoint tests pass            |
-| A4   | 12-API Builder      | Scoring, rubric, submission API routes         | Validate | `tsc --noEmit` passes, endpoint tests pass            |
-| A5   | 12-API Builder      | Challenge, progression API routes              | Validate | `tsc --noEmit` passes, endpoint tests pass            |
-| A6   | 12-API Builder      | Admin, audit, config API routes                | Validate | `tsc --noEmit` passes, all API tests pass             |
-| A7   | 13-Frontend Builder | Leaderboard page (SSR), dashboard pages        | Validate | `npm run build` succeeds, no type errors              |
-| A8   | 14-Test Writer      | Unit + integration test suite                  | Validate | Coverage threshold met                                |
-| A9   | 15-App Deployer     | CI/CD workflows, deployment config             | Approval | Workflows pass dry-run validation                     |
+| Step | Agent               | Output                                         | Gate     | Exit Criteria                                       |
+| ---- | ------------------- | ---------------------------------------------- | -------- | --------------------------------------------------- |
+| A1   | 11-App Scaffolder   | `apps/web/`, `packages/shared/`, `turbo.json`  | Approval | `npm run build` succeeds, local SQL Server connects |
+| A2   | 12-API Builder      | `src/lib/auth.ts`, `src/proxy.ts`, role guards | Approval | Role guard unit tests pass                          |
+| A3   | 12-API Builder      | Hackathon, team, join API routes               | Validate | `tsc --noEmit` passes, endpoint tests pass          |
+| A4   | 12-API Builder      | Scoring, rubric, submission API routes         | Validate | `tsc --noEmit` passes, endpoint tests pass          |
+| A5   | 12-API Builder      | Challenge, progression API routes              | Validate | `tsc --noEmit` passes, endpoint tests pass          |
+| A6   | 12-API Builder      | Admin, audit, config API routes                | Validate | `tsc --noEmit` passes, all API tests pass           |
+| A7   | 13-Frontend Builder | Leaderboard page (SSR), dashboard pages        | Validate | `npm run build` succeeds, no type errors            |
+| A8   | 14-Test Writer      | Unit + integration test suite                  | Validate | Coverage threshold met                              |
+| A9   | 15-App Deployer     | CI/CD workflows, deployment config             | Approval | Workflows pass dry-run validation                   |
 
 The infra Conductor (01) hands off to App Conductor (16) after infrastructure deployment completes. Add a single handoff entry in 01's agents list: `"16-App Conductor"`.
 
@@ -248,7 +248,7 @@ Create in `.github/skills/`. **For the 4 technology skills**, use the existing `
 | Skill folder                  | Creation method             | Content                                                                                                                                                                                                                                                                                                                        |
 | ----------------------------- | --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `nextjs-patterns/SKILL.md`    | **microsoft-skill-creator** | Next.js 15 App Router conventions: route handlers, middleware, server vs client components, `use server`/`use client`, SSR patterns, error boundaries, loading states. Verified against official Next.js docs via Learn MCP.                                                                                                   |
-| `cosmos-db-sdk/SKILL.md`      | **microsoft-skill-creator** | `@azure/cosmos` v4 SDK patterns: client singleton, managed identity auth factory, CRUD operations, cross-partition queries, change feed, error handling, connection string vs DefaultAzureCredential branching. Verified against official Azure SDK docs via Learn MCP.                                                        |
+| `sql-client/SKILL.md`         | _(archived)_                | The `cosmos-db-sdk` skill has been removed. SQL client patterns are documented in `@/lib/sql.ts` (exports: `query<T>`, `queryOne<T>`, `execute`, `transaction`). Use `mssql` package documentation directly.                                                                                                                   |
 | `shadcn-ui-patterns/SKILL.md` | **microsoft-skill-creator** | shadcn/ui component catalog for HackOps: Table (leaderboard), Form (submissions), Badge (grades/awards), Dialog (confirmations), Card (dashboard), Tabs (admin) — with Tailwind 4 styling conventions                                                                                                                          |
 | `zod-validation/SKILL.md`     | **microsoft-skill-creator** | Zod schema patterns: API boundary validation, discriminated unions for submission types, rubric schema validation, error message formatting, shared schemas in `packages/shared`                                                                                                                                               |
 | `hackops-domain/SKILL.md`     | **Hand-written** from plan  | HackOps business domain knowledge: roles and permissions matrix, hackathon lifecycle state machine, submission workflow (pending→approved/rejected), rubric pointer pattern, challenge gating logic, audit trail contract. **Keystone skill** — paired with `validate-business-rules.mjs` for mechanical enforcement (see C6). |
@@ -262,7 +262,7 @@ Create in `.github/instructions/`:
 | `typescript.instructions.md`           | `**/*.ts, **/*.tsx`          | TypeScript strict mode, type-only imports, no `any`, shared types from `packages/shared`, naming conventions                                                                                                                                           |
 | ~~`nextjs.instructions.md`~~           | ~~`**/apps/web/**`~~         | Merged into `nextjs-patterns` skill — App Router file conventions, boundaries, middleware chain                                                                                                                                                        |
 | ~~`react-components.instructions.md`~~ | ~~`**/components/**/*.tsx`~~ | Merged into `shadcn-ui-patterns` skill — Component conventions, functional components only, props interfaces, composition, accessibility                                                                                                               |
-| `testing.instructions.md`              | `**/*.test.ts, **/*.spec.ts` | Vitest conventions, test naming (`describe`/`it`), mock patterns for Cosmos DB client, test fixtures location, coverage thresholds                                                                                                                     |
+| `testing.instructions.md`              | `**/*.test.ts, **/*.spec.ts` | Vitest conventions, test naming (`describe`/`it`), mock patterns for SQL client, test fixtures location, coverage thresholds                                                                                                                           |
 | `api-routes.instructions.md`           | `**/app/api/**`              | Route handler conventions: Zod validation at entry, role guard pattern, error response format, audit logging pattern, **MUST import types from `packages/shared/types/api-contract.ts`**, no business logic in route files (delegate to service layer) |
 
 **Registration steps** (MANDATORY — instructions won't auto-apply without these):
@@ -307,9 +307,9 @@ Create in `.github/prompts/`:
 
 | Prompt file                         | Feeds agent               | What it does                                                                                                                                                                                                                                      |
 | ----------------------------------- | ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `infra-01-requirements.prompt.md`   | 02-Requirements           | Seeds the requirements phase with the tech stack from plan-hackOps.prompt.md — networking, Cosmos DB, App Service, Key Vault, monitoring. Outputs `agent-output/hackops/01-requirements.md`                                                       |
+| `infra-01-requirements.prompt.md`   | 02-Requirements           | Seeds the requirements phase with the tech stack from plan-hackOps.prompt.md — networking, Azure SQL Database, App Service, Key Vault, monitoring. Outputs `agent-output/hackops/01-requirements.md`                                              |
 | `infra-02-architecture.prompt.md`   | 03-Architect              | Feeds the requirements doc. Requests WAF assessment, cost estimate (uses Pricing MCP), and architecture decisions. Outputs `agent-output/hackops/02-architecture-assessment.md`                                                                   |
-| `infra-03-design.prompt.md`         | 04-Design                 | Requests architecture diagram (VNet topology, private endpoints, App Service → Cosmos DB flow) and ADRs for key decisions (serverless Cosmos DB, App Service over Container Apps, Easy Auth). Outputs `agent-output/hackops/03-des-*.py/.png/.md` |
+| `infra-03-design.prompt.md`         | 04-Design                 | Requests architecture diagram (VNet topology, private endpoints, App Service → Azure SQL flow) and ADRs for key decisions (Azure SQL Serverless, App Service over Container Apps, Easy Auth). Outputs `agent-output/hackops/03-des-*.py/.png/.md` |
 | `infra-04-governance.prompt.md`     | 05-Bicep Planner          | Triggers governance discovery against target subscription, then implementation plan. This is the Phase 1.5 + Phase 2-4 planning gate. Outputs `agent-output/hackops/04-*.md/.json`                                                                |
 | `infra-05-bicep-generate.prompt.md` | 06-Bicep Code Generator   | Provides the implementation plan and governance constraints. Requests Bicep code for all 9 AVM modules in the plan. Outputs `infra/bicep/hackops/` with `main.bicep`, modules, `.bicepparam`, `deploy.ps1`                                        |
 | `infra-06-deploy.prompt.md`         | 07-Deploy                 | Triggers what-if analysis then actual deployment to `rg-hackops-dev`. Outputs `agent-output/hackops/06-deployment-summary.md`                                                                                                                     |
@@ -330,7 +330,7 @@ Create in `.github/prompts/`:
 
 | Prompt file                       | Feeds agent         | Plan phase    | What it does                                                                                                                                                             |
 | --------------------------------- | ------------------- | ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `app-01-scaffold.prompt.md`       | 11-App Scaffolder   | Phase 1       | Turborepo setup, Next.js 15 init, `packages/shared/types/` for all 10 container interfaces, Cosmos DB emulator config, `.env.example`, seed script                       |
+| `app-01-scaffold.prompt.md`       | 11-App Scaffolder   | Phase 1       | Turborepo setup, Next.js 15 init, `packages/shared/types/` for all 10 table interfaces, local SQL Server (Docker) config, `.env.example`, seed script                    |
 | `app-02-auth.prompt.md`           | 12-API Builder      | Phase 5       | Auth middleware (Easy Auth header parsing), role resolution, role guards, dev auth bypass, CORS config, rate limiter, audit logger                                       |
 | `app-03-api-hackathons.prompt.md` | 12-API Builder      | Phase 6       | Hackathon CRUD, event code generation (plaintext + rate limiting), hacker onboarding (join), team assignment (Fisher-Yates), manual reassignment                         |
 | `app-04-api-scoring.prompt.md`    | 12-API Builder      | Phase 7       | Rubric CRUD (pointer + versioned pattern), submission endpoint (form + JSON upload), review queue, approve/reject, score override                                        |
@@ -347,7 +347,7 @@ Create in `.github/prompts/`:
 
 ### F1. Seed data and test fixtures
 
-- Create `scripts/seed-cosmos.ts` — referenced in the plan but needs a companion: `apps/web/tests/fixtures/` with sample hackathon, teams, hackers, rubric, submissions, and progression data for testing
+- Create `scripts/seed-sql.ts` — referenced in the plan but needs a companion: `apps/web/tests/fixtures/` with sample hackathon, teams, hackers, rubric, submissions, and progression data for testing
 
 ### F2. OpenAPI spec (optional but high-value)
 
@@ -356,7 +356,7 @@ Create in `.github/prompts/`:
 ### F3. Testing strategy doc
 
 - **Create**: `docs/testing-strategy.md`
-- **Content**: Test pyramid (unit → integration → E2E), tools (Vitest for unit, Playwright for E2E), coverage targets, what to mock (Cosmos DB client), what to test against emulator
+- **Content**: Test pyramid (unit → integration → E2E), tools (Vitest for unit, Playwright for E2E), coverage targets, what to mock (SQL client), what to test against local SQL Server
 
 ### F4. Security checklist
 
@@ -366,7 +366,7 @@ Create in `.github/prompts/`:
 ### F5. Local development runbook
 
 - **Create**: `docs/local-dev-guide.md`
-- **Content**: Step-by-step: start Cosmos DB emulator, seed data, configure `.env.local`, run `npm run dev`, test auth bypass, verify API routes
+- **Content**: Step-by-step: start local SQL Server (Docker), seed data, configure `.env.local`, run `npm run dev`, test auth bypass, verify API routes
 
 ### F6. Update existing meta-docs
 
@@ -388,7 +388,7 @@ Create in `.github/prompts/`:
 | Backlog setup doc        | 1     | `docs/exec-plans/backlog-setup.md`                                                                                                                      |
 | New agents (top-level)   | 6     | `11-app-scaffolder`, `12-api-builder`, `13-frontend-builder`, `14-test-writer`, `15-app-deployer`, `16-app-conductor`                                   |
 | New subagents            | 3     | `app-lint-subagent`, `app-review-subagent`, `app-test-subagent`                                                                                         |
-| New skills               | 5     | `nextjs-patterns`, `cosmos-db-sdk`, `shadcn-ui-patterns`, `zod-validation`, `hackops-domain`                                                            |
+| New skills               | 5     | `nextjs-patterns`, `shadcn-ui-patterns`, `zod-validation`, `hackops-domain` (note: `cosmos-db-sdk` archived)                                            |
 | New instructions         | 5     | `typescript`, `nextjs`, `react-components`, `testing`, `api-routes`                                                                                     |
 | Business rules validator | 1     | `scripts/validate-business-rules.mjs`                                                                                                                   |
 | Session management       | 2     | `session-resume.prompt.md`, `docs/exec-plans/active/hackops-execution.md`                                                                               |
@@ -431,7 +431,7 @@ Create in `.github/prompts/`:
 | Type checking            | `npm run type-check`                                                                                                     |
 | Unit tests               | `npm test`                                                                                                               |
 | What-if                  | `az deployment group what-if -g rg-hackops-dev -f infra/bicep/hackops/main.bicep -p infra/bicep/hackops/main.bicepparam` |
-| Local dev                | `npm run dev` → Cosmos DB emulator + Next.js dev server                                                                  |
+| Local dev                | `npm run dev` → local SQL Server (Docker) + Next.js dev server                                                           |
 | Auth flow                | Deploy to dev → navigate to app → GitHub OAuth redirect → role assigned                                                  |
 
 ---

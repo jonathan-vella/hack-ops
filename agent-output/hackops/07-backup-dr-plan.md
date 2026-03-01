@@ -44,11 +44,11 @@
 > [!IMPORTANT]
 > This document defines the backup strategy and disaster recovery procedures for hackops.
 
-| Metric           | Current                              | Target                                 |
-| ---------------- | ------------------------------------ | -------------------------------------- |
-| **RPO**          | ≤ 1 hour for Cosmos operational data | ≤ 1 hour                               |
-| **RTO**          | 4–8 hours (redeploy + restore path)  | ≤ 8 hours                              |
-| **Availability** | Single-region dev baseline           | Improve to multi-region for production |
+| Metric           | Current                             | Target                                 |
+| ---------------- | ----------------------------------- | -------------------------------------- |
+| **RPO**          | ≤ 1 hour for SQL operational data   | ≤ 1 hour                               |
+| **RTO**          | 4–8 hours (redeploy + restore path) | ≤ 8 hours                              |
+| **Availability** | Single-region dev baseline          | Improve to multi-region for production |
 
 ---
 
@@ -58,17 +58,17 @@
 
 | Tier         | RTO Target | Services                             |
 | ------------ | ---------- | ------------------------------------ |
-| 🔴 Critical  | 4 hours    | App Service, Cosmos DB               |
+| 🔴 Critical  | 4 hours    | App Service, SQL Database            |
 | 🟠 Important | 8 hours    | Key Vault, DNS, Monitoring           |
 | 🟢 Standard  | 24 hours   | Non-critical observability artifacts |
 
 ### 1.2 Recovery Point Objective (RPO)
 
-| Data Type                             | RPO Target | Backup Strategy                            |
-| ------------------------------------- | ---------- | ------------------------------------------ |
-| Hackathon transactional data (Cosmos) | ≤ 1 hour   | Cosmos DB continuous backup (30 days tier) |
-| Secrets/configuration references      | ≤ 24 hours | Key Vault soft-delete + IaC reconstruction |
-| Infrastructure configuration          | ≤ 1 hour   | Git + Bicep in repository                  |
+| Data Type                          | RPO Target | Backup Strategy                                 |
+| ---------------------------------- | ---------- | ----------------------------------------------- |
+| Hackathon transactional data (SQL) | ≤ 1 hour   | Azure SQL geo-redundant backup (PITR 7–35 days) |
+| Secrets/configuration references   | ≤ 24 hours | Key Vault soft-delete + IaC reconstruction      |
+| Infrastructure configuration       | ≤ 1 hour   | Git + Bicep in repository                       |
 
 ```mermaid
 %%{init: {'theme':'neutral'}}%%
@@ -92,19 +92,19 @@ gantt
 ## 💾 2. Backup Strategy
 
 <details>
-<summary><strong>💾 Azure Cosmos DB</strong></summary>
+<summary><strong>💾 Azure SQL Database</strong></summary>
 
-| Setting        | Configuration                                    |
-| -------------- | ------------------------------------------------ |
-| Backup Type    | Continuous                                       |
-| Tier           | Continuous30Days                                 |
-| Region         | Central US                                       |
-| Restore Method | Point-in-time restore / account restore workflow |
+| Setting        | Configuration                                 |
+| -------------- | --------------------------------------------- |
+| Backup Type    | Automated (geo-redundant)                     |
+| Retention      | 7–35 days PITR (Point-in-Time Restore)        |
+| Region         | Sweden Central                                |
+| Restore Method | Point-in-time restore via Azure Portal or CLI |
 
 **Verification Command:**
 
 ```bash
-az cosmosdb show -g rg-hackops-us-dev -n cosmos-hackops-dev-fplrs3 --query backupPolicy
+az sql db show -g rg-hackops-se-dev -s sql-hackops-dev -n hackopsdb --query 'earliestRestoreDate'
 ```
 
 </details>
@@ -131,7 +131,7 @@ az cosmosdb show -g rg-hackops-us-dev -n cosmos-hackops-dev-fplrs3 --query backu
 
 1. Declare incident and capture outage context.
 2. Deploy infrastructure to designated fallback region using `main.bicep` with region override.
-3. Restore Cosmos data using continuous backup restore workflow.
+3. Restore SQL data using point-in-time restore workflow.
 4. Reconfigure app settings and DNS cutover.
 5. Validate critical user journeys.
 
@@ -156,7 +156,7 @@ az cosmosdb show -g rg-hackops-us-dev -n cosmos-hackops-dev-fplrs3 --query backu
 | Test Type                | Frequency | Last Test  | Next Test  |
 | ------------------------ | --------- | ---------- | ---------- |
 | Backup policy validation | Monthly   | 2026-02-26 | 2026-03-26 |
-| Cosmos restore drill     | Quarterly | Not run    | 2026-05-15 |
+| SQL restore drill        | Quarterly | Not run    | 2026-05-15 |
 | Full DR tabletop         | Quarterly | Not run    | 2026-05-30 |
 
 ```mermaid
@@ -188,8 +188,8 @@ gantt
 
 | Role                 | Team             | Responsibility                               |
 | -------------------- | ---------------- | -------------------------------------------- |
-| Incident Commander   | InfraOps         | Incident coordination and decision gates     |
-| Platform Engineer    | InfraOps         | Infrastructure recovery execution            |
+| Incident Commander   | Platform Ops     | Incident coordination and decision gates     |
+| Platform Engineer    | Platform Ops     | Infrastructure recovery execution            |
 | Application Engineer | HackOps App Team | Application validation and functional checks |
 | Security Reviewer    | Security/GRC     | Compliance and control impact validation     |
 
@@ -207,10 +207,10 @@ gantt
 
 ## 📖 8. Recovery Runbooks
 
-| Scenario                     | Runbook     | Owner               |
-| ---------------------------- | ----------- | ------------------- |
-| App outage in primary region | Section 8.1 | InfraOps            |
-| Cosmos data corruption       | Section 8.2 | InfraOps + App Team |
+| Scenario                     | Runbook     | Owner                   |
+| ---------------------------- | ----------- | ----------------------- |
+| App outage in primary region | Section 8.1 | Platform Ops            |
+| SQL data corruption          | Section 8.2 | Platform Ops + App Team |
 
 <details>
 <summary><strong>📖 Runbook: App Service Regional Outage</strong></summary>
@@ -242,7 +242,7 @@ az webapp show -g <dr-rg> -n <dr-app> --query state
 - Current production-like deployment: `rg-hackops-us-dev` (`centralus`)
 - Critical endpoints:
   - `https://app-hackops-dev.azurewebsites.net`
-  - `https://cosmos-hackops-dev-fplrs3.documents.azure.com:443/`
+  - `sql-hackops-dev.database.windows.net`
   - `https://kv-hackops-dev-fplrs3.vault.azure.net/`
 
 </details>

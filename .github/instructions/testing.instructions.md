@@ -52,23 +52,20 @@ describe("calculateScore", () => {
 
 ## Mocking
 
-### Cosmos DB Client
+### SQL Client
 
 ```typescript
-vi.mock("@/lib/cosmos", () => ({
-  getContainer: vi.fn().mockReturnValue({
-    items: {
-      query: vi.fn().mockReturnValue({
-        fetchAll: vi.fn().mockResolvedValue({ resources: mockData }),
-      }),
-      create: vi.fn().mockResolvedValue({ resource: mockDoc }),
-      upsert: vi.fn().mockResolvedValue({ resource: mockDoc }),
-    },
-    item: vi.fn().mockReturnValue({
-      read: vi.fn().mockResolvedValue({ resource: mockDoc }),
-      replace: vi.fn().mockResolvedValue({ resource: mockDoc }),
+vi.mock("@/lib/sql", () => ({
+  query: vi.fn().mockResolvedValue(mockRows),
+  queryOne: vi.fn().mockResolvedValue(mockRow),
+  execute: vi.fn().mockResolvedValue(1),
+  transaction: vi.fn(async (fn) =>
+    fn({
+      query: vi.fn().mockResolvedValue(mockRows),
+      queryOne: vi.fn().mockResolvedValue(mockRow),
+      execute: vi.fn().mockResolvedValue(1),
     }),
-  }),
+  ),
 }));
 ```
 
@@ -76,8 +73,8 @@ vi.mock("@/lib/cosmos", () => ({
 
 ```typescript
 beforeEach(() => {
-  vi.stubEnv("COSMOS_ENDPOINT", "https://localhost:8081");
-  vi.stubEnv("COSMOS_KEY", "test-key");
+  vi.stubEnv("SQL_SERVER", "localhost");
+  vi.stubEnv("SQL_DATABASE", "hackops");
 });
 ```
 

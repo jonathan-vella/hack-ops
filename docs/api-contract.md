@@ -47,7 +47,7 @@ interface EasyAuthPrincipal {
 ```
 
 **Role resolution:** After decoding the principal, the
-middleware looks up the user in the `roles` container by
+middleware looks up the user in the `roles` table by
 `githubUserId` + `hackathonId` to determine their role
 (`admin`, `coach`, or `hacker`). Users with no role record
 are treated as unauthenticated for role-gated endpoints.
@@ -75,8 +75,8 @@ All endpoints return a consistent `ApiResponse<T>` wrapper:
 
 ## Pagination
 
-List endpoints support cursor-based pagination via Cosmos DB
-continuation tokens:
+List endpoints support offset-based pagination via SQL
+OFFSET/FETCH:
 
 ```typescript
 // Request query parameters
@@ -408,7 +408,7 @@ only their own team's submissions.
 On **approval**, the Coach must provide rubric `scores` per
 category. The scores are validated against the active rubric
 (each category score ≤ `maxScore`). Validated scores are
-copied to the `scores` container as immutable records.
+copied to the `scores` table as immutable records.
 
 On **rejection**, `scores` is omitted. A `reason` is always
 required.
@@ -687,7 +687,7 @@ refresh interval, max team size, etc.).
 | `409` | Conflict              | Duplicate submission, invalid state transition,            |
 |       |                       | already reviewed, user already has role                    |
 | `429` | Too Many Requests     | Rate limit exceeded (5/min/IP on join, 100/min/IP general) |
-| `500` | Internal Server Error | Unexpected server error, Cosmos DB connectivity failure    |
+| `500` | Internal Server Error | Unexpected server error, SQL Database connectivity failure |
 
 ---
 

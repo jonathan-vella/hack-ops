@@ -42,8 +42,7 @@ pass with >80% coverage before CI/CD setup.
 - **Data model**: `docs/data-model.md` — sample documents
   for test fixtures
 - **Skills**: Read `hackops-domain` (business rules to test),
-  `zod-validation` (schema patterns), `cosmos-db-sdk` (mock
-  patterns)
+  `zod-validation` (schema patterns)
 
 ## Workflow
 
@@ -61,11 +60,11 @@ pass with >80% coverage before CI/CD setup.
 Set up test infrastructure (if not already present):
 
 1. Vitest config in `apps/web/vitest.config.ts`
-2. Test setup file with Cosmos DB client mock
+2. Test setup file with SQL client mock
 3. Test utility helpers in `apps/web/tests/helpers/`:
    - `mock-auth.ts` — simulate Easy Auth headers for each role
-   - `mock-cosmos.ts` — mock Cosmos DB container operations
-   - `fixtures.ts` — sample documents for all 10 containers
+   - `mock-sql.ts` — mock SQL client query/execute operations
+   - `fixtures.ts` — sample documents for all 10 tables
 4. Configure coverage reporter (istanbul or v8)
 
 ### Step 3 — Auth tests
@@ -209,7 +208,7 @@ Create `apps/web/tests/business-logic/`:
 ## Quality Assurance
 
 - [ ] Vitest configured with coverage reporter
-- [ ] Mock helpers created for auth and Cosmos DB
+- [ ] Mock helpers created for auth and SQL client
 - [ ] Test fixtures match `docs/data-model.md` samples
 - [ ] All API routes have at least happy-path + error tests
 - [ ] Role guards tested for each role combination

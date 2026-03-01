@@ -37,8 +37,7 @@ tools:
     search/usages,
     web/fetch,
     web/githubRepo,
-    mcp_context7_resolve-library-id,
-    mcp_context7_query-docs,
+    "context7/*",
     todo,
   ]
 handoffs:
@@ -75,11 +74,11 @@ handoffs:
 4. **Read** `.github/skills/hackops-domain/SKILL.md` — business rules, roles matrix, lifecycle
 5. **Read** `.github/skills/nextjs-patterns/SKILL.md` — App Router conventions
 6. **Read** `.github/skills/shadcn-ui-patterns/SKILL.md` — component catalog and styling
-7. **Read** `.github/skills/cosmos-db-sdk/SKILL.md` — Cosmos DB client patterns
-8. **Read** `.github/skills/zod-validation/SKILL.md` — API boundary validation schemas
+7. **Read** `.github/skills/zod-validation/SKILL.md` — API boundary validation schemas
+8. **Read** `apps/web/src/lib/sql.ts` — SQL client helpers (`query<T>`, `queryOne<T>`, `execute`, `transaction`)
 9. **Read** `packages/shared/types/api-contract.ts` — **SOURCE OF TRUTH** for all API types
 10. **Read** `docs/api-contract.md` — endpoint reference with request/response shapes
-11. **Read** `docs/data-model.md` — Cosmos DB containers and partition keys
+11. **Read** `docs/data-model.md` — SQL tables, foreign keys, and indexes
 12. **Read** `docs/ui-pages.md` — page inventory and route map
 13. **Read** `docs/prd.md` — product requirements
 14. **Read** `docs/environment-config.md` — env var contract and Key Vault refs
@@ -94,7 +93,7 @@ against live documentation:
 3. Compare results against the skill's hardcoded patterns
 4. If patterns differ, flag the discrepancy before proceeding
 
-Libraries to verify: `next.js`, `zod`, `@azure/cosmos`, `shadcn/ui`
+Libraries to verify: `next.js`, `zod`, `mssql`, `shadcn/ui`
 
 ## Scaffold Structure
 
@@ -107,7 +106,7 @@ hackops/
 │       ├── src/
 │       │   ├── app/            # App Router pages + API routes
 │       │   ├── components/     # shadcn/ui + custom components
-│       │   ├── lib/            # Cosmos client, auth helpers
+│       │   ├── lib/            # SQL client, auth helpers
 │       │   └── middleware.ts   # Zod validation wrapper
 │       ├── next.config.ts
 │       ├── tailwind.config.ts
@@ -128,7 +127,7 @@ hackops/
 - **Next.js 15** with App Router (no Pages Router)
 - **Tailwind CSS 4** with shadcn/ui component library
 - **TypeScript strict mode** across all packages
-- **Cosmos DB emulator** config in `.env.local` for local dev
+- **Local SQL Server (Docker)** config in `.env.local` for local dev
 - **Easy Auth** header parsing in middleware (no client-side auth SDK)
 
 ### Scaffold Exit Criteria

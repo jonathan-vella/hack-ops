@@ -9,7 +9,7 @@ applyTo: "**/*.bicep"
 
 | Rule          | Standard                                                            |
 | ------------- | ------------------------------------------------------------------- |
-| Region        | `centralus` (alt: `swedencentral`)                                  |
+| Region        | `swedencentral` (alt: `northeurope`)                                |
 | Unique suffix | `var uniqueSuffix = uniqueString(resourceGroup().id)` in main.bicep |
 | AVM first     | **MANDATORY** - Use Azure Verified Modules where available          |
 | Tags          | Environment, ManagedBy, Project, Owner on ALL resources             |
@@ -51,8 +51,8 @@ var kvName = 'kv-${take(projectName, 10)}-${environment}-${take(uniqueSuffix, 6)
 
 ```bicep
 @description('Azure region for all resources.')
-@allowed(['centralus', 'swedencentral', 'germanywestcentral', 'northeurope'])
-param location string = 'centralus'
+@allowed(['swedencentral', 'northeurope', 'germanywestcentral', 'westeurope'])
+param location string = 'swedencentral'
 
 @description('Unique suffix for resource naming.')
 @minLength(5)

@@ -174,9 +174,9 @@ fi
 # -----------------------------------------------------------------------
 
 step_start "☁️ " "Configuring Azure CLI..."
-if az config set defaults.location=centralus --only-show-errors 2>/dev/null; then
+if az config set defaults.location=swedencentral --only-show-errors 2>/dev/null; then
     az config set auto-upgrade.enable=no --only-show-errors 2>/dev/null || true
-    step_done "Default location: centralus"
+    step_done "Default location: swedencentral"
 else
     step_warn "Azure CLI config skipped (not authenticated)"
 fi
@@ -263,5 +263,5 @@ echo ""
 echo " 📝 Next steps:"
 echo "    1. Authenticate: az login"
 echo "    2. Set subscription: az account set --subscription <id>"
-echo "    3. Open Chat (Ctrl+Shift+I) → Select InfraOps Conductor"
+echo "    3. Open Chat (Ctrl+Shift+I) → Select 01-Conductor"
 echo ""

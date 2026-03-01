@@ -1,6 +1,6 @@
 ---
 name: 12-App Tester
-description: Writes unit tests (Vitest), integration tests (API routes against Cosmos DB emulator), and E2E test stubs for the HackOps platform. Reads acceptance criteria from the PRD. Uses Context7 MCP for Vitest API verification.
+description: Writes unit tests (Vitest), integration tests (API routes against local SQL Server), and E2E test stubs for the HackOps platform. Reads acceptance criteria from the PRD. Uses Context7 MCP for Vitest API verification.
 model: "GPT-5.3-Codex"
 argument-hint: "Specify which test domain to target (auth, api, components, e2e) or run the app-09 prompt"
 target: vscode
@@ -34,8 +34,7 @@ tools:
     search/textSearch,
     search/usages,
     web/fetch,
-    mcp_context7_resolve-library-id,
-    mcp_context7_query-docs,
+    "context7/*",
     todo,
   ]
 handoffs:
@@ -78,7 +77,7 @@ API patterns before generating test code.
 | Layer       | Framework    | Target                     | Coverage goal |
 | ----------- | ------------ | -------------------------- | ------------- |
 | Unit        | Vitest       | Services, utils, helpers   | >80%          |
-| Integration | Vitest       | API routes + Cosmos DB     | >70%          |
+| Integration | Vitest       | API routes + SQL Database  | >70%          |
 | Component   | Vitest + RTL | React components           | >60%          |
 | E2E         | Playwright   | Critical user flows (stub) | Stubs only    |
 
@@ -101,7 +100,7 @@ apps/web/src/
 
 ### Mock Patterns
 
-- **Cosmos DB client**: Mock `@azure/cosmos` `Container.items` methods
+- **SQL client**: Mock `@/lib/sql` (`query`, `queryOne`, `execute`, `transaction`) methods
 - **Auth context**: Mock Easy Auth headers (`x-ms-client-principal`)
 - **Test fixtures**: Shared fixtures in `packages/shared/test-fixtures/`
 

@@ -4,22 +4,11 @@ import type { EasyAuthPrincipal } from "@hackops/shared";
 
 // ── Mocks ──────────────────────────────────────────────────
 
-const mockQuery = vi.fn();
-const mockCreate = vi.fn();
-const mockRead = vi.fn();
-const mockReplace = vi.fn();
-
-vi.mock("@/lib/cosmos", () => ({
-  getContainer: vi.fn(() => ({
-    items: {
-      query: mockQuery,
-      create: mockCreate,
-    },
-    item: vi.fn(() => ({
-      read: mockRead,
-      replace: mockReplace,
-    })),
-  })),
+vi.mock("@/lib/sql", () => ({
+  query: vi.fn(),
+  queryOne: vi.fn(),
+  execute: vi.fn(),
+  transaction: vi.fn(),
 }));
 
 vi.mock("@/lib/auth", () => ({
@@ -34,9 +23,13 @@ vi.mock("@/lib/audit", () => ({
   auditLog: vi.fn(),
 }));
 
+import { query, queryOne, execute } from "@/lib/sql";
 import { getAuthPrincipal } from "@/lib/auth";
 import { resolveRole } from "@/lib/roles";
 
+const mockQuery = vi.mocked(query);
+const mockQueryOne = vi.mocked(queryOne);
+const mockExecute = vi.mocked(execute);
 const mockGetAuth = vi.mocked(getAuthPrincipal);
 const mockResolveRole = vi.mocked(resolveRole);
 
@@ -64,13 +57,8 @@ function createRequest(
 describe("POST /api/hackathons", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockQuery.mockReturnValue({
-      fetchAll: vi.fn().mockResolvedValue({ resources: [] }),
-      fetchNext: vi
-        .fn()
-        .mockResolvedValue({ resources: [], continuationToken: null }),
-    });
-    mockCreate.mockResolvedValue({ resource: {} });
+    mockQuery.mockResolvedValue([]);
+    mockExecute.mockResolvedValue(1);
   });
 
   it("returns 401 when unauthenticated", async () => {
@@ -87,7 +75,6 @@ describe("POST /api/hackathons", () => {
 
   it("creates a hackathon with valid input", async () => {
     mockGetAuth.mockReturnValue(fakePrincipal);
-    mockCreate.mockResolvedValue({ resource: {} });
 
     const { POST } = await import("../hackathons/route");
     const req = createRequest("POST", "http://localhost/api/hackathons", {
@@ -118,21 +105,8 @@ describe("POST /api/hackathons", () => {
 
   it("auto-generates unique 4-digit event code", async () => {
     mockGetAuth.mockReturnValue(fakePrincipal);
-    // First call returns collision, second succeeds
-    let callCount = 0;
-    mockQuery.mockReturnValue({
-      fetchAll: vi.fn().mockImplementation(() => {
-        callCount++;
-        if (callCount === 1) {
-          return Promise.resolve({ resources: [{ id: "existing" }] });
-        }
-        return Promise.resolve({ resources: [] });
-      }),
-      fetchNext: vi
-        .fn()
-        .mockResolvedValue({ resources: [], continuationToken: null }),
-    });
-    mockCreate.mockResolvedValue({ resource: {} });
+    // First call returns collision, subsequent calls succeed
+    mockQuery.mockResolvedValueOnce([{ id: "existing" }]).mockResolvedValue([]);
 
     const { POST } = await import("../hackathons/route");
     const req = createRequest("POST", "http://localhost/api/hackathons", {
@@ -151,12 +125,9 @@ describe("GET /api/hackathons", () => {
 
   it("returns paginated hackathons", async () => {
     mockGetAuth.mockReturnValue(fakePrincipal);
-    mockQuery.mockReturnValue({
-      fetchNext: vi.fn().mockResolvedValue({
-        resources: [{ id: "h1", name: "Hack 1", status: "active" }],
-        continuationToken: null,
-      }),
-    });
+    mockQuery.mockResolvedValueOnce([
+      { id: "h1", name: "Hack 1", status: "active" },
+    ]);
 
     const { GET } = await import("../hackathons/route");
     const req = createRequest(
@@ -178,7 +149,7 @@ describe("GET /api/hackathons/:id", () => {
   it("returns 404 when hackathon not found", async () => {
     mockGetAuth.mockReturnValue(fakePrincipal);
     mockResolveRole.mockResolvedValue("admin");
-    mockRead.mockResolvedValue({ resource: undefined });
+    mockQueryOne.mockResolvedValueOnce(null);
 
     const { GET } = await import("../hackathons/[id]/route");
     const req = createRequest(
@@ -195,8 +166,10 @@ describe("GET /api/hackathons/:id", () => {
   it("returns hackathon for admin", async () => {
     mockGetAuth.mockReturnValue(fakePrincipal);
     mockResolveRole.mockResolvedValue("admin");
-    mockRead.mockResolvedValue({
-      resource: { id: "h1", name: "Test", status: "active" },
+    mockQueryOne.mockResolvedValueOnce({
+      id: "h1",
+      name: "Test",
+      status: "active",
     });
 
     const { GET } = await import("../hackathons/[id]/route");
@@ -217,21 +190,13 @@ describe("PATCH /api/hackathons/:id", () => {
   it("enforces valid state transitions (draft → active)", async () => {
     mockGetAuth.mockReturnValue(fakePrincipal);
     mockResolveRole.mockResolvedValue("admin");
-    mockRead.mockResolvedValue({
-      resource: { id: "h1", name: "Test", status: "draft", _type: "hackathon" },
-    });
-    mockReplace.mockResolvedValue({
-      resource: {
-        id: "h1",
-        name: "Test",
-        status: "active",
-        _type: "hackathon",
-      },
-    });
-    // Progression init queries: teams, challenges — return empty for simplicity
-    mockQuery.mockReturnValue({
-      fetchAll: vi.fn().mockResolvedValue({ resources: [] }),
-    });
+    // 1: read existing, 2: re-read after update
+    mockQueryOne
+      .mockResolvedValueOnce({ id: "h1", name: "Test", status: "draft" })
+      .mockResolvedValueOnce({ id: "h1", name: "Test", status: "active" });
+    mockExecute.mockResolvedValue(1);
+    // Progression init: teams query + challenges query — empty for simplicity
+    mockQuery.mockResolvedValueOnce([]).mockResolvedValueOnce([]);
 
     const { PATCH } = await import("../hackathons/[id]/route");
     const req = createRequest("PATCH", "http://localhost/api/hackathons/h1", {
@@ -247,8 +212,10 @@ describe("PATCH /api/hackathons/:id", () => {
   it("rejects invalid state transition (draft → archived)", async () => {
     mockGetAuth.mockReturnValue(fakePrincipal);
     mockResolveRole.mockResolvedValue("admin");
-    mockRead.mockResolvedValue({
-      resource: { id: "h1", name: "Test", status: "draft", _type: "hackathon" },
+    mockQueryOne.mockResolvedValueOnce({
+      id: "h1",
+      name: "Test",
+      status: "draft",
     });
 
     const { PATCH } = await import("../hackathons/[id]/route");
@@ -267,13 +234,10 @@ describe("PATCH /api/hackathons/:id", () => {
   it("rejects state transition from archived", async () => {
     mockGetAuth.mockReturnValue(fakePrincipal);
     mockResolveRole.mockResolvedValue("admin");
-    mockRead.mockResolvedValue({
-      resource: {
-        id: "h1",
-        name: "Test",
-        status: "archived",
-        _type: "hackathon",
-      },
+    mockQueryOne.mockResolvedValueOnce({
+      id: "h1",
+      name: "Test",
+      status: "archived",
     });
 
     const { PATCH } = await import("../hackathons/[id]/route");

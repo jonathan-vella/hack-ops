@@ -94,7 +94,7 @@
 - [x] C1: Create `app-test-subagent.agent.md`
 - [x] C2: Verify App Conductor workflow table matches blueprint
 - [x] C3: Run microsoft-skill-creator for `nextjs-patterns`
-- [x] C3: Run microsoft-skill-creator for `cosmos-db-sdk`
+- [x] C3: Run microsoft-skill-creator for `cosmos-db-sdk` (now archived — replaced by SQL patterns)
 - [x] C3: Run microsoft-skill-creator for `shadcn-ui-patterns`
 - [x] C3: Run microsoft-skill-creator for `zod-validation`
 - [x] C3: Hand-write `hackops-domain` skill
@@ -182,7 +182,7 @@ but artifacts were never committed. Recreate before continuing app builds
 so agents 12–15 have the skills/instructions they were designed to use.
 
 - [x] C-fix 1: Recreate 5 app-dev skills (debt #15)
-  - `hackops-domain`, `nextjs-patterns`, `cosmos-db-sdk`,
+  - `hackops-domain`, `nextjs-patterns`, `cosmos-db-sdk` (archived),
     `shadcn-ui-patterns`, `zod-validation`
   - Gate: `npm run validate` passes ✅
 - [x] C-fix 2: Recreate 5 app-dev instructions (debt #16)
@@ -226,11 +226,11 @@ so agents 12–15 have the skills/instructions they were designed to use.
 - [x] G1.1: Create `apps/web/Dockerfile` (multi-stage, node:24-alpine, non-root UID 1001)
 - [x] G1.2: Create `.dockerignore` at repo root
 - [x] G1.3: Create `infra/bicep/hackops/modules/container-registry.bicep` (ACR Standard via AVM)
-- [x] G1.4: Update `main.bicep` (ACR module, imageTag param, AcrPull RBAC prod+staging, staging Cosmos+KV RBAC)
+- [x] G1.4: Update `main.bicep` (ACR module, imageTag param, AcrPull RBAC prod+staging, staging SQL+KV RBAC)
 - [x] G1.5: Update `app-service.bicep` (DOCKER linuxFxVersion, acrUseManagedIdentityCreds, staging slot, container app settings, tokenStore disabled)
 - [x] G1.6: Update `hackops-deploy.yml` (container build → Trivy scan → ACR push → Bicep deploy → slot swap → auto-rollback)
 - [x] G1.7: Update `hackops-ci.yml` (add docker-build job)
-- [x] G1.8: Update health endpoint (60s warmup mode, eager Cosmos pre-warm)
+- [x] G1.8: Update health endpoint (60s warmup mode, eager SQL pre-warm)
 - [x] G1.9: Create `scripts/setup-acr-purge.sh` (weekly purge of old SHA-tagged images)
 - [x] G1.10: Create `docs/first-deploy-runbook.md` (supervised migration process)
 - [x] G1.11: Verify `bicep build` passes (exit 0, 1 cosmetic BCP334 warning only)
@@ -251,7 +251,7 @@ so agents 12–15 have the skills/instructions they were designed to use.
 
 > Decision: Since we are not in production, delete the existing
 > App Service (zip-deploy, NODE|22-lts) and redeploy from
-> scratch as container-based. Cosmos DB, Key Vault, VNet, and
+> scratch as container-based. SQL Database, Key Vault, VNet, and
 > monitoring resources are preserved.
 
 #### H0: Code changes (prep)
@@ -291,7 +291,7 @@ so agents 12–15 have the skills/instructions they were designed to use.
 
 - [ ] H5.1: Redeploy Bicep with `imageTag=first-deploy`
 - [ ] H5.2: Verify health endpoint returns 200 (`/api/health`)
-- [ ] H5.3: Verify Cosmos DB connectivity (health check `cosmos-db: ok`)
+- [ ] H5.3: Verify SQL Database connectivity (health check `sql-database: ok`)
 
 #### H6: Verify full stack
 
@@ -322,15 +322,15 @@ so agents 12–15 have the skills/instructions they were designed to use.
 
 #### Updated Defaults (decided 2026-03-01)
 
-| Resource          | Old Value          | New Value                | Notes                                     |
-| ----------------- | ------------------ | ------------------------ | ----------------------------------------- |
-| Region            | centralus          | **swedencentral**        | germanywestcentral as alternative          |
-| App Service SKU   | S1 (dev) / P1v3    | **P1v4** (all envs)      | Replaces both S1 and P1v3                  |
-| Azure SQL DB      | GP_S_Gen5_2        | **S2** (50 DTU)          | DTU-based, simpler for hackathon workload  |
-| ACR               | Standard           | Standard (no change)     | Already correct                            |
-| VNet CIDR         | 10.0.0.0/16        | **10.0.0.0/23**          | Tighter range, 512 addresses plenty        |
-| Resource Group    | rg-hackops-us-dev  | **rg-hackops-se-dev**    | Region prefix follows naming convention    |
-| DB seeding        | Direct connection   | **ACI in VNet**          | DB behind PE — must seed from inside VNet  |
+| Resource        | Old Value         | New Value             | Notes                                     |
+| --------------- | ----------------- | --------------------- | ----------------------------------------- |
+| Region          | centralus         | **swedencentral**     | germanywestcentral as alternative         |
+| App Service SKU | S1 (dev) / P1v3   | **P1v4** (all envs)   | Replaces both S1 and P1v3                 |
+| Azure SQL DB    | GP_S_Gen5_2       | **S2** (50 DTU)       | DTU-based, simpler for hackathon workload |
+| ACR             | Standard          | Standard (no change)  | Already correct                           |
+| VNet CIDR       | 10.0.0.0/16       | **10.0.0.0/23**       | Tighter range, 512 addresses plenty       |
+| Resource Group  | rg-hackops-us-dev | **rg-hackops-se-dev** | Region prefix follows naming convention   |
+| DB seeding      | Direct connection | **ACI in VNet**       | DB behind PE — must seed from inside VNet |
 
 > **Important**: SQL DB is behind a private endpoint. Any data seeding,
 > migrations, or ad-hoc queries must run from within the VNet — use
@@ -394,7 +394,7 @@ so agents 12–15 have the skills/instructions they were designed to use.
 
 ### Phase F — Supporting Artifacts
 
-- [x] F1: Create `scripts/seed-cosmos.ts` + test fixtures
+- [x] F1: Create `scripts/seed-cosmos.ts` + test fixtures (archived — replaced by SQL seeder)
 - [x] F2: Create `docs/openapi.yaml` (optional — skipped, not needed)
 - [x] F3: Create `docs/testing-strategy.md`
 - [x] F4: Create `docs/security-checklist.md`
@@ -744,7 +744,7 @@ so agents 12–15 have the skills/instructions they were designed to use.
 |     |            |            | runbook with Step 0;     |                     |           |
 |     |            |            | session tracker with     |                     |           |
 |     |            |            | Phase H checklist        |                     |           |
-| 37  | 2026-02-28 | H / H0-H2  | H0.4 bicep build pass;  | H3.1: Bicep deploy  | P1v3      |
+| 37  | 2026-02-28 | H / H0-H2  | H0.4 bicep build pass;   | H3.1: Bicep deploy  | P1v3      |
 |     |            |            | H1 deleted: stack,       | with S1 SKU (retry) | quota = 0 |
 |     |            |            | staging slot, App Svc,   |                     | in sub;   |
 |     |            |            | ASP; verified clean      |                     | switched  |
@@ -785,30 +785,30 @@ have enough context for the current step.
 
 ### Read when working on specific phases
 
-| Phase          | Additional context files                    |
-| -------------- | ------------------------------------------- |
-| A (docs)       | `plan-hackOps.prompt.md` (Phases 5-10)      |
-| B (backlog)    | `docs/prd.md`, `docs/api-contract.md`       |
-| C (toolchain)  | `agent-definitions.instructions.md`,        |
-|                | `agent-skills.instructions.md`,             |
-|                | `microsoft-skill-creator` skill             |
-| D (infra)      | `azure-defaults` skill, existing agent defs |
-| E (app)        | All Phase A docs, `hackops-domain` skill,   |
-|                | `api-contract.ts` types                     |
-| F (supporting) | `AGENTS.md`, `docs/README.md`               |
-| G (container)  | `archive/prompts/plan-containerizeHackOps`, |
-|                | `docs/first-deploy-runbook.md`,             |
-|                | `infra/bicep/hackops/main.bicep`,           |
-|                | `apps/web/Dockerfile`,                      |
-|                | `.github/workflows/hackops-deploy.yml`      |
-| H (first-dep)  | `docs/first-deploy-runbook.md`,             |
-|                | `infra/bicep/hackops/deploy.ps1`,           |
-|                | `infra/bicep/hackops/main.bicep`,           |
-|                | `.github/workflows/hackops-deploy.yml`      |
-| I (migration)  | All Bicep modules in `infra/bicep/hackops/`,|
-|                | `03-des-adr-0004-sql-database-over-cosmos`, |
-|                | `docs/first-deploy-runbook.md`,             |
-|                | `docs/environment-config.md`                |
+| Phase          | Additional context files                     |
+| -------------- | -------------------------------------------- |
+| A (docs)       | `plan-hackOps.prompt.md` (Phases 5-10)       |
+| B (backlog)    | `docs/prd.md`, `docs/api-contract.md`        |
+| C (toolchain)  | `agent-definitions.instructions.md`,         |
+|                | `agent-skills.instructions.md`,              |
+|                | `microsoft-skill-creator` skill              |
+| D (infra)      | `azure-defaults` skill, existing agent defs  |
+| E (app)        | All Phase A docs, `hackops-domain` skill,    |
+|                | `api-contract.ts` types                      |
+| F (supporting) | `AGENTS.md`, `docs/README.md`                |
+| G (container)  | `archive/prompts/plan-containerizeHackOps`,  |
+|                | `docs/first-deploy-runbook.md`,              |
+|                | `infra/bicep/hackops/main.bicep`,            |
+|                | `apps/web/Dockerfile`,                       |
+|                | `.github/workflows/hackops-deploy.yml`       |
+| H (first-dep)  | `docs/first-deploy-runbook.md`,              |
+|                | `infra/bicep/hackops/deploy.ps1`,            |
+|                | `infra/bicep/hackops/main.bicep`,            |
+|                | `.github/workflows/hackops-deploy.yml`       |
+| I (migration)  | All Bicep modules in `infra/bicep/hackops/`, |
+|                | `03-des-adr-0004-sql-database-over-cosmos`,  |
+|                | `docs/first-deploy-runbook.md`,              |
+|                | `docs/environment-config.md`                 |
 
 ---
 
@@ -833,11 +833,11 @@ have enough context for the current step.
 | 2026-02-27 | Next.js 16 middleware file convention still used (deprecated) | "proxy" rename is cosmetic; middleware works and migration can wait                   |
 | 2026-02-28 | Delete & recreate App Service instead of in-place migration   | Not in prod; NODE                                                                     | 22-lts → DOCKER requires fresh resource; avoids AVM kind conflict |
 | 2026-02-28 | Drop Deployment Stacks, use `az deployment group create`      | CI/CD uses Incremental deploy; aligning deploy.ps1 to same mechanism avoids conflicts |
-| 2026-02-28 | ADMIN_GITHUB_IDS accepts usernames (not just numeric IDs)       | User requested `jonathan-vella` rather than `25802147`; code matches both              |
-| 2026-02-28 | S1 SKU for dev/staging, P1v3 for prod only                      | Subscription has PremiumV3 quota of 0; S1 supports staging slots + containers          |
-| 2026-03-01 | Region: swedencentral default, germanywestcentral alt    | EU regions preferred for hackathon audience              |
-| 2026-03-01 | App Service SKU: P1v4 (all environments)                 | Replaces S1 (dev) + P1v3 (prod); sufficient for scale   |
-| 2026-03-01 | Azure SQL DB: S2 (50 DTU) replacing GP_S_Gen5_2          | DTU tier simpler/cheaper for bursty hackathon workload   |
-| 2026-03-01 | VNet CIDR: 10.0.0.0/23 (512 addresses)                  | /16 was over-provisioned for a single-workload VNet      |
-| 2026-03-01 | Data seeding via ACI (VNet-integrated, ephemeral)        | SQL DB behind PE; ACI seeds from inside VNet             |
-| 2026-03-01 | Replace Cosmos DB with Azure SQL Database (ADR-0004)     | Relational workload; joins, ref integrity, lower cost    |
+| 2026-02-28 | ADMIN_GITHUB_IDS accepts usernames (not just numeric IDs)     | User requested `jonathan-vella` rather than `25802147`; code matches both             |
+| 2026-02-28 | S1 SKU for dev/staging, P1v3 for prod only                    | Subscription has PremiumV3 quota of 0; S1 supports staging slots + containers         |
+| 2026-03-01 | Region: swedencentral default, germanywestcentral alt         | EU regions preferred for hackathon audience                                           |
+| 2026-03-01 | App Service SKU: P1v4 (all environments)                      | Replaces S1 (dev) + P1v3 (prod); sufficient for scale                                 |
+| 2026-03-01 | Azure SQL DB: S2 (50 DTU) replacing GP_S_Gen5_2               | DTU tier simpler/cheaper for bursty hackathon workload                                |
+| 2026-03-01 | VNet CIDR: 10.0.0.0/23 (512 addresses)                        | /16 was over-provisioned for a single-workload VNet                                   |
+| 2026-03-01 | Data seeding via ACI (VNet-integrated, ephemeral)             | SQL DB behind PE; ACI seeds from inside VNet                                          |
+| 2026-03-01 | Replace Cosmos DB with Azure SQL Database (ADR-0004)          | Relational workload; joins, ref integrity, lower cost                                 |

@@ -227,7 +227,7 @@ Security measures (multi-select with business descriptions), Authentication meth
 | RTO / RPO          | Phase 3     | 4 hours / 1 hour            |
 | Compliance         | Phase 4     | Based on industry           |
 | Security controls  | Phase 4     | Managed Identity + KV + TLS |
-| Region             | Phase 4     | `centralus`                 |
+| Region             | Phase 4     | `swedencentral`             |
 | Project name       | Phase 5     | (required)                  |
 | Environments       | Phase 5     | Dev + Production            |
 | Timeline           | Phase 5     | 1-3 months                  |
@@ -243,7 +243,7 @@ Before saving the requirements document:
 - [ ] Architecture Pattern H3 populated (workload, tier, justification)
 - [ ] Recommended Security Controls H3 populated
 - [ ] Budget section has approximate monthly amount
-- [ ] Region defaults correct (centralus unless exception)
+- [ ] Region defaults correct (swedencentral unless exception)
 - [ ] Baseline tags captured (Environment, ManagedBy, Project, Owner — governance may add more)
 - [ ] Attribution header matches template pattern exactly
 - [ ] No Bicep code blocks in the document

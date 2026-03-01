@@ -167,9 +167,9 @@ const form = useForm<CreateHackathon>({
 
 ```typescript
 const EnvSchema = z.object({
-  COSMOS_ENDPOINT: z.url(),
-  COSMOS_KEY: z.string().min(1),
-  COSMOS_DATABASE: z.string().min(1),
+  SQL_SERVER: z.string().min(1),
+  SQL_PASSWORD: z.string().min(1),
+  SQL_DATABASE: z.string().min(1),
   NEXTAUTH_SECRET: z.string().min(32),
 });
 
