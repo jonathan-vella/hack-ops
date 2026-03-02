@@ -70,6 +70,8 @@ venv/
 # Test results
 TestResults/
 *.trx
+coverage/
+*.tsbuildinfo
 
 # Personal notes
 NOTES.md
