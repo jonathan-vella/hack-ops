@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import type { HackathonsAPI, ApiResponse, TeamsAPI } from "@hackops/shared";
 import { requireRole } from "@/lib/guards";
-import { query, queryOne, execute, transaction } from "@/lib/sql";
+import { query, queryOne, transaction } from "@/lib/sql";
 import { auditLog } from "@/lib/audit";
 import { assignTeamsSchema } from "@/lib/validation/hackathon";
 

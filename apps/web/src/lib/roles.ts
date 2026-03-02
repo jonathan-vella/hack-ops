@@ -1,5 +1,5 @@
 import type { UserRole } from "@hackops/shared";
-import { query, queryOne, execute } from "./sql";
+import { queryOne, execute } from "./sql";
 
 interface RoleDocument {
   id: string;
