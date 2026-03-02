@@ -86,10 +86,17 @@ export async function advanceProgression(
   if (challengeOrder !== progression.currentChallenge) return;
 
   const now = new Date().toISOString();
-  const unlocked = JSON.parse(progression.unlockedChallenges) as Array<{
-    challengeId: string;
-    unlockedAt: string;
-  }>;
+  let unlocked: Array<{ challengeId: string; unlockedAt: string }>;
+  if (!progression.unlockedChallenges) {
+    unlocked = [];
+  } else {
+    try {
+      const parsed = JSON.parse(progression.unlockedChallenges) as unknown;
+      unlocked = Array.isArray(parsed) ? parsed : [];
+    } catch {
+      unlocked = [];
+    }
+  }
   unlocked.push({ challengeId, unlockedAt: now });
 
   // Optimistic concurrency via rowVersion — UPDATE fails (0 rows) if another writer changed the row

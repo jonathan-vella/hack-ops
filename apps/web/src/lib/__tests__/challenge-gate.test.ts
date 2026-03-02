@@ -112,6 +112,40 @@ describe("advanceProgression", () => {
     expect(mockExecute).not.toHaveBeenCalled();
   });
 
+  it("proceeds normally with malformed unlockedChallenges JSON", async () => {
+    mockQueryOne.mockResolvedValueOnce({ order: 2 }).mockResolvedValueOnce({
+      id: "prog-1",
+      currentChallenge: 2,
+      unlockedChallenges: "INVALID_JSON{{{",
+      rowVersion: Buffer.from("v1"),
+    });
+    mockExecute.mockResolvedValueOnce(1);
+
+    await expect(
+      advanceProgression("team-1", "h1", "ch-2"),
+    ).resolves.toBeUndefined();
+    expect(mockExecute).toHaveBeenCalledTimes(1);
+    const [, params] = mockExecute.mock.calls[0];
+    expect(params?.nextChallenge).toBe(3);
+  });
+
+  it("proceeds normally when unlockedChallenges is null", async () => {
+    mockQueryOne.mockResolvedValueOnce({ order: 2 }).mockResolvedValueOnce({
+      id: "prog-1",
+      currentChallenge: 2,
+      unlockedChallenges: null,
+      rowVersion: Buffer.from("v1"),
+    });
+    mockExecute.mockResolvedValueOnce(1);
+
+    await expect(
+      advanceProgression("team-1", "h1", "ch-2"),
+    ).resolves.toBeUndefined();
+    expect(mockExecute).toHaveBeenCalledTimes(1);
+    const [, params] = mockExecute.mock.calls[0];
+    expect(params?.nextChallenge).toBe(3);
+  });
+
   it("does nothing when challenge not found", async () => {
     mockQueryOne.mockResolvedValueOnce(null);
 

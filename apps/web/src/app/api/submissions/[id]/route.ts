@@ -186,12 +186,16 @@ export const PATCH = requireAuth(async (request: NextRequest, context, auth) => 
       details: { scores: body.scores, total, teamId: submission.teamId },
     });
 
-    // Auto-unlock next challenge on approval
-    await advanceProgression(
-      submission.teamId as string,
-      submission.hackathonId as string,
-      submission.challengeId as string,
-    );
+    // Auto-unlock next challenge; non-fatal — approval and score are already committed
+    try {
+      await advanceProgression(
+        submission.teamId as string,
+        submission.hackathonId as string,
+        submission.challengeId as string,
+      );
+    } catch {
+      // Progression failure must not roll back an approved submission
+    }
 
     const record: SubmissionsAPI.SubmissionRecord = {
       id: submission.id as string,
