@@ -1,12 +1,12 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import type { ScoresAPI, ApiResponse, CategoryScore } from "@hackops/shared";
-import { requireRole } from "@/lib/guards";
+import { requireAuth, checkRole } from "@/lib/guards";
 import { queryOne, execute } from "@/lib/sql";
 import { auditLog } from "@/lib/audit";
 import { overrideScoreSchema } from "@/lib/validation/score";
 
-export const PATCH = requireRole("admin")(async (
+export const PATCH = requireAuth(async (
   request: NextRequest,
   context,
   auth,
@@ -40,7 +40,7 @@ export const PATCH = requireRole("admin")(async (
 
   const body = result.data;
 
-  // Find the score record
+  // Look up resource first — params.id is a score ID, not a hackathonId
   const score = await queryOne<Record<string, unknown>>(
     "SELECT * FROM scores WHERE id = @id",
     { id },
@@ -55,6 +55,14 @@ export const PATCH = requireRole("admin")(async (
       { status: 404 },
     );
   }
+
+  // Role check using the score's hackathonId
+  const roleCheck = await checkRole(
+    auth.principal,
+    score.hackathonId as string,
+    "admin",
+  );
+  if (roleCheck instanceof NextResponse) return roleCheck;
 
   // Validate scores against the active rubric
   const pointerId = `rubric-ptr-${score.hackathonId as string}`;

@@ -17,6 +17,14 @@ function isAuthenticated(request: NextRequest): boolean {
   return hasPrincipal || isDev;
 }
 
+function addSecurityHeaders(response: NextResponse): NextResponse {
+  response.headers.set("X-Frame-Options", "DENY");
+  response.headers.set("X-Content-Type-Options", "nosniff");
+  response.headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
+  response.headers.set("Permissions-Policy", "camera=(), microphone=(), geolocation=()");
+  return response;
+}
+
 function addCorsHeaders(
   response: NextResponse,
   origin: string | null,
@@ -61,7 +69,8 @@ export function proxy(request: NextRequest) {
 
   // Skip non-API routes and the public health endpoint
   if (!pathname.startsWith("/api/") || pathname === "/api/health") {
-    return NextResponse.next();
+    const response = NextResponse.next();
+    return addSecurityHeaders(response);
   }
 
   // Rate limiting: 5/min for /api/join, 100/min for everything else
@@ -97,6 +106,7 @@ export function proxy(request: NextRequest) {
   }
 
   const response = NextResponse.next();
+  addSecurityHeaders(response);
   return addCorsHeaders(response, origin);
 }
 

@@ -1,13 +1,13 @@
 import { NextResponse } from "next/server";
 import type { RubricsAPI, ApiResponse } from "@hackops/shared";
-import { requireRole } from "@/lib/guards";
+import { requireAuth, checkRole } from "@/lib/guards";
 import { queryOne, execute } from "@/lib/sql";
 import { auditLog } from "@/lib/audit";
 
-export const PATCH = requireRole("admin")(async (_request, context, auth) => {
+export const PATCH = requireAuth(async (_request, context, auth) => {
   const { id } = await context.params;
 
-  // Verify the target rubric version exists
+  // Look up resource first — params.id is a rubric version ID, not a hackathonId
   const rubricVersion = await queryOne<Record<string, unknown>>(
     "SELECT * FROM rubric_versions WHERE id = @id",
     { id },
@@ -20,6 +20,10 @@ export const PATCH = requireRole("admin")(async (_request, context, auth) => {
   }
 
   const hackathonId = rubricVersion.hackathonId as string;
+
+  // Role check using the rubric's hackathonId
+  const roleCheck = await checkRole(auth.principal, hackathonId, "admin");
+  if (roleCheck instanceof NextResponse) return roleCheck;
   const pointerId = `rubric-ptr-${hackathonId}`;
   const now = new Date().toISOString();
 

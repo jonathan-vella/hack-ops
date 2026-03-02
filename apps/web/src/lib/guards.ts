@@ -113,17 +113,45 @@ export async function protectPrimaryAdmin(
   return null;
 }
 
+/**
+ * Performs an inline role check for handlers that resolve hackathonId
+ * after resource lookup (when params.id is not a hackathon ID).
+ * Returns the resolved role on success, or a 403 NextResponse on failure.
+ */
+export async function checkRole(
+  principal: EasyAuthPrincipal,
+  hackathonId: string,
+  ...allowedRoles: UserRole[]
+): Promise<{ role: UserRole } | NextResponse> {
+  const role =
+    getDevRole() ?? (await resolveRole(principal.userId, hackathonId));
+  if (!role || !allowedRoles.includes(role)) {
+    return NextResponse.json(
+      {
+        error: `Access denied. Required role: ${allowedRoles.join(" or ")}`,
+        ok: false,
+      },
+      { status: 403 },
+    );
+  }
+  return { role };
+}
+
 async function extractHackathonId(
   request: NextRequest,
   context: RouteContext,
 ): Promise<string | null> {
   const params = await context.params;
-  if (params.hackathonId) return params.hackathonId;
-  if (params.id) return params.id;
 
+  // Explicit [hackathonId] segment (e.g. /api/audit/[hackathonId])
+  if (params.hackathonId) return params.hackathonId;
+
+  // Query string — checked before params.id so routes with non-hackathon
+  // [id] segments (submissions, roles, rubrics, etc.) can pass hackathonId
   const queryId = request.nextUrl.searchParams.get("hackathonId");
   if (queryId) return queryId;
 
+  // Request body — for POST/PUT/PATCH
   if (["POST", "PUT", "PATCH"].includes(request.method)) {
     try {
       const body = await request.clone().json();
@@ -132,6 +160,9 @@ async function extractHackathonId(
       // Body is not JSON — hackathonId unavailable from body
     }
   }
+
+  // Fallback: params.id — only correct for /api/hackathons/[id] routes
+  if (params.id) return params.id;
 
   return null;
 }

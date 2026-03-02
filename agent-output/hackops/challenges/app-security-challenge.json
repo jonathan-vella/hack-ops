@@ -1,0 +1,115 @@
+{
+  "challenged_scope": [
+    "apps/web/src/app/api/",
+    "apps/web/src/lib/auth.ts",
+    "apps/web/src/lib/guards.ts",
+    "apps/web/src/lib/roles.ts",
+    "apps/web/src/lib/sql.ts",
+    "apps/web/src/lib/rate-limiter.ts",
+    "apps/web/src/lib/audit.ts",
+    "apps/web/src/lib/challenge-gate.ts",
+    "apps/web/src/lib/leaderboard.ts",
+    "apps/web/src/proxy.ts"
+  ],
+  "challenge_summary": "3-pass adversarial review (auth, api-routes, data-handling) of the HackOps Next.js application for Phase I pre-deploy gate. Found 1 critical issue (extractHackathonId logic breaks 7 route handlers in production), 1 high (event codes exposed to all users), 2 medium (missing security headers, progression data leaks across teams), and 2 low (unvalidated status enum, no explicit CSRF). Auth middleware and SQL parameterization are solid. Rate limiting and audit logging are comprehensive.",
+  "risk_level": "critical",
+  "total_critical": 1,
+  "total_high": 1,
+  "total_medium": 2,
+  "total_low": 2,
+  "passes": [
+    {
+      "review_focus": "auth",
+      "pass_summary": "Authentication via Easy Auth headers is correctly implemented server-side. Dev mode fallback is properly gated. requireAuth and requireRole wrappers are applied to all non-health routes. Rate limiting is in place. RBAC role resolution uses DB lookups server-side. However, the extractHackathonId function in guards.ts has a critical logic error: it returns params.id (the resource ID) as the hackathonId for routes where [id] is not a hackathon ID (e.g., submission, role, rubric, challenge, score routes). This causes resolveRole() to query for a non-existent hackathon, returning null, and the request gets 403. Seven route handlers are completely broken in production — only working in dev mode because getDevRole() bypasses DB lookup.",
+      "risk_level": "critical",
+      "critical_count": 1,
+      "high_count": 0,
+      "medium_count": 0,
+      "low_count": 0,
+      "issues": [
+        {
+          "severity": "critical",
+          "category": "auth_bypass",
+          "title": "extractHackathonId returns wrong ID for non-hackathon [id] routes — 7 endpoints broken in production",
+          "file": "apps/web/src/lib/guards.ts",
+          "line_range": "L120-L145",
+          "description": "extractHackathonId checks params.id BEFORE query params and body. For routes like /api/submissions/[id], /api/roles/[id], /api/rubrics/[id], /api/challenges/[id], and /api/scores/[id]/override, params.id is the resource UUID (not a hackathonId). The function returns this UUID immediately, so resolveRole() queries 'SELECT * FROM roles WHERE hackathonId = <submissionId>', finds nothing, and returns null. requireRole then returns 403 for ALL callers including admins. This affects 7 route handlers that work in dev (getDevRole() bypasses DB) but fail in production.",
+          "attack_scenario": "1. Admin tries to PATCH /api/submissions/abc-123 to approve a submission in production. 2. extractHackathonId returns 'abc-123' (the submission UUID). 3. resolveRole('admin-user', 'abc-123') queries roles table for hackathonId='abc-123', finds nothing. 4. Returns 403 'Access denied'. Admin cannot approve any submissions. Same for: DELETE roles, PATCH challenges, GET/PATCH rubrics, PATCH score overrides, GET challenges by ID.",
+          "suggested_fix": "Reorder extractHackathonId to check params.hackathonId first, then query string hackathonId, then body hackathonId, then params.id as LAST fallback. Alternatively, add hackathonId as a required query parameter for routes where [id] is not a hackathon. Affected routes: PATCH /api/submissions/[id], DELETE /api/roles/[id], GET/PATCH /api/challenges/[id], GET /api/rubrics/[id], PATCH /api/rubrics/[id]/activate, PATCH /api/scores/[id]/override."
+        }
+      ]
+    },
+    {
+      "review_focus": "api-routes",
+      "pass_summary": "All route handlers use Zod validation for inputs. SQL queries are fully parameterized via mssql @param bindings — no injection risk. Error responses are clean (no stack traces or DB schema leaks). Rate limiting is correctly applied (5/min join, 100/min general). HTTP methods are properly restricted by Next.js App Router export conventions. IDOR protections are mostly correct (coach cross-hackathon check, cross-hackathon reassign check, primary admin protection). One high issue: GET /api/hackathons returns full records including eventCode to all authenticated users — event codes should be admin-only.",
+      "risk_level": "high",
+      "critical_count": 0,
+      "high_count": 1,
+      "medium_count": 0,
+      "low_count": 1,
+      "issues": [
+        {
+          "severity": "high",
+          "category": "data_exposure",
+          "title": "GET /api/hackathons exposes eventCode to all authenticated users",
+          "file": "apps/web/src/app/api/hackathons/route.ts",
+          "line_range": "L100-L130",
+          "description": "The GET /api/hackathons endpoint uses requireAuth (not requireRole) and returns SELECT * FROM hackathons, which includes the eventCode field. Any authenticated user — including hackers in other hackathons — can enumerate all hackathons with their event codes. Event codes are the secret used to join hackathons; exposing them undermines the invite-only model.",
+          "attack_scenario": "1. Hacker authenticates via GitHub OAuth. 2. Calls GET /api/hackathons to list all hackathons. 3. Each record includes eventCode. 4. Hacker joins any active hackathon using the exposed event code, even without being invited.",
+          "suggested_fix": "Strip eventCode from the response for non-admin callers. Either: (a) add a role check and conditionally omit eventCode, or (b) change the SELECT to exclude eventCode and only include it in admin-scoped endpoints like GET /api/hackathons/[id]."
+        },
+        {
+          "severity": "low",
+          "category": "missing_control",
+          "title": "Hackathon status query parameter not validated with Zod",
+          "file": "apps/web/src/app/api/hackathons/route.ts",
+          "line_range": "L100-L105",
+          "description": "The GET handler casts status query param as HackathonStatus without Zod validation: `request.nextUrl.searchParams.get('status') as HackathonStatus | null`. While this poses no SQL injection risk (parameterized query), it allows arbitrary string values to be used in the query, returning empty results silently.",
+          "attack_scenario": "Caller sends GET /api/hackathons?status=nonexistent — query runs but returns no results. No security impact, but inconsistent with the validation pattern used by other endpoints.",
+          "suggested_fix": "Add a Zod schema for the GET query params that validates status against z.enum(['draft', 'active', 'archived']).optional()."
+        }
+      ]
+    },
+    {
+      "review_focus": "data-handling",
+      "pass_summary": "SQL queries are consistently parameterized — no string interpolation anywhere. No dangerouslySetInnerHTML usage. React's built-in escaping handles XSS for rendered strings. Audit logging is comprehensive (all state-changing operations logged). Leaderboard only exposes aggregated team scores. However, two defense-in-depth gaps exist: no explicit security headers (CSP, X-Frame-Options, X-Content-Type-Options) in the middleware, and the progression endpoint doesn't verify team membership — any hacker in the hackathon can view any team's progression.",
+      "risk_level": "medium",
+      "critical_count": 0,
+      "high_count": 0,
+      "medium_count": 2,
+      "low_count": 1,
+      "issues": [
+        {
+          "severity": "medium",
+          "category": "data_exposure",
+          "title": "Progression endpoint doesn't enforce team membership — any role can view any team's data",
+          "file": "apps/web/src/app/api/progression/route.ts",
+          "line_range": "L9-L15",
+          "description": "GET /api/progression?hackathonId=X&teamId=Y requires any role (admin, coach, hacker) but does not verify that a hacker is a member of the queried team. A hacker on Team Alpha can query Team Bravo's progression (currentChallenge, unlockedChallenges) by passing their teamId.",
+          "attack_scenario": "1. Hacker on Team Alpha calls GET /api/progression?hackathonId=H1&teamId=team-bravo-id. 2. Response returns Team Bravo's currentChallenge and full list of unlockedChallenges. 3. Hacker gains competitive advantage by knowing which challenges competitors have unlocked.",
+          "suggested_fix": "For hacker role, verify that the caller's teamId matches the queried teamId. Admins and coaches should retain unrestricted access. Add: if (auth.role === 'hacker') { verify hacker.teamId === teamId }."
+        },
+        {
+          "severity": "medium",
+          "category": "missing_control",
+          "title": "No explicit security headers (CSP, X-Frame-Options, X-Content-Type-Options)",
+          "file": "apps/web/src/proxy.ts",
+          "line_range": "L20-L40",
+          "description": "The middleware sets CORS headers but does not set Content-Security-Policy, X-Frame-Options, or X-Content-Type-Options. While Azure App Service adds some headers by default, explicitly setting them in the app ensures consistent protection across all environments (local dev, staging, production).",
+          "attack_scenario": "Without X-Frame-Options, the app could be embedded in an iframe on a malicious site for clickjacking. Without CSP, inline script injection (if any XSS is found) has no mitigation layer.",
+          "suggested_fix": "Add security headers in the middleware: response.headers.set('X-Frame-Options', 'DENY'); response.headers.set('X-Content-Type-Options', 'nosniff'); response.headers.set('Content-Security-Policy', \"default-src 'self'; script-src 'self' 'unsafe-inline'\"). Or configure them in next.config.ts headers()."
+        },
+        {
+          "severity": "low",
+          "category": "csrf",
+          "title": "No explicit CSRF token for state-changing operations",
+          "file": "apps/web/src/proxy.ts",
+          "line_range": "L1-L10",
+          "description": "The app relies on CORS + Easy Auth's SameSite cookie for implicit CSRF protection. This is adequate for browsers that support SameSite, but adding an explicit CSRF token would provide defense-in-depth against token-fixation or cookie-tossing attacks.",
+          "attack_scenario": "Theoretical: if SameSite cookie behavior is overridden by a subdomain attacker (cookie-tossing), a CSRF attack could be mounted. Low probability given Easy Auth's session management.",
+          "suggested_fix": "Consider adding a CSRF token via a custom header (X-CSRF-Token) validated server-side for POST/PATCH/DELETE requests. This is a hardening measure, not a critical fix."
+        }
+      ]
+    }
+  ]
+}

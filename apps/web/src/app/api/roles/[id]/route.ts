@@ -1,12 +1,13 @@
 import { NextResponse } from "next/server";
 import type { ApiResponse } from "@hackops/shared";
-import { requireRole } from "@/lib/guards";
+import { requireAuth, checkRole } from "@/lib/guards";
 import { queryOne, execute } from "@/lib/sql";
 import { auditLog } from "@/lib/audit";
 
-export const DELETE = requireRole("admin")(async (_request, context, auth) => {
+export const DELETE = requireAuth(async (_request, context, auth) => {
   const { id } = await context.params;
 
+  // Look up the role record first — params.id is a role record ID, not a hackathonId
   const roleDoc = await queryOne<{
     id: string;
     hackathonId: string;
@@ -24,6 +25,10 @@ export const DELETE = requireRole("admin")(async (_request, context, auth) => {
       { status: 404 },
     );
   }
+
+  // Role check using the role record's hackathonId
+  const roleCheck = await checkRole(auth.principal, roleDoc.hackathonId, "admin");
+  if (roleCheck instanceof NextResponse) return roleCheck;
 
   // Primary admin cannot be demoted
   if (roleDoc.isPrimaryAdmin) {

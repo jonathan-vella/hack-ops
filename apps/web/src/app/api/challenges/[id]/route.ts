@@ -1,18 +1,15 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import type { ChallengesAPI, ApiResponse } from "@hackops/shared";
-import { requireRole } from "@/lib/guards";
+import { requireAuth, checkRole } from "@/lib/guards";
 import { queryOne, execute } from "@/lib/sql";
 import { auditLog } from "@/lib/audit";
 import { updateChallengeSchema } from "@/lib/validation/challenge";
 
-export const GET = requireRole(
-  "admin",
-  "coach",
-  "hacker",
-)(async (_request, context, _auth) => {
+export const GET = requireAuth(async (_request, context, auth) => {
   const { id } = await context.params;
 
+  // Look up resource first — params.id is a challenge ID, not a hackathonId
   const r = await queryOne<Record<string, unknown>>(
     "SELECT * FROM challenges WHERE id = @id",
     { id },
@@ -24,6 +21,16 @@ export const GET = requireRole(
       { status: 404 },
     );
   }
+
+  // Role check using the challenge's hackathonId
+  const roleCheck = await checkRole(
+    auth.principal,
+    r.hackathonId as string,
+    "admin",
+    "coach",
+    "hacker",
+  );
+  if (roleCheck instanceof NextResponse) return roleCheck;
 
   const record: ChallengesAPI.ChallengeRecord = {
     id: r.id as string,
@@ -43,7 +50,7 @@ export const GET = requireRole(
   return NextResponse.json(response);
 });
 
-export const PATCH = requireRole("admin")(async (
+export const PATCH = requireAuth(async (
   request: NextRequest,
   context,
   auth,
@@ -77,6 +84,7 @@ export const PATCH = requireRole("admin")(async (
 
   const body = result.data;
 
+  // Look up resource first — params.id is a challenge ID, not a hackathonId
   const existing = await queryOne<Record<string, unknown>>(
     "SELECT * FROM challenges WHERE id = @id",
     { id },
@@ -90,6 +98,10 @@ export const PATCH = requireRole("admin")(async (
   }
 
   const hackathonId = existing.hackathonId as string;
+
+  // Role check using the challenge's hackathonId
+  const roleCheck = await checkRole(auth.principal, hackathonId, "admin");
+  if (roleCheck instanceof NextResponse) return roleCheck;
 
   const setClauses: string[] = [];
   const params: Record<string, unknown> = { id };

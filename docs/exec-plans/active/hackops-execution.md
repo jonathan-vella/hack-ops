@@ -45,9 +45,9 @@
 <!-- Update this at the START of each session -->
 
 **Phase**: I (Region Migration & Redeploy)
-**Step**: I3.2 — Run `app-security-challenger-subagent` (Phase I, first pass)
+**Step**: I5 — Adversarial review round 2 (final gate)
 **Branch**: `main`
-**Goal**: Complete adversarial review round 1 (I3.2 + I3.3), then I4 Context7 check, then deploy.
+**Goal**: Run I5 final gate reviews, then I6 deploy to swedencentral.
 **Detailed plan**: See Phase I checklist below
 **Blockers**: None — `az login` confirmed active
 
@@ -353,14 +353,14 @@ so agents 12–15 have the skills/instructions they were designed to use.
 #### I3: Adversarial review (pre-deploy, round 1)
 
 - [x] I3.1: Run `infra-challenger-subagent` (security, waf, governance passes) — 2 round reviews done 2026-03-01; 2 must_fix + 23 should_fix identified; must_fix items addressed in current Bicep code (UAMI-first ordering, imageDigest deploy)
-- [ ] I3.2: Run `app-security-challenger-subagent` (auth, api-routes, data-handling passes) — NOT YET RUN for Phase I
-- [ ] I3.3: Fix any critical/high findings
+- [x] I3.2: Run `app-security-challenger-subagent` (auth, api-routes, data-handling passes) — 1 critical, 1 high, 2 medium, 2 low; findings in `agent-output/hackops/challenges/app-security-challenge.json`
+- [x] I3.3: Fix critical/high findings — fixed `extractHackathonId` ordering (CRITICAL: 7 routes broken in prod), converted 7 handlers to `requireAuth`+`checkRole`, stripped eventCode from listing endpoint (HIGH), added security headers (MEDIUM)
 
 #### I4: Context7 code check
 
-- [ ] I4.1: Verify Bicep patterns against latest AVM docs (Context7)
-- [ ] I4.2: Verify Next.js / SDK patterns against latest docs (Context7)
-- [ ] I4.3: Fix any outdated patterns
+- [x] I4.1: Verify Bicep patterns against latest AVM docs — 12 AVM modules pinned, `bicep build` clean, no updates needed (Context7 MCP unavailable; manual verification)
+- [x] I4.2: Verify Next.js / SDK patterns against latest docs — Next.js 16.1.6, mssql 11, Zod 4.3.6 all current; patterns are correct
+- [x] I4.3: Fix any outdated patterns — none found
 
 #### I5: Adversarial review (pre-deploy, round 2 — final gate)
 
@@ -779,6 +779,20 @@ so agents 12–15 have the skills/instructions they were designed to use.
 |     |            |            | must_fix addressed in    |                     |           |
 |     |            |            | current code); az login  |                     |           |
 |     |            |            | confirmed active         |                     |           |
+| 40  | 2026-03-02 | I / I3-I4  | I3.2: 3-pass app-security| I5: Adversarial     | None      |
+|     |            |            | review (1 crit, 1 high,  | review round 2      |           |
+|     |            |            | 2 med, 2 low); I3.3:     | (final gate), then  |           |
+|     |            |            | fixed CRITICAL            | I6 deploy to        |           |
+|     |            |            | extractHackathonId bug   | swedencentral       |           |
+|     |            |            | (7 routes broken in      |                     |           |
+|     |            |            | prod), converted to      |                     |           |
+|     |            |            | requireAuth+checkRole,   |                     |           |
+|     |            |            | stripped eventCode from   |                     |           |
+|     |            |            | listing, added security  |                     |           |
+|     |            |            | headers; I4: all current |                     |           |
+|     |            |            | (next 16.1.6, mssql 11,  |                     |           |
+|     |            |            | zod 4.3.6, AVM pinned);  |                     |           |
+|     |            |            | tsc + bicep build clean  |                     |           |
 
 ---
 
@@ -853,3 +867,5 @@ have enough context for the current step.
 | 2026-03-01 | VNet CIDR: 10.0.0.0/23 (512 addresses)                        | /16 was over-provisioned for a single-workload VNet                                   |
 | 2026-03-01 | Data seeding via ACI (VNet-integrated, ephemeral)             | SQL DB behind PE; ACI seeds from inside VNet                                          |
 | 2026-03-01 | Replace Cosmos DB with Azure SQL Database (ADR-0004)          | Relational workload; joins, ref integrity, lower cost                                 |
+| 2026-03-02 | requireAuth+checkRole pattern for non-hackathon `[id]` routes | extractHackathonId returned params.id for 7 routes; guards must resolve after resource lookup |
+| 2026-03-02 | Strip eventCode from GET /api/hackathons listing              | eventCode is invite secret; exposure breaks invite-only model                         |

@@ -6,16 +6,13 @@ import type {
   ApiResponse,
   CategoryScore,
 } from "@hackops/shared";
-import { requireRole } from "@/lib/guards";
+import { requireAuth, checkRole } from "@/lib/guards";
 import { queryOne, execute } from "@/lib/sql";
 import { auditLog } from "@/lib/audit";
 import { advanceProgression } from "@/lib/challenge-gate";
 import { reviewSubmissionSchema } from "@/lib/validation/submission";
 
-export const PATCH = requireRole(
-  "admin",
-  "coach",
-)(async (request: NextRequest, context, auth) => {
+export const PATCH = requireAuth(async (request: NextRequest, context, auth) => {
   const { id } = await context.params;
 
   let raw: unknown;
@@ -45,7 +42,8 @@ export const PATCH = requireRole(
 
   const body = result.data;
 
-  // Find submission
+  // Find submission — must look up resource before role check
+  // because params.id is a submission ID, not a hackathonId
   const submission = await queryOne<Record<string, unknown>>(
     "SELECT * FROM submissions WHERE id = @id",
     { id },
@@ -58,6 +56,12 @@ export const PATCH = requireRole(
     );
   }
 
+  // Role check using the submission's hackathonId (not params.id)
+  const hackathonId = submission.hackathonId as string;
+  const roleCheck = await checkRole(auth.principal, hackathonId, "admin", "coach");
+  if (roleCheck instanceof NextResponse) return roleCheck;
+  const { role } = roleCheck;
+
   if (submission.state !== "pending") {
     return NextResponse.json(
       {
@@ -69,15 +73,10 @@ export const PATCH = requireRole(
   }
 
   // Coaches can only review submissions for their assigned hackathon
-  if (auth.role === "coach" && submission.hackathonId !== auth.hackathonId) {
-    return NextResponse.json(
-      {
-        error:
-          "Coaches can only review submissions for their assigned hackathon",
-        ok: false,
-      },
-      { status: 403 },
-    );
+  if (role === "coach") {
+    const coachHackathonId = hackathonId;
+    // Coach's role was resolved against this hackathonId, so they have access
+    // No additional cross-hackathon check needed since checkRole already scoped it
   }
 
   const now = new Date().toISOString();

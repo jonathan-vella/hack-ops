@@ -129,9 +129,13 @@ export const GET = requireAuth(async (request, _context, _auth) => {
 
   const resources = await query<HackathonsAPI.HackathonRecord>(sqlText, params);
 
-  const response: ApiResponse<PageResponse<HackathonsAPI.HackathonRecord>> = {
+  // Strip eventCode from listing responses — event codes are admin-only
+  // and should not be exposed to all authenticated users
+  const sanitized = resources.map(({ eventCode: _ec, ...rest }) => rest);
+
+  const response: ApiResponse<PageResponse<Omit<HackathonsAPI.HackathonRecord, "eventCode">>> = {
     data: {
-      items: resources,
+      items: sanitized,
       continuationToken:
         resources.length === pageSize ? String(offset + pageSize) : null,
     },
