@@ -81,8 +81,8 @@ describe("POST /api/rubrics", () => {
     const req = createRequest("POST", "http://localhost/api/rubrics", {
       hackathonId: "h1",
       categories: [
-        { id: "cat-1", name: "Innovation", maxScore: 50 },
-        { id: "cat-2", name: "Execution", maxScore: 50 },
+        { id: "cat-1", name: "Innovation", description: "Novel approach", maxScore: 50 },
+        { id: "cat-2", name: "Execution", description: "Quality of output", maxScore: 50 },
       ],
     });
     const res = await POST(req, { params: Promise.resolve({}) });
@@ -112,7 +112,7 @@ describe("POST /api/rubrics", () => {
     const { POST } = await import("../rubrics/route");
     const req = createRequest("POST", "http://localhost/api/rubrics", {
       hackathonId: "h1",
-      categories: [{ id: "cat-1", name: "Design", maxScore: 100 }],
+      categories: [{ id: "cat-1", name: "Design", description: "Visual quality", maxScore: 100 }],
     });
     const res = await POST(req, { params: Promise.resolve({}) });
     const body = await res.json();

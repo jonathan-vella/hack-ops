@@ -78,7 +78,7 @@ describe("POST /api/join", () => {
 
     const { POST } = await import("../join/route");
     const req = createRequest("POST", "http://localhost/api/join", {
-      eventCode: "HACK25",
+      eventCode: "2025",
     });
     const res = await POST(req, { params: Promise.resolve({}) });
     const body = await res.json();
@@ -95,7 +95,7 @@ describe("POST /api/join", () => {
 
     const { POST } = await import("../join/route");
     const req = createRequest("POST", "http://localhost/api/join", {
-      eventCode: "BADCODE",
+      eventCode: "9999",
     });
     const res = await POST(req, { params: Promise.resolve({}) });
 
@@ -113,7 +113,7 @@ describe("POST /api/join", () => {
 
     const { POST } = await import("../join/route");
     const req = createRequest("POST", "http://localhost/api/join", {
-      eventCode: "HACK25",
+      eventCode: "2025",
     });
     const res = await POST(req, { params: Promise.resolve({}) });
 
@@ -131,7 +131,7 @@ describe("POST /api/join", () => {
 
     const { POST } = await import("../join/route");
     const req = createRequest("POST", "http://localhost/api/join", {
-      eventCode: "HACK25",
+      eventCode: "2025",
     });
     const res = await POST(req, { params: Promise.resolve({}) });
 

@@ -91,6 +91,7 @@ var sharedAppSettings = [
   { name: 'SQL_SERVER', value: sqlServerFqdn }
   { name: 'SQL_DATABASE', value: sqlDatabaseName }
   { name: 'KEY_VAULT_URI', value: keyVaultUri }
+  { name: 'AZURE_CLIENT_ID', value: uamiClientId }
   { name: 'APPLICATIONINSIGHTS_CONNECTION_STRING', value: aiConnStrRef }
   { name: 'ApplicationInsightsAgent_EXTENSION_VERSION', value: '~3' }
   { name: 'NODE_ENV', value: 'production' }
@@ -142,7 +143,7 @@ module appService 'br/public:avm/res/web/site:0.12.0' = {
     name: appName
     location: location
     tags: tags
-    kind: 'app,linux'
+    kind: 'app,linux,container'
     serverFarmResourceId: appServicePlan.outputs.resourceId
     managedIdentities: {
       userAssignedResourceIds: [uamiId]

@@ -5,10 +5,10 @@ Summary: A Model Context Protocol server for querying Azure retail pricing infor
 Author: Jonathan Vella, Nadav Ben Haim, Michael Liav
 Maintainer: Jonathan Vella
 License: MIT
-Project-URL: Homepage, https://github.com/jonathan-vella/azure-agentic-infraops
-Project-URL: Repository, https://github.com/jonathan-vella/azure-agentic-infraops
-Project-URL: Issues, https://github.com/jonathan-vella/azure-agentic-infraops/issues
-Project-URL: Documentation, https://github.com/jonathan-vella/azure-agentic-infraops/tree/main/mcp/azure-pricing-mcp#readme
+Project-URL: Homepage, https://github.com/jonathan-vella/hack-ops
+Project-URL: Repository, https://github.com/jonathan-vella/hack-ops
+Project-URL: Issues, https://github.com/jonathan-vella/hack-ops/issues
+Project-URL: Documentation, https://github.com/jonathan-vella/hack-ops/tree/main/mcp/azure-pricing-mcp#readme
 Keywords: azure,pricing,mcp,model-context-protocol,cloud-costs,cost-estimation
 Classifier: Development Status :: 4 - Beta
 Classifier: Intended Audience :: Developers

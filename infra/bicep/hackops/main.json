@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.41.2.15936",
-      "templateHash": "7482000133320791405"
+      "templateHash": "14056148676977614706"
     }
   },
   "parameters": {
@@ -21165,7 +21165,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.41.2.15936",
-              "templateHash": "15675195042789634006"
+              "templateHash": "18300447762804446835"
             }
           },
           "parameters": {
@@ -21324,6 +21324,10 @@
               {
                 "name": "KEY_VAULT_URI",
                 "value": "[parameters('keyVaultUri')]"
+              },
+              {
+                "name": "AZURE_CLIENT_ID",
+                "value": "[parameters('uamiClientId')]"
               },
               {
                 "name": "APPLICATIONINSIGHTS_CONNECTION_STRING",
@@ -22040,7 +22044,7 @@
                     "value": "[parameters('tags')]"
                   },
                   "kind": {
-                    "value": "app,linux"
+                    "value": "app,linux,container"
                   },
                   "serverFarmResourceId": {
                     "value": "[reference(resourceId('Microsoft.Resources/deployments', format('asp-{0}', uniqueString(deployment().name))), '2025-04-01').outputs.resourceId.value]"

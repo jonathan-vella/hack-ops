@@ -45,11 +45,11 @@
 <!-- Update this at the START of each session -->
 
 **Phase**: I (Region Migration & Redeploy)
-**Step**: I5 — Adversarial review round 2 (final gate)
+**Step**: I7 — Seed data via ACI
 **Branch**: `main`
-**Goal**: Run I5 final gate reviews, then I6 deploy to swedencentral.
+**Goal**: Seed SQL database via ACI, then update docs (I8).
 **Detailed plan**: See Phase I checklist below
-**Blockers**: None — `az login` confirmed active
+**Blockers**: None
 
 ---
 
@@ -364,17 +364,17 @@ so agents 12–15 have the skills/instructions they were designed to use.
 
 #### I5: Adversarial review (pre-deploy, round 2 — final gate)
 
-- [ ] I5.1: Run `infra-challenger-subagent` (should pass clean)
-- [ ] I5.2: Run `app-security-challenger-subagent` (should pass clean)
-- [ ] I5.3: Confirm 0 critical / 0 high findings
+- [x] I5.1: Run `infra-challenger-subagent` (should pass clean) — 0 critical, 0 high (3 passes: security, WAF, governance)
+- [x] I5.2: Run `app-security-challenger-subagent` (should pass clean) — 0 critical, 0 high (3 passes: auth, api-routes, data-handling); fixed 13 test failures from I3.3
+- [x] I5.3: Confirm 0 critical / 0 high findings — PASSED; bicep build 0 errors, tsc clean, 159/159 tests pass
 
 #### I6: Deploy to swedencentral
 
-- [ ] I6.1: Create resource group `rg-hackops-se-dev` (swedencentral)
-- [ ] I6.2: Run Bicep deploy with `imageTag=latest` (bootstrap)
-- [ ] I6.3: Build + push Docker image to ACR (`az acr build`)
-- [ ] I6.4: Redeploy Bicep with real image tag
-- [ ] I6.5: Verify health endpoint returns 200
+- [x] I6.1: Create resource group `rg-hackops-se-dev` (swedencentral) — 9 governance tags applied
+- [x] I6.2: Run Bicep deploy with `imageTag=latest` (bootstrap) — first attempt failed (slot kind mismatch), fixed kind to `app,linux,container`, retry succeeded
+- [x] I6.3: Build + push Docker image to ACR (`az acr build`) — first attempt failed (packages/shared/node_modules), fixed Dockerfile, image pushed as `hackops:first-deploy` (sha256:f73424911cdb...)
+- [x] I6.4: Redeploy Bicep with real image digest — added `AZURE_CLIENT_ID` app setting for UAMI SQL auth
+- [x] I6.5: Verify health endpoint returns 200 — both prod and staging healthy, SQL 5ms/65ms
 
 #### I7: Seed data via ACI
 
@@ -793,6 +793,19 @@ so agents 12–15 have the skills/instructions they were designed to use.
 |     |            |            | (next 16.1.6, mssql 11,  |                     |           |
 |     |            |            | zod 4.3.6, AVM pinned);  |                     |           |
 |     |            |            | tsc + bicep build clean  |                     |           |
+| 41  | 2026-03-02 | I / I5-I6  | I5 final gate: 0         | I7: Seed data via   | None      |
+|     |            |            | crit, 0 high across      | ACI (VNet), then    |           |
+|     |            |            | infra + app security     | I8: Update docs     |           |
+|     |            |            | reviews; fixed 13 test   |                     |           |
+|     |            |            | failures (join event     |                     |           |
+|     |            |            | codes + rubric desc);    |                     |           |
+|     |            |            | I6: deployed to          |                     |           |
+|     |            |            | swedencentral (rg-       |                     |           |
+|     |            |            | hackops-se-dev); fixed   |                     |           |
+|     |            |            | slot kind, Dockerfile,   |                     |           |
+|     |            |            | AZURE_CLIENT_ID for      |                     |           |
+|     |            |            | UAMI; health OK (prod    |                     |           |
+|     |            |            | 5ms, staging 65ms SQL)   |                     |           |
 
 ---
 
@@ -869,3 +882,6 @@ have enough context for the current step.
 | 2026-03-01 | Replace Cosmos DB with Azure SQL Database (ADR-0004)          | Relational workload; joins, ref integrity, lower cost                                 |
 | 2026-03-02 | requireAuth+checkRole pattern for non-hackathon `[id]` routes | extractHackathonId returned params.id for 7 routes; guards must resolve after resource lookup |
 | 2026-03-02 | Strip eventCode from GET /api/hackathons listing              | eventCode is invite secret; exposure breaks invite-only model                         |
+| 2026-03-02 | App Service kind: `app,linux,container` (not `app,linux`)     | DOCKER linuxFxVersion sets kind to `container`; slot kind must match production       |
+| 2026-03-02 | `AZURE_CLIENT_ID` app setting for UAMI SQL auth               | DefaultAzureCredential needs client ID to select user-assigned managed identity       |
+| 2026-03-02 | Dockerfile: skip `packages/shared/node_modules` COPY          | npm workspaces hoists shared deps to root; dir doesn't exist at build time            |

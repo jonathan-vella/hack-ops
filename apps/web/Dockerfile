@@ -19,8 +19,10 @@ FROM node:24-alpine AS build
 WORKDIR /app
 
 COPY --from=deps /app/node_modules ./node_modules
-COPY --from=deps /app/apps/web/node_modules ./apps/web/node_modules
-COPY --from=deps /app/packages/shared/node_modules ./packages/shared/node_modules
+
+# Copy workspace-local node_modules if they exist (npm workspaces hoists most
+# dependencies to root, but workspace symlinks may live here)
+COPY --from=deps /app/apps/web/package.json ./apps/web/package.json
 
 # Copy full source
 COPY . .
