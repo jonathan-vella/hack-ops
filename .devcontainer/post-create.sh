@@ -3,7 +3,7 @@ set -e
 
 # -----------------------------------------------------------------------
 
-TOTAL_STEPS=9
+TOTAL_STEPS=10
 CURRENT_STEP=0
 SETUP_START=$(date +%s)
 STEP_START=0
@@ -79,6 +79,19 @@ chmod 755 "${HOME}/.config/gh" 2>/dev/null || true
 git config --global --add safe.directory "${PWD}"
 git config --global core.autocrlf input
 step_done "Git configured, cache dirs created"
+
+# -----------------------------------------------------------------------
+
+step_start "🔑" "Authenticating GitHub CLI (PAT)..."
+if [ -n "${GITHUB_TOKEN}" ]; then
+    if echo "${GITHUB_TOKEN}" | gh auth login --with-token 2>&1; then
+        step_done "gh authenticated via GITHUB_TOKEN"
+    else
+        step_warn "gh auth failed — run 'gh auth login' manually"
+    fi
+else
+    step_warn "GITHUB_TOKEN not set — skipping gh auth (run 'gh auth login' manually)"
+fi
 
 # -----------------------------------------------------------------------
 
@@ -261,7 +274,8 @@ fi
 echo "====================================================="
 echo ""
 echo " 📝 Next steps:"
-echo "    1. Authenticate: az login"
-echo "    2. Set subscription: az account set --subscription <id>"
-echo "    3. Open Chat (Ctrl+Shift+I) → Select 01-Conductor"
+echo "    1. Authenticate Azure: az login"
+echo "    2. Set subscription:   az account set --subscription <id>"
+echo "    3. Check gh auth:      gh auth status  (auto-ran via GITHUB_TOKEN)"
+echo "    4. Open Chat (Ctrl+Shift+I) → Select 01-Conductor"
 echo ""

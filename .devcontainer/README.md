@@ -102,6 +102,26 @@ cd ../../infra/bicep/ && tree -L 2
 Your host machine's `~/.azure` credentials are automatically mounted into the container,
 so you only need to `az login` once on your host machine.
 
+### GitHub CLI (PAT) Authentication
+
+The container reads `GITHUB_TOKEN` from your host environment and runs `gh auth login --with-token`
+automatically during `post-create.sh`. No interactive login needed.
+
+**Set the token on your host before opening the container:**
+
+```bash
+# Linux / macOS / WSL bash
+export GITHUB_TOKEN=ghp_your_pat_here
+```
+
+```powershell
+# PowerShell (Windows host)
+$env:GITHUB_TOKEN = 'ghp_your_pat_here'
+```
+
+> The PAT needs at least the `repo` and `read:org` scopes for normal `gh` operations.
+> To verify inside the container: `gh auth status`
+
 ### PowerShell Modules (Auto-installed)
 
 - Az.Accounts, Az.Resources, Az.Storage
@@ -148,6 +168,7 @@ sudo npm update -g markdownlint-cli           # markdownlint
 | Container won't start | Check Docker running, increase memory to 4GB+            |
 | Tool not found        | Run `bash .devcontainer/post-create.sh`                  |
 | Azure auth fails      | Use `az login --use-device-code`                         |
+| gh auth fails         | Set `GITHUB_TOKEN` on host, then rebuild container       |
 | Rebuild needed        | `F1` → `Dev Containers: Rebuild Container Without Cache` |
 
 📖 **Full troubleshooting guide:** [docs/troubleshooting.md](../docs/troubleshooting.md)

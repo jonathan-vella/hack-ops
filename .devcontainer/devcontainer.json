@@ -42,7 +42,12 @@
     "UV_CACHE_DIR": "/home/vscode/.cache/uv"
   },
   "remoteEnv": {
-    "AZURE_DEFAULTS_LOCATION": "swedencentral"
+    "AZURE_DEFAULTS_LOCATION": "swedencentral",
+    // Forward PAT from host for `gh auth login --with-token` in post-create.sh
+    // Set GITHUB_TOKEN on your host before opening the devcontainer:
+    //   export GITHUB_TOKEN=<your-pat>  (Linux/macOS)
+    //   $env:GITHUB_TOKEN = '<your-pat>'  (PowerShell / WSL)
+    "GITHUB_TOKEN": "${localEnv:GITHUB_TOKEN}"
   },
   "customizations": {
     "vscode": {
@@ -82,7 +87,9 @@
         "chat.useAgentSkills": true,
         "editor.formatOnSave": true,
         "editor.defaultFormatter": "esbenp.prettier-vscode",
-        "editor.rulers": [120],
+        "editor.rulers": [
+          120
+        ],
         "editor.wordWrap": "wordWrapColumn",
         "editor.wordWrapColumn": 120,
         "terminal.integrated.defaultProfile.linux": "bash",
@@ -90,7 +97,9 @@
         "editor.tabSize": 2,
         "[markdown]": {
           "editor.defaultFormatter": "esbenp.prettier-vscode",
-          "editor.rulers": [120],
+          "editor.rulers": [
+            120
+          ],
           "editor.wordWrap": "wordWrapColumn",
           "editor.wordWrapColumn": 120
         },
@@ -113,9 +122,10 @@
   },
   // Mounts for credential/cache persistence across rebuilds
   // - Azure CLI: Named volume (bind mount not viable when ~/.azure is a WSL2 symlink to Windows)
-  // - GitHub CLI: Docker volume (Windows uses keyring, can't be mounted; Linux/macOS use files)
+  // - GitHub CLI: Docker volume persists tokens written by post-create.sh (gh auth login --with-token)
   // - UV cache: Docker volume for Python package cache
   // NOTE: After `Rebuild Container`, run `az login` once — credentials persist across stop/start.
+  // NOTE: GITHUB_TOKEN (PAT) is injected via remoteEnv; gh auth runs automatically in post-create.sh.
   "mounts": [
     {
       "source": "devcontainer-azure-config-${devcontainerId}",
