@@ -45,11 +45,11 @@
 <!-- Update this at the START of each session -->
 
 **Phase**: I (Region Migration & Redeploy)
-**Step**: I1 — Delete existing centralus deployment
+**Step**: I3.2 — Run `app-security-challenger-subagent` (Phase I, first pass)
 **Branch**: `main`
-**Goal**: Migrate to swedencentral with updated SKUs (P1v4, S2, /23 network), adversarial reviews, deploy, update docs.
+**Goal**: Complete adversarial review round 1 (I3.2 + I3.3), then I4 Context7 check, then deploy.
 **Detailed plan**: See Phase I checklist below
-**Blockers**: None
+**Blockers**: None — `az login` confirmed active
 
 ---
 
@@ -338,22 +338,22 @@ so agents 12–15 have the skills/instructions they were designed to use.
 
 #### I1: Delete existing deployment
 
-- [ ] I1.1: Delete all resources in `rg-hackops-us-dev` (`az group delete` or selective)
-- [ ] I1.2: Do NOT wait — proceed immediately to I2
+- [x] I1.1: Delete all resources in `rg-hackops-us-dev` (deleted by user)
+- [x] I1.2: Do NOT wait — proceed immediately to I2
 
 #### I2: Update Bicep code (new defaults)
 
-- [ ] I2.1: Update `main.bicep` — default region `swedencentral`, remove `centralus` from allowed
-- [ ] I2.2: Update `app-service.bicep` — SKU to `P1v4` (all envs)
-- [ ] I2.3: Update `sql-database.bicep` — SKU to `S2` (DTU tier)
-- [ ] I2.4: Update `networking.bicep` — VNet CIDR `10.0.0.0/23`, refit subnet ranges
-- [ ] I2.5: Update `main.bicepparam` — new region + resource group name
-- [ ] I2.6: Run `bicep build` — verify clean
+- [x] I2.1: Update `main.bicep` — default region `swedencentral`, remove `centralus` from allowed
+- [x] I2.2: Update `app-service.bicep` — SKU to `P1v4` (all envs)
+- [x] I2.3: Update `sql-database.bicep` — SKU to `S2` (DTU tier)
+- [x] I2.4: Update `networking.bicep` — VNet CIDR `10.0.0.0/23`, refit subnet ranges
+- [x] I2.5: Update `main.bicepparam` — new region + resource group name
+- [x] I2.6: Run `bicep build` — verify clean (0 errors, 1 cosmetic BCP334 warning)
 
 #### I3: Adversarial review (pre-deploy, round 1)
 
-- [ ] I3.1: Run `infra-challenger-subagent` (security, waf, governance passes)
-- [ ] I3.2: Run `app-security-challenger-subagent` (auth, api-routes, data-handling passes)
+- [x] I3.1: Run `infra-challenger-subagent` (security, waf, governance passes) — 2 round reviews done 2026-03-01; 2 must_fix + 23 should_fix identified; must_fix items addressed in current Bicep code (UAMI-first ordering, imageDigest deploy)
+- [ ] I3.2: Run `app-security-challenger-subagent` (auth, api-routes, data-handling passes) — NOT YET RUN for Phase I
 - [ ] I3.3: Fix any critical/high findings
 
 #### I4: Context7 code check
@@ -767,6 +767,18 @@ so agents 12–15 have the skills/instructions they were designed to use.
 |     |            |            | 2x adversarial gates     |                     |           |
 |     |            |            | + Context7 check;        |                     |           |
 |     |            |            | ACI for VNet seeding     |                     |           |
+| 39  | 2026-03-02 | I / I1-I3  | I1: centralus RG deleted | I3.2: Run           | None      |
+|     |            |            | by user; I2: all Bicep   | app-security-       |           |
+|     |            |            | updates verified clean   | challenger-subagent |           |
+|     |            |            | (swedencentral, P1v4,    | (Phase I, first     |           |
+|     |            |            | SQL S2, /23 VNet,        | pass), then I3.3    |           |
+|     |            |            | param file); bicep       | fix findings, I4    |           |
+|     |            |            | build 0 errors; I3.1     | Context7 check,     |           |
+|     |            |            | infra-challenger done    | I5 final gate,      |           |
+|     |            |            | (2026-03-01, 2 rounds,   | then I6 deploy      |           |
+|     |            |            | must_fix addressed in    |                     |           |
+|     |            |            | current code); az login  |                     |           |
+|     |            |            | confirmed active         |                     |           |
 
 ---
 
