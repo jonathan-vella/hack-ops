@@ -59,7 +59,6 @@ export const PATCH = requireAuth(async (request: NextRequest, context, auth) => 
   const hackathonId = submission.hackathonId as string;
   const roleCheck = await checkRole(auth.principal, hackathonId, "admin", "coach");
   if (roleCheck instanceof NextResponse) return roleCheck;
-  const { role: _role } = roleCheck;
 
   if (submission.state !== "pending") {
     return NextResponse.json(
