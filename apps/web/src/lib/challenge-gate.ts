@@ -1,4 +1,4 @@
-import { query, queryOne, execute } from "./sql";
+import { queryOne, execute } from "./sql";
 
 interface GateResult {
   allowed: boolean;

@@ -2,7 +2,6 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import type {
   SubmissionsAPI,
-  ScoresAPI,
   ApiResponse,
   CategoryScore,
 } from "@hackops/shared";
@@ -60,7 +59,7 @@ export const PATCH = requireAuth(async (request: NextRequest, context, auth) => 
   const hackathonId = submission.hackathonId as string;
   const roleCheck = await checkRole(auth.principal, hackathonId, "admin", "coach");
   if (roleCheck instanceof NextResponse) return roleCheck;
-  const { role } = roleCheck;
+  const { role: _role } = roleCheck;
 
   if (submission.state !== "pending") {
     return NextResponse.json(
@@ -72,12 +71,9 @@ export const PATCH = requireAuth(async (request: NextRequest, context, auth) => 
     );
   }
 
-  // Coaches can only review submissions for their assigned hackathon
-  if (role === "coach") {
-    const coachHackathonId = hackathonId;
-    // Coach's role was resolved against this hackathonId, so they have access
-    // No additional cross-hackathon check needed since checkRole already scoped it
-  }
+  // Coaches can only review submissions for their assigned hackathon.
+  // Coach's role was resolved against this hackathonId via checkRole above,
+  // so no additional cross-hackathon check is needed.
 
   const now = new Date().toISOString();
 
