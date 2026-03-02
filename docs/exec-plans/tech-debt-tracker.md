@@ -6,16 +6,17 @@ Updated by the doc-gardening workflow and referenced by `QUALITY_SCORE.md`.
 
 ## Active Debt Items
 
-| ID  | Category       | Description                                                                                                                            | Severity | Owner                              |
-| --- | -------------- | -------------------------------------------------------------------------------------------------------------------------------------- | -------- | ---------------------------------- |
-| 24  | Infrastructure | Post-implementation adversarial reviews pending (plan Step 11): security (Dockerfile, ACR, CI) + logic (pipeline, runtime, failures)   | Medium   | Run adversarial subagents per plan |
-| 23  | Documentation  | Agent-output planning artifacts (01-04) reference B1 SKU; current deployment standard is P1v3 (region now re-aligned to swedencentral) | Low      | Next doc-gardening or re-plan pass |
+None. All tracked debt items resolved as of 2026-03-02.
 
 ## Resolved Items
 
-| ID  | Category      | Description                                                                           | Resolved   | Resolution                                                                                 |
-| --- | ------------- | ------------------------------------------------------------------------------------- | ---------- | ------------------------------------------------------------------------------------------ |
-| 25  | Documentation | docs/README.md skill count header said 20; filesystem has 19 (cosmos-db-sdk archived) | 2026-03-01 | Fixed header `## Skills (20)` → `## Skills (19)`; QUALITY_SCORE updated                    |
+| ID  | Category       | Description                                                   | Resolved   | Resolution                                                        |
+| --- | -------------- | ------------------------------------------------------------- | ---------- | ----------------------------------------------------------------- |
+| 27  | CI/Lint        | hackops-execution.md 42 MD013 line-length errors              | 2026-03-02 | Wrapped long checklist lines; narrowed decisions table columns    |
+| 26  | Application    | Test count 178→159, coverage 93%→83% after SQL migration      | 2026-03-02 | Deleted orphaned cosmos.ts; wrote 11 tests; 91% line coverage    |
+| 24  | Infrastructure | Post-impl adversarial reviews pending (Step 11)               | 2026-03-02 | Completed in exec plan I3+I5 (2 rounds, 0 critical/high remain)  |
+| 23  | Documentation  | Planning artifacts (01-04) reference B1 SKU                   | 2026-03-02 | ADR-0002 superseded; preflight+governance updated to P1v4        |
+| 25  | Documentation  | docs/README.md skill count said 20; filesystem has 19         | 2026-03-01 | Fixed header; QUALITY_SCORE updated                              |
 | 22  | Instructions  | Orphaned refs to deleted nextjs/react-components instructions                         | 2026-02-28 | Reworded prompt file refs; validator now 0 errors                                          |
 | 21  | Documentation | docs/README.md instruction count stale (21 vs 28 on disk)                             | 2026-02-28 | Fixed count 28→26 after context7 skill integration merges                                  |
 | 20  | Tracker       | Phantom completions for C3-C6 items — checkboxes checked but files absent             | 2026-02-28 | Artifacts recreated; checkboxes now reflect reality                                        |

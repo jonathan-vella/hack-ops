@@ -1,7 +1,7 @@
 # ADR-0002: App Service over Container Apps for Compute
 
 ![Step](https://img.shields.io/badge/Step-3-blue?style=for-the-badge)
-![Status](https://img.shields.io/badge/Status-Proposed-orange?style=for-the-badge)
+![Status](https://img.shields.io/badge/Status-Superseded-red?style=for-the-badge)
 ![Type](https://img.shields.io/badge/Type-ADR-purple?style=for-the-badge)
 
 <details open>
@@ -17,9 +17,13 @@
 
 </details>
 
-> Status: Proposed
+> Status: Superseded (2026-03-01)
 > Date: 2026-02-26
 > Deciders: HackOps architecture team
+>
+> **Superseded by runtime decisions**: B1/S1 zip-deploy replaced
+> with P1v4 container deploy (ACR + Dockerfile). See execution
+> plan Phase G and decisions log.
 
 ## 🔍 Context
 
@@ -37,18 +41,22 @@ a standard Node.js app deployable via zip deploy.
 
 ## ✅ Decision
 
-Use **Azure App Service** (Linux, Node 22 LTS) with B1 tier for
-dev and S1 tier for production.
+Use **Azure App Service** (Linux, P1v4) with container deploy
+from Azure Container Registry.
 
-App Service hosts the Next.js application as a single deployment
-unit with SSR and API routes co-located. GitHub OAuth is handled
-by the built-in Easy Auth feature.
+App Service hosts the Next.js application as a containerized
+deployment via ACR. GitHub OAuth is handled by the built-in
+Easy Auth feature. Staging slot enables zero-downtime swaps.
+
+> **Original decision** (2026-02-26): B1 tier for dev, S1 for
+> production with zip deploy. Superseded in Phase G when the
+> project moved to container-based deployment requiring P1v4.
 
 ## 🔄 Alternatives Considered
 
 | Option                      | Pros                                  | Cons                                            | WAF Impact                  |
 | --------------------------- | ------------------------------------- | ----------------------------------------------- | --------------------------- |
-| **App Service** (chosen)    | Easy Auth built-in, no Docker, mature | No scale-to-zero, B1 lacks SLA                  | Cost: →, Operations: ↑      |
+| **App Service** (chosen)    | Easy Auth built-in, staging slots, ACR | P1v4 cost (~$85/mo); no scale-to-zero           | Cost: →, Operations: ↑      |
 | Azure Container Apps        | Scale-to-zero, modern platform        | Requires Dockerfile, no Easy Auth, more complex | Cost: ↑, Operations: ↓      |
 | Azure Functions             | Event-driven, auto-scale              | Cold start latency, no SSR support              | Performance: ↓, Cost: ↑     |
 | Azure Static Web Apps + API | Free tier, global CDN                 | Limited API routes, no SSR, no VNet integration | Performance: ↓, Security: ↓ |
@@ -80,9 +88,9 @@ by the built-in Easy Auth feature.
 
 ### Negative
 
-- No scale-to-zero — B1 costs ~$13/mo even with no traffic
-- B1 tier (1 vCPU, 1.75 GB) may be a bottleneck during peak
-  hackathon activity
+- No scale-to-zero — P1v4 costs ~$85/mo even with no traffic
+- Container build adds CI pipeline complexity (Trivy scan,
+  ACR push, image digest pinning)
 - Locked to App Service — cannot easily migrate to Container
   Apps later without adding Docker
 - Easy Auth dependency means auth strategy is tied to App Service
@@ -91,17 +99,17 @@ by the built-in Easy Auth feature.
 
 - App Service supports both Linux and Windows; Linux chosen
   for Node.js ecosystem alignment
-- Staging slot available on S1+ tiers (not on B1) — dev
-  environment deploys directly
+- Staging slot used for zero-downtime container deployments
+  with auto-rollback on health check failure
 
 ## 🏛️ WAF Pillar Analysis
 
 | Pillar      | Impact | Notes                                               |
 | ----------- | ------ | --------------------------------------------------- |
 | Security    | ↑      | Easy Auth reduces attack surface (no custom auth)   |
-| Reliability | →      | B1 has no SLA; S1 provides 99.95%                   |
-| Performance | →      | Always-on eliminates cold starts; B1 is entry-level |
-| Cost        | →      | ~$13/mo (B1); competitive with Container Apps min   |
+| Reliability | ↑      | P1v4 provides 99.95% SLA; staging slot swap          |
+| Performance | ↑      | Always-on + P1v4 (4 GB RAM) handles peak hackathons  |
+| Cost        | →      | ~$85/mo (P1v4); acceptable for hackathon workload   |
 | Operations  | ↑      | Simplest deployment model; no container management  |
 
 ## 🔒 Compliance Considerations

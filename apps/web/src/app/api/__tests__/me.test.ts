@@ -137,4 +137,96 @@ describe("GET /api/me", () => {
     expect(body.ok).toBe(true);
     expect(body.data.roles).toHaveLength(0);
   });
+
+  it("auto-creates admin role for bootstrap admin by userId", async () => {
+    mockGetAuth.mockReturnValue(fakePrincipal);
+    vi.stubEnv("NODE_ENV", "production");
+    vi.stubEnv("ADMIN_GITHUB_IDS", "user-1,other-admin");
+    mockQuery.mockResolvedValue([]);
+    mockExecute.mockResolvedValue(1);
+
+    const { GET } = await import("../me/route");
+    const req = createRequest("http://localhost/api/me");
+    const res = await GET(req);
+    const body = await res.json();
+
+    expect(res.status).toBe(200);
+    expect(body.data.roles).toContainEqual({
+      hackathonId: "__global__",
+      role: "admin",
+    });
+    expect(mockExecute).toHaveBeenCalled();
+  });
+
+  it("auto-creates admin role for bootstrap admin by githubLogin", async () => {
+    mockGetAuth.mockReturnValue(fakePrincipal);
+    vi.stubEnv("NODE_ENV", "production");
+    vi.stubEnv("ADMIN_GITHUB_IDS", "testuser");
+    mockQuery.mockResolvedValue([]);
+    mockExecute.mockResolvedValue(1);
+
+    const { GET } = await import("../me/route");
+    const req = createRequest("http://localhost/api/me");
+    const res = await GET(req);
+    const body = await res.json();
+
+    expect(res.status).toBe(200);
+    expect(body.data.roles).toContainEqual({
+      hackathonId: "__global__",
+      role: "admin",
+    });
+  });
+
+  it("skips bootstrap when user already has admin role", async () => {
+    mockGetAuth.mockReturnValue(fakePrincipal);
+    vi.stubEnv("NODE_ENV", "production");
+    vi.stubEnv("ADMIN_GITHUB_IDS", "user-1");
+    mockQuery.mockResolvedValue([
+      { hackathonId: "__global__", role: "admin" },
+    ]);
+
+    const { GET } = await import("../me/route");
+    const req = createRequest("http://localhost/api/me");
+    const res = await GET(req);
+    const body = await res.json();
+
+    expect(body.data.roles).toHaveLength(1);
+    expect(mockExecute).not.toHaveBeenCalled();
+  });
+
+  it("handles bootstrap execute failure gracefully", async () => {
+    mockGetAuth.mockReturnValue(fakePrincipal);
+    vi.stubEnv("NODE_ENV", "production");
+    vi.stubEnv("ADMIN_GITHUB_IDS", "user-1");
+    mockQuery.mockResolvedValue([]);
+    mockExecute.mockRejectedValue(new Error("MERGE failed"));
+
+    const { GET } = await import("../me/route");
+    const req = createRequest("http://localhost/api/me");
+    const res = await GET(req);
+    const body = await res.json();
+
+    expect(res.status).toBe(200);
+    expect(body.data.roles).toContainEqual({
+      hackathonId: "__global__",
+      role: "admin",
+    });
+  });
+
+  it("skips bootstrap when ADMIN_GITHUB_IDS is empty", async () => {
+    mockGetAuth.mockReturnValue(fakePrincipal);
+    vi.stubEnv("NODE_ENV", "production");
+    vi.stubEnv("ADMIN_GITHUB_IDS", "");
+    mockQuery.mockResolvedValue([
+      { hackathonId: "h1", role: "hacker" },
+    ]);
+
+    const { GET } = await import("../me/route");
+    const req = createRequest("http://localhost/api/me");
+    const res = await GET(req);
+    const body = await res.json();
+
+    expect(body.data.roles).toHaveLength(1);
+    expect(mockExecute).not.toHaveBeenCalled();
+  });
 });

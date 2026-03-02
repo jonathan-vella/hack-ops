@@ -202,7 +202,7 @@ flowchart TD
 | Policy            | Constraint                                                        |
 | ----------------- | ----------------------------------------------------------------- |
 | Budget            | No budget policy detected; self-imposed ~$30-50/mo dev ceiling    |
-| SKU Restrictions  | Only VM SKUs restricted (HPC/GPU); App Service B1/S1 unrestricted |
+| SKU Restrictions  | Only VM SKUs restricted (HPC/GPU); App Service P1v4 unrestricted  |
 | Reserved Capacity | No reserved capacity restrictions on PaaS services                |
 
 ## 🌐 Network Policies

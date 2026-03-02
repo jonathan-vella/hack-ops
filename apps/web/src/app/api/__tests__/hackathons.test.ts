@@ -265,4 +265,119 @@ describe("PATCH /api/hackathons/:id", () => {
 
     expect(res.status).toBe(403);
   });
+
+  it("returns 400 for invalid JSON body", async () => {
+    mockGetAuth.mockReturnValue(fakePrincipal);
+    mockResolveRole.mockResolvedValue("admin");
+
+    const { PATCH } = await import("../hackathons/[id]/route");
+    const req = new NextRequest("http://localhost/api/hackathons/h1", {
+      method: "PATCH",
+      headers: { "content-type": "application/json" },
+      body: "not json{",
+    });
+    const res = await PATCH(req, {
+      params: Promise.resolve({ id: "h1" }),
+    });
+
+    expect(res.status).toBe(400);
+  });
+
+  it("returns 400 for invalid update payload", async () => {
+    mockGetAuth.mockReturnValue(fakePrincipal);
+    mockResolveRole.mockResolvedValue("admin");
+
+    const { PATCH } = await import("../hackathons/[id]/route");
+    const req = createRequest("PATCH", "http://localhost/api/hackathons/h1", {
+      teamSize: -5,
+    });
+    const res = await PATCH(req, {
+      params: Promise.resolve({ id: "h1" }),
+    });
+
+    expect(res.status).toBe(400);
+  });
+
+  it("returns 404 when updating non-existent hackathon", async () => {
+    mockGetAuth.mockReturnValue(fakePrincipal);
+    mockResolveRole.mockResolvedValue("admin");
+    mockQueryOne.mockResolvedValueOnce(null);
+
+    const { PATCH } = await import("../hackathons/[id]/route");
+    const req = createRequest("PATCH", "http://localhost/api/hackathons/h1", {
+      name: "New Name",
+    });
+    const res = await PATCH(req, {
+      params: Promise.resolve({ id: "h1" }),
+    });
+
+    expect(res.status).toBe(404);
+  });
+
+  it("updates name without status change", async () => {
+    mockGetAuth.mockReturnValue(fakePrincipal);
+    mockResolveRole.mockResolvedValue("admin");
+    mockQueryOne
+      .mockResolvedValueOnce({ id: "h1", name: "Old", status: "draft" })
+      .mockResolvedValueOnce({ id: "h1", name: "New Name", status: "draft" });
+    mockExecute.mockResolvedValue(1);
+
+    const { PATCH } = await import("../hackathons/[id]/route");
+    const req = createRequest("PATCH", "http://localhost/api/hackathons/h1", {
+      name: "New Name",
+    });
+    const res = await PATCH(req, {
+      params: Promise.resolve({ id: "h1" }),
+    });
+    const body = await res.json();
+
+    expect(res.status).toBe(200);
+    expect(body.data.name).toBe("New Name");
+  });
+
+  it("archives an active hackathon", async () => {
+    mockGetAuth.mockReturnValue(fakePrincipal);
+    mockResolveRole.mockResolvedValue("admin");
+    mockQueryOne
+      .mockResolvedValueOnce({ id: "h1", name: "Test", status: "active" })
+      .mockResolvedValueOnce({
+        id: "h1",
+        name: "Test",
+        status: "archived",
+      });
+    mockExecute.mockResolvedValue(1);
+
+    const { PATCH } = await import("../hackathons/[id]/route");
+    const req = createRequest("PATCH", "http://localhost/api/hackathons/h1", {
+      status: "archived",
+    });
+    const res = await PATCH(req, {
+      params: Promise.resolve({ id: "h1" }),
+    });
+
+    expect(res.status).toBe(200);
+  });
+
+  it("initializes progression when activating with teams and challenges", async () => {
+    mockGetAuth.mockReturnValue(fakePrincipal);
+    mockResolveRole.mockResolvedValue("admin");
+    mockQueryOne
+      .mockResolvedValueOnce({ id: "h1", name: "Test", status: "draft" })
+      .mockResolvedValueOnce({ id: "h1", name: "Test", status: "active" });
+    mockExecute.mockResolvedValue(1);
+    mockQuery
+      .mockResolvedValueOnce([{ id: "team-1" }, { id: "team-2" }])
+      .mockResolvedValueOnce([{ id: "ch-1" }]);
+
+    const { PATCH } = await import("../hackathons/[id]/route");
+    const req = createRequest("PATCH", "http://localhost/api/hackathons/h1", {
+      status: "active",
+    });
+    const res = await PATCH(req, {
+      params: Promise.resolve({ id: "h1" }),
+    });
+
+    expect(res.status).toBe(200);
+    expect(mockExecute).toHaveBeenCalledTimes(3);
+  });
 });

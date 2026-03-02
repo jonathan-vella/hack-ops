@@ -226,18 +226,25 @@ so agents 12–15 have the skills/instructions they were designed to use.
 - [x] G1.1: Create `apps/web/Dockerfile` (multi-stage, node:24-alpine, non-root UID 1001)
 - [x] G1.2: Create `.dockerignore` at repo root
 - [x] G1.3: Create `infra/bicep/hackops/modules/container-registry.bicep` (ACR Standard via AVM)
-- [x] G1.4: Update `main.bicep` (ACR module, imageTag param, AcrPull RBAC prod+staging, staging SQL+KV RBAC)
-- [x] G1.5: Update `app-service.bicep` (DOCKER linuxFxVersion, acrUseManagedIdentityCreds, staging slot, container app settings, tokenStore disabled)
-- [x] G1.6: Update `hackops-deploy.yml` (container build → Trivy scan → ACR push → Bicep deploy → slot swap → auto-rollback)
+- [x] G1.4: Update `main.bicep`
+  (ACR module, imageTag param, AcrPull RBAC prod+staging, staging SQL+KV RBAC)
+- [x] G1.5: Update `app-service.bicep`
+  (DOCKER linuxFxVersion, acrUseManagedIdentityCreds, staging slot,
+  container app settings, tokenStore disabled)
+- [x] G1.6: Update `hackops-deploy.yml`
+  (container build → Trivy scan → ACR push → Bicep deploy → slot swap → auto-rollback)
 - [x] G1.7: Update `hackops-ci.yml` (add docker-build job)
 - [x] G1.8: Update health endpoint (60s warmup mode, eager SQL pre-warm)
 - [x] G1.9: Create `scripts/setup-acr-purge.sh` (weekly purge of old SHA-tagged images)
 - [x] G1.10: Create `docs/first-deploy-runbook.md` (supervised migration process)
 - [x] G1.11: Verify `bicep build` passes (exit 0, 1 cosmetic BCP334 warning only)
 - [x] G1.12: Create `apps/web/public/.gitkeep` (Dockerfile COPY dependency)
-- [x] G2.1: Post-implementation security review (Dockerfile, ACR Bicep, CI — passes: auth, container-supply-chain, infra-permissions)
-- [x] G2.2: Post-implementation logic review (pipeline, runtime, failures — passes: deploy-pipeline, container-runtime, failure-modes)
-- [ ] G3: Local Docker build test (`docker build -t hackops:test -f apps/web/Dockerfile .`) — blocked: Docker not available in devcontainer
+- [x] G2.1: Post-implementation security review
+  (Dockerfile, ACR Bicep, CI — passes: auth, container-supply-chain, infra-permissions)
+- [x] G2.2: Post-implementation logic review
+  (pipeline, runtime, failures — passes: deploy-pipeline, container-runtime, failure-modes)
+- [ ] G3: Local Docker build test — blocked: Docker not available in devcontainer
+  (`docker build -t hackops:test -f apps/web/Dockerfile .`)
 - [x] G4: Commit and push all containerization changes (commit 8885d14)
 - [x] G5: Replaced by Phase H (delete/recreate approach — not in prod, safe to destroy)
 - [ ] G6: Set GitHub environment variables (AZURE_ACR_NAME, AZURE_ACR_LOGIN_SERVER) → moved to H7
@@ -256,7 +263,8 @@ so agents 12–15 have the skills/instructions they were designed to use.
 
 #### H0: Code changes (prep)
 
-- [x] H0.1: Update `deploy.ps1` — drop Deployment Stacks, use `az deployment group create`, add `imageTag` + `adminGithubIds` params
+- [x] H0.1: Update `deploy.ps1` — drop Deployment Stacks,
+  use `az deployment group create`, add `imageTag` + `adminGithubIds` params
 - [x] H0.2: Update `first-deploy-runbook.md` — add Step 0 (delete existing resources)
 - [x] H0.3: Update session tracker with Phase H plan
 - [x] H0.4: Verify `bicep build` passes (1 cosmetic BCP334 warning only)
@@ -268,17 +276,20 @@ so agents 12–15 have the skills/instructions they were designed to use.
 - [x] H1.2: Delete staging slot (`az webapp deployment slot delete ...`)
 - [x] H1.3: Delete App Service (`az webapp delete ...`)
 - [x] H1.4: Delete App Service Plan (`az appservice plan delete ...`)
-- [x] H1.5: Verify: `az resource list --resource-group rg-hackops-us-dev` shows no App Service / ASP
+- [x] H1.5: Verify `az resource list --resource-group rg-hackops-us-dev`
+  shows no App Service / ASP
 
 #### H2: Azure AD setup (OIDC for CI/CD)
 
 - [x] H2.1: Create app registration `hackops-github-oidc` (appId: `6507ac72-518a-4974-b834-3479efc93f4c`)
 - [x] H2.2: Add federated credential for `repo:jonathan-vella/hack-ops:environment:dev`
-- [x] H2.3: Grant `Contributor` + `User Access Administrator` on `rg-hackops-us-dev` to the OIDC identity (SP: `3c413e61-ac97-4bf1-897b-45a4c3925563`)
+- [x] H2.3: Grant `Contributor` + `User Access Administrator`
+  on `rg-hackops-us-dev` to OIDC SP `3c413e61...`
 
 #### H3: Deploy fresh Bicep (bootstrap)
 
-- [ ] H3.1: Run Bicep deploy with `imageTag=latest` (bootstrap) — first attempt failed: P1v3 quota=0; switched to S1; retry pending
+- [ ] H3.1: Run Bicep deploy with `imageTag=latest` (bootstrap)
+  — first attempt failed: P1v3 quota=0; switched to S1; retry pending
 - [ ] H3.2: Capture ACR name + login server from deployment outputs
 - [ ] H3.3: Wait 2 min for RBAC propagation
 
@@ -352,29 +363,48 @@ so agents 12–15 have the skills/instructions they were designed to use.
 
 #### I3: Adversarial review (pre-deploy, round 1)
 
-- [x] I3.1: Run `infra-challenger-subagent` (security, waf, governance passes) — 2 round reviews done 2026-03-01; 2 must_fix + 23 should_fix identified; must_fix items addressed in current Bicep code (UAMI-first ordering, imageDigest deploy)
-- [x] I3.2: Run `app-security-challenger-subagent` (auth, api-routes, data-handling passes) — 1 critical, 1 high, 2 medium, 2 low; findings in `agent-output/hackops/challenges/app-security-challenge.json`
-- [x] I3.3: Fix critical/high findings — fixed `extractHackathonId` ordering (CRITICAL: 7 routes broken in prod), converted 7 handlers to `requireAuth`+`checkRole`, stripped eventCode from listing endpoint (HIGH), added security headers (MEDIUM)
+- [x] I3.1: Run `infra-challenger-subagent` (security, waf, governance)
+  — 2 rounds done 2026-03-01; 2 must_fix + 23 should_fix;
+  must_fix items addressed in current Bicep code
+- [x] I3.2: Run `app-security-challenger-subagent` (auth, api-routes,
+  data-handling) — 1 critical, 1 high, 2 medium, 2 low;
+  findings in `agent-output/hackops/challenges/app-security-challenge.json`
+- [x] I3.3: Fix critical/high findings — fixed `extractHackathonId`
+  ordering (CRITICAL: 7 routes broken in prod), converted 7 handlers
+  to `requireAuth`+`checkRole`, stripped eventCode (HIGH),
+  added security headers (MEDIUM)
 
 #### I4: Context7 code check
 
-- [x] I4.1: Verify Bicep patterns against latest AVM docs — 12 AVM modules pinned, `bicep build` clean, no updates needed (Context7 MCP unavailable; manual verification)
-- [x] I4.2: Verify Next.js / SDK patterns against latest docs — Next.js 16.1.6, mssql 11, Zod 4.3.6 all current; patterns are correct
+- [x] I4.1: Verify Bicep patterns against latest AVM docs
+  — 12 AVM modules pinned, `bicep build` clean, no updates needed
+- [x] I4.2: Verify Next.js / SDK patterns against latest docs
+  — Next.js 16.1.6, mssql 11, Zod 4.3.6 all current
 - [x] I4.3: Fix any outdated patterns — none found
 
 #### I5: Adversarial review (pre-deploy, round 2 — final gate)
 
-- [x] I5.1: Run `infra-challenger-subagent` (should pass clean) — 0 critical, 0 high (3 passes: security, WAF, governance)
-- [x] I5.2: Run `app-security-challenger-subagent` (should pass clean) — 0 critical, 0 high (3 passes: auth, api-routes, data-handling); fixed 13 test failures from I3.3
-- [x] I5.3: Confirm 0 critical / 0 high findings — PASSED; bicep build 0 errors, tsc clean, 159/159 tests pass
+- [x] I5.1: Run `infra-challenger-subagent` (should pass clean)
+  — 0 critical, 0 high (3 passes: security, WAF, governance)
+- [x] I5.2: Run `app-security-challenger-subagent` (should pass clean)
+  — 0 critical, 0 high (3 passes: auth, api-routes, data-handling);
+  fixed 13 test failures from I3.3
+- [x] I5.3: Confirm 0 critical / 0 high findings
+  — PASSED; bicep build 0 errors, tsc clean, 159/159 tests pass
 
 #### I6: Deploy to swedencentral
 
 - [x] I6.1: Create resource group `rg-hackops-se-dev` (swedencentral) — 9 governance tags applied
-- [x] I6.2: Run Bicep deploy with `imageTag=latest` (bootstrap) — first attempt failed (slot kind mismatch), fixed kind to `app,linux,container`, retry succeeded
-- [x] I6.3: Build + push Docker image to ACR (`az acr build`) — first attempt failed (packages/shared/node_modules), fixed Dockerfile, image pushed as `hackops:first-deploy` (sha256:f73424911cdb...)
-- [x] I6.4: Redeploy Bicep with real image digest — added `AZURE_CLIENT_ID` app setting for UAMI SQL auth
-- [x] I6.5: Verify health endpoint returns 200 — both prod and staging healthy, SQL 5ms/65ms
+- [x] I6.2: Run Bicep deploy with `imageTag=latest` (bootstrap)
+  — first attempt failed (slot kind mismatch),
+  fixed kind to `app,linux,container`, retry succeeded
+- [x] I6.3: Build + push Docker image to ACR (`az acr build`)
+  — first attempt failed (packages/shared/node_modules),
+  fixed Dockerfile, image pushed as `hackops:first-deploy`
+- [x] I6.4: Redeploy Bicep with real image digest
+  — added `AZURE_CLIENT_ID` app setting for UAMI SQL auth
+- [x] I6.5: Verify health endpoint returns 200
+  — both prod and staging healthy, SQL 5ms/65ms
 
 #### I7: Seed data via ACI
 
@@ -855,33 +885,33 @@ have enough context for the current step.
 
 <!-- Record any runtime decisions that deviate from the blueprint -->
 
-| Date       | Decision                                                      | Rationale                                                                             |
-| ---------- | ------------------------------------------------------------- | ------------------------------------------------------------------------------------- | ----------------------------------------------------------------- |
-| 2026-02-25 | Hackers submit evidence; Coaches enter rubric scores          | Scoring authority belongs with Coaches, not Hackers                                   |
-| 2026-02-25 | Event codes stored as plaintext + rate limiting (5/min/IP)    | SHA-256 hashing adds complexity without real security gain                            |
-| 2026-02-25 | Tiebreaker: earliest last-approval timestamp wins             | Rewards faster completion when total scores are equal                                 |
-| 2026-02-25 | Unlimited evidence resubmissions allowed                      | Scores only entered by Coach on review; no reason to limit                            |
-| 2026-02-25 | Team balance: `ceil(teamSize/2)` minimum per team             | Prevents runt teams of 1; balanced distribution is fairer                             |
-| 2026-02-25 | Coach review queue is hackathon-scoped                        | Coaches should only see submissions for their assigned events                         |
-| 2026-02-26 | Moved 10-Challenger to infra-challenger-subagent              | Adversarial review is invoked by parent agents, not directly                          |
-| 2026-02-26 | C3 skills created manually (no Learn MCP tools available)     | Skills include Learn MCP search queries for future freshness                          |
-| 2026-02-26 | Instructions auto-discovered (no devcontainer.json change)    | `.github/instructions/*.instructions.md` auto-apply by glob                           |
-| 2026-02-26 | 9 tags required on RG (not 4 baseline) — lowercase keys       | Deny policy JV-Enforce RG Tags v3 requires 9 tags                                     |
-| 2026-02-26 | Cosmos DB uses Entra ID RBAC only (no connection strings)     | Modify policy auto-disables local auth; comply rather than exempt                     |
-| 2026-02-26 | Tag keys use lowercase (not PascalCase from azure-defaults)   | Policy checks `tags['environment']`, not `tags['Environment']`                        |
-| 2026-02-27 | Next.js 16 middleware file convention still used (deprecated) | "proxy" rename is cosmetic; middleware works and migration can wait                   |
-| 2026-02-28 | Delete & recreate App Service instead of in-place migration   | Not in prod; NODE                                                                     | 22-lts → DOCKER requires fresh resource; avoids AVM kind conflict |
-| 2026-02-28 | Drop Deployment Stacks, use `az deployment group create`      | CI/CD uses Incremental deploy; aligning deploy.ps1 to same mechanism avoids conflicts |
-| 2026-02-28 | ADMIN_GITHUB_IDS accepts usernames (not just numeric IDs)     | User requested `jonathan-vella` rather than `25802147`; code matches both             |
-| 2026-02-28 | S1 SKU for dev/staging, P1v3 for prod only                    | Subscription has PremiumV3 quota of 0; S1 supports staging slots + containers         |
-| 2026-03-01 | Region: swedencentral default, germanywestcentral alt         | EU regions preferred for hackathon audience                                           |
-| 2026-03-01 | App Service SKU: P1v4 (all environments)                      | Replaces S1 (dev) + P1v3 (prod); sufficient for scale                                 |
-| 2026-03-01 | Azure SQL DB: S2 (50 DTU) replacing GP_S_Gen5_2               | DTU tier simpler/cheaper for bursty hackathon workload                                |
-| 2026-03-01 | VNet CIDR: 10.0.0.0/23 (512 addresses)                        | /16 was over-provisioned for a single-workload VNet                                   |
-| 2026-03-01 | Data seeding via ACI (VNet-integrated, ephemeral)             | SQL DB behind PE; ACI seeds from inside VNet                                          |
-| 2026-03-01 | Replace Cosmos DB with Azure SQL Database (ADR-0004)          | Relational workload; joins, ref integrity, lower cost                                 |
-| 2026-03-02 | requireAuth+checkRole pattern for non-hackathon `[id]` routes | extractHackathonId returned params.id for 7 routes; guards must resolve after resource lookup |
-| 2026-03-02 | Strip eventCode from GET /api/hackathons listing              | eventCode is invite secret; exposure breaks invite-only model                         |
-| 2026-03-02 | App Service kind: `app,linux,container` (not `app,linux`)     | DOCKER linuxFxVersion sets kind to `container`; slot kind must match production       |
-| 2026-03-02 | `AZURE_CLIENT_ID` app setting for UAMI SQL auth               | DefaultAzureCredential needs client ID to select user-assigned managed identity       |
-| 2026-03-02 | Dockerfile: skip `packages/shared/node_modules` COPY          | npm workspaces hoists shared deps to root; dir doesn't exist at build time            |
+| Date       | Decision                                        | Rationale                                          |
+| ---------- | ----------------------------------------------- | -------------------------------------------------- |
+| 2026-02-25 | Hackers submit evidence; Coaches score          | Scoring authority belongs with Coaches             |
+| 2026-02-25 | Event codes plaintext + rate limit (5/min/IP)   | Hashing adds complexity without real gain          |
+| 2026-02-25 | Tiebreaker: earliest last-approval timestamp    | Rewards faster completion on equal scores          |
+| 2026-02-25 | Unlimited evidence resubmissions allowed        | Scores only entered by Coach; no reason to limit   |
+| 2026-02-25 | Team balance: `ceil(teamSize/2)` min per team   | Prevents runt teams of 1                           |
+| 2026-02-25 | Coach review queue is hackathon-scoped          | Coaches see only their assigned events             |
+| 2026-02-26 | 10-Challenger to infra-challenger-subagent      | Adversarial review invoked by parent agents        |
+| 2026-02-26 | C3 skills created manually (no Learn MCP)       | Skills include MCP queries for future freshness    |
+| 2026-02-26 | Instructions auto-discovered (no devcontainer)  | `.github/instructions/` files auto-apply by glob   |
+| 2026-02-26 | 9 tags required on RG, lowercase keys           | Deny policy JV-Enforce RG Tags v3 requires 9 tags |
+| 2026-02-26 | Cosmos DB Entra ID RBAC only (no conn strings)  | Modify policy auto-disables local auth             |
+| 2026-02-26 | Tag keys lowercase (not PascalCase)             | Policy checks `tags['environment']`                |
+| 2026-02-27 | Next.js 16 middleware convention still used      | "proxy" rename is cosmetic; migration can wait     |
+| 2026-02-28 | Delete and recreate App Service                 | NODE 22-lts to DOCKER needs fresh resource         |
+| 2026-02-28 | Drop Deployment Stacks for `az deployment`      | Incremental deploy aligns CI/CD and deploy.ps1     |
+| 2026-02-28 | ADMIN_GITHUB_IDS accepts usernames              | `jonathan-vella` not just numeric ID               |
+| 2026-02-28 | S1 SKU for dev/staging, P1v3 for prod only      | PremiumV3 quota=0; S1 supports slots+containers   |
+| 2026-03-01 | Region: swedencentral, alt germanywestcentral   | EU regions preferred for hackathon audience        |
+| 2026-03-01 | App Service SKU: P1v4 (all environments)        | Replaces S1 (dev) + P1v3 (prod)                   |
+| 2026-03-01 | Azure SQL DB: S2 (50 DTU) not GP_S_Gen5_2       | DTU tier simpler/cheaper for bursty workload       |
+| 2026-03-01 | VNet CIDR: 10.0.0.0/23 (512 addresses)          | /16 was over-provisioned for single workload       |
+| 2026-03-01 | Data seeding via ACI (VNet-integrated)          | SQL DB behind PE; ACI seeds from inside VNet       |
+| 2026-03-01 | Replace Cosmos DB with Azure SQL (ADR-0004)     | Relational workload; joins, ref integrity          |
+| 2026-03-02 | requireAuth+checkRole for non-hackathon routes  | extractHackathonId broke 7 routes                  |
+| 2026-03-02 | Strip eventCode from GET /api/hackathons        | eventCode is invite secret                         |
+| 2026-03-02 | App Service kind: `app,linux,container`         | DOCKER linuxFxVersion needs container in kind      |
+| 2026-03-02 | `AZURE_CLIENT_ID` app setting for UAMI SQL      | DefaultAzureCredential needs client ID for UAMI    |
+| 2026-03-02 | Dockerfile: skip shared/node_modules COPY       | npm workspaces hoists deps; dir absent at build    |

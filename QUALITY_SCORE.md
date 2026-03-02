@@ -6,12 +6,12 @@
 | ------------------- | ----- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------- |
 | **Agents**          | A     | 13 agents + 11 subagents; all pass validation                                                                                                                                 | Maintain as agents are added                      |
 | **Skills**          | A     | 19/19 skills pass GA validation; 6 have Context7 dynamic verification                                                                                                         | Maintain as new skills are added                  |
-| **Instructions**    | A     | 26 on disk; 1 non-blocking applyTo warning (cosmetic only)                                                                                                                    | Maintain; warning is cosmetic and non-blocking    |
-| **Infrastructure**  | A-    | ACR Standard + container deploy pipeline; region=swedencentral, P1v3 enforced; staging slot MI + RBAC; planning artifacts (01–04) still reference swedencentral/B1 (debt #23) | Post-implementation adversarial reviews (Step 11) |
-| **Application**     | A     | 24 API routes, 10 pages, 26 components; 178 tests (18 files); 93% line coverage; health endpoint warmup mode (P20)                                                            | Post-implementation adversarial reviews (Step 11) |
-| **Documentation**   | A     | Docs fresh; all counts accurate (13+11 agents, 19 skills, 26 instructions)                                                                                                    | Run doc-gardening after each bulk addition        |
-| **CI / Validation** | A     | 15 validators pass; ESLint flat config clean; CI has docker-build job + Trivy scan; deploy pipeline containerized                                                             | Maintain; add validators as new domains arrive    |
-| **Backlog**         | A     | Issue hygiene good; 2 active debt items (#23 planning drift, #24 post-impl adversarial reviews pending)                                                                       | Complete adversarial reviews per plan Step 11     |
+| **Instructions**    | A     | 27 on disk; 1 non-blocking applyTo warning (cosmetic only)                                                                                                                    | Maintain; warning is cosmetic and non-blocking    |
+| **Infrastructure**  | A     | ACR Standard + container deploy pipeline; region=swedencentral, P1v4 enforced; staging slot MI + RBAC; adversarial reviews complete (I3+I5)                                   | Maintain; re-run adversarial reviews on changes   |
+| **Application**     | A     | 24 API routes, 12 pages, 28 components; 170 tests (18 files); 91% line coverage; sql.ts excluded (infra, always mocked)                                                      | Maintain >=90% coverage threshold                 |
+| **Documentation**   | A     | Docs fresh; all counts accurate (13+11 agents, 19 skills, 27 instructions)                                                                                                    | Run doc-gardening after each bulk addition        |
+| **CI / Validation** | A     | 15 validators pass; ESLint flat config clean; CI has docker-build job + Trivy scan; 0 MD013 errors in active docs                                                             | Maintain; add validators as new domains arrive    |
+| **Backlog**         | A     | All 27 debt items resolved; 0 active debt                                                                                                                                      | Track new discoveries via doc-gardening           |
 
 ## Grading Scale
 
@@ -27,6 +27,11 @@
 
 | Date       | Domain         | Change                                                                                                                                                   |
 | ---------- | -------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-03-02 | Backlog        | All 4 active debt items (#23-#27) resolved; 0 remaining                                                                                                 |
+| 2026-03-02 | CI/Validation  | debt #27 resolved: 43 MD013 violations fixed in hackops-execution.md; 0 remaining in active docs                                                        |
+| 2026-03-02 | Infrastructure | debt #23 resolved: ADR-0002 superseded to P1v4; preflight+governance updated. debt #24 resolved (adversarial reviews complete per I3+I5)                 |
+| 2026-03-02 | Application    | debt #26 resolved: deleted orphaned cosmos.ts; wrote 11 new tests; 170 tests, 91% line coverage (threshold 90%); pages 10→12, components 26→28          |
+| 2026-03-02 | Instructions   | doc-gardening: instruction count 26→27 (dependency-management added)                                                                                     |
 | 2026-03-01 | Skills         | doc-gardening: corrected skill count 20→19; SQL migration complete; docs/README.md header fixed; debt #25 resolved                                       |
 | 2026-03-01 | Documentation  | doc-gardening: all counts accurate (13+11 agents, 19 skills, 26 instructions); 0 validator errors, 1 cosmetic warning; all 24 agents pass frontmatter    |
 | 2026-02-28 | Infrastructure | doc-gardening: B+→A-; ACR containerization complete (Dockerfile, ACR Bicep, container deploy pipeline, staging slot MI, health warmup); debt #24 added   |

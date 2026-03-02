@@ -17,9 +17,10 @@ export default defineConfig({
         "src/**/__tests__/**",
         "src/lib/hooks/**",
         "src/lib/validation/index.ts",
+        "src/lib/sql.ts",
       ],
       thresholds: {
-        lines: 80,
+        lines: 90,
         branches: 80,
       },
     },

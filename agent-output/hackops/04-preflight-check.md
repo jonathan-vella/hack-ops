@@ -146,7 +146,7 @@ latest versions are noted above for future upgrades.
 | Parameter     | AVM Type | Notes                         |
 | ------------- | -------- | ----------------------------- |
 | `kind`        | `string` | `'linux'` for Linux plans     |
-| `skuName`     | `string` | `'B1'` (dev) / `'S1'` (prod)  |
+| `skuName`     | `string` | `'P1v4'` (all environments)   |
 | `skuCapacity` | `int`    | `1` — single instance for dev |
 | `reserved`    | `bool`   | `true` — required for Linux   |
 
