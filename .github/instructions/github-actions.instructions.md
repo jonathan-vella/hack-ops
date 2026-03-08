@@ -14,7 +14,7 @@ For general GitHub Actions best practices, rely on
 ### Runner and Node.js
 
 - **Runner**: `ubuntu-latest` for all jobs
-- **Node.js**: Version `22` with `npm` caching
+- **Node.js**: Version `24` with `npm` caching
 - **Dependencies**: `npm ci` (not `npm install`)
 
 ### Permissions
