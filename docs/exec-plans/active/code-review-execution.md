@@ -18,8 +18,8 @@
 | Step                       | Issue | Status      |
 | -------------------------- | ----- | ----------- |
 | Epic: Code Review          | —     | Not started |
-| R1: Foundation setup       | —     | Not started |
-| R2: Context7 library audit | —     | Not started |
+| R1: Foundation setup       | —     | Complete    |
+| R2: Context7 library audit | —     | Complete    |
 | R3: E2E admin journey      | —     | Not started |
 | R4: E2E coach journey      | —     | Not started |
 | R5: E2E hacker journey     | —     | Not started |
@@ -35,10 +35,10 @@
 
 <!-- Update this at the START of each session -->
 
-**Phase**: R1 (Foundation Setup)
-**Step**: R1.1 — Install Playwright + create config
+**Phase**: R3 (E2E Tests: Admin Journey)
+**Step**: R3.1 — Create hackathon (draft) test
 **Branch**: `feature/code-review`
-**Goal**: Set up Playwright, local SQL container, E2E fixtures, auth helpers, and npm scripts.
+**Goal**: Write E2E tests for admin journey (create hackathon, challenges, rubrics, activation, teams, audit, scores, archive).
 **Blockers**: None
 
 ---
@@ -51,22 +51,22 @@
 **Prompt**: `review-01-foundation.prompt.md`
 **Blocks**: All other phases (R2-R10)
 
-- [ ] R1.1: Install `@playwright/test` + create `playwright.config.ts`
+- [x] R1.1: Install `@playwright/test` + create `playwright.config.ts`
       (Chromium, Firefox, Mobile Chrome projects)
-- [ ] R1.2: Create `docker-compose.test.yml` with SQL Server 2022
+- [x] R1.2: Create `docker-compose.test.yml` with SQL Server 2022
       container, mount `schema.sql` as init script
-- [ ] R1.3: Create E2E seed scripts in `apps/web/tests/fixtures/`
+- [x] R1.3: Create E2E seed scripts in `apps/web/tests/fixtures/`
       for all 11 tables (hackathons, teams, hackers, challenges,
       submissions, scores, roles, rubrics, config, progressions, audit_log)
-- [ ] R1.4: Create Playwright auth helper
+- [x] R1.4: Create Playwright auth helper
       (`apps/web/tests/helpers/auth-helper.ts`) — injects
       `x-ms-client-principal` headers for admin/coach/hacker personas
-- [ ] R1.5: Create Playwright global setup
+- [x] R1.5: Create Playwright global setup
       (`apps/web/tests/global-setup.ts`) — starts SQL container,
       runs seed, starts Next.js dev server
-- [ ] R1.6: Add npm scripts: `test:e2e`, `test:e2e:headed`,
+- [x] R1.6: Add npm scripts: `test:e2e`, `test:e2e:headed`,
       `test:components`, `test:review`
-- [ ] R1.7: Verify: `npx playwright test --list` shows 0 tests,
+- [x] R1.7: Verify: `npx playwright test --list` shows 0 tests,
       no config errors
 
 Gate: `npx playwright test --list` exits 0 (config valid).
@@ -77,20 +77,20 @@ Gate: `npx playwright test --list` exits 0 (config valid).
 **Prompt**: `review-02-context7-audit.prompt.md`
 **Parallel with**: R3-R7 (once R1 complete)
 
-- [ ] R2.1: Next.js 15 — resolve library, verify route handler
+- [x] R2.1: Next.js 15 — resolve library, verify route handler
       patterns, `NextResponse.json()`, async `cookies()`/`headers()`,
       `"use client"` boundaries across ~30 route files
-- [ ] R2.2: Zod 4 — verify `safeParse`, `z.coerce`, error formatting,
+- [x] R2.2: Zod 4 — verify `safeParse`, `z.coerce`, error formatting,
       schema composition across 12 validation files
-- [ ] R2.3: mssql — verify pool config, parameterized query syntax,
+- [x] R2.3: mssql — verify pool config, parameterized query syntax,
       Entra ID token refresh in `lib/sql.ts`
-- [ ] R2.4: React 19 + Testing Library — verify hooks, client
+- [x] R2.4: React 19 + Testing Library — verify hooks, client
       component patterns, query/assertion APIs
-- [ ] R2.5: Tailwind CSS v4 + shadcn/ui — verify imports,
+- [x] R2.5: Tailwind CSS v4 + shadcn/ui — verify imports,
       composition, theming in 20+ components
-- [ ] R2.6: Vitest 4 — verify mock patterns (`vi.mock`, `vi.stubEnv`,
+- [x] R2.6: Vitest 4 — verify mock patterns (`vi.mock`, `vi.stubEnv`,
       `vi.importActual`), config, coverage provider
-- [ ] R2.7: Write Context7 findings to
+- [x] R2.7: Write Context7 findings to
       `agent-output/hackops/review-context7-findings.md`
 
 Gate: Findings doc created with per-library summary + actionable items.
@@ -314,8 +314,22 @@ applied first). R10 requires all previous phases.
 
 <!-- Append one entry per session. Keep entries concise. -->
 
-| #   | Date       | Phase/Step | What was done          | What's next   | Blockers |
-| --- | ---------- | ---------- | ---------------------- | ------------- | -------- |
-| 0   | 2026-03-08 | Planning   | Created plan, tracker, | R1.1: Install | None     |
-|     |            |            | 10 phase prompts, and  | Playwright    |          |
-|     |            |            | session-resume prompt  |               |          |
+| #   | Date       | Phase/Step | What was done           | What's next   | Blockers |
+| --- | ---------- | ---------- | ----------------------- | ------------- | -------- |
+| 0   | 2026-03-08 | Planning   | Created plan, tracker,  | R1.1: Install | None     |
+|     |            |            | 10 phase prompts, and   | Playwright    |          |
+|     |            |            | session-resume prompt   |               |          |
+| 1   | 2026-03-08 | R1.1-R1.7  | Installed Playwright    | R2.1: Next.js | None     |
+|     |            |            | 1.58.2, config (3       | 15 route      |          |
+|     |            |            | projects), Docker       | handler audit |          |
+|     |            |            | Compose, seed/teardown, |               |          |
+|     |            |            | auth helper, global     |               |          |
+|     |            |            | setup, npm scripts.     |               |          |
+|     |            |            | tsc clean, config valid |               |          |
+| 2   | 2026-03-08 | R2.1-R2.7  | Context7 audit of all 6 | R3.1: Admin   | None     |
+|     |            |            | libraries. 0 breaking,  | E2E journey   |          |
+|     |            |            | 0 deprecated, 1 style   |               |          |
+|     |            |            | (SQL auto-types). All   |               |          |
+|     |            |            | patterns match latest   |               |          |
+|     |            |            | docs. Findings written. |               |          |
+|     |            |            | tsc clean, 178 tests OK |               |          |

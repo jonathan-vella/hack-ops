@@ -8,7 +8,12 @@
     "start": "next start",
     "lint": "eslint src/",
     "type-check": "tsc --noEmit",
-    "test": "vitest run"
+    "test": "vitest run",
+    "test:e2e": "playwright test",
+    "test:e2e:headed": "playwright test --headed",
+    "test:e2e:ui": "playwright test --ui",
+    "test:components": "vitest run --testPathPattern=components",
+    "test:review": "npm run test && npm run test:e2e"
   },
   "dependencies": {
     "@azure/identity": "^4.7.0",
@@ -31,6 +36,7 @@
   },
   "devDependencies": {
     "@next/eslint-plugin-next": "^16.1.6",
+    "@playwright/test": "^1.58.2",
     "@tailwindcss/postcss": "^4.1.0",
     "@testing-library/react": "^16.2.0",
     "@types/mssql": "^9.1.9",

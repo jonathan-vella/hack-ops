@@ -2,15 +2,24 @@
 description: "Resume the code review from where you left off — loads tracker state and continues the next incomplete step"
 tools:
   [
-    "read/readFile",
-    "edit/editFiles",
-    "edit/createFile",
-    "edit/createDirectory",
-    "search/textSearch",
-    "search/fileSearch",
-    "execute/runInTerminal",
-    "execute/runTests",
-    "mcp/context7",
+    vscode,
+    execute,
+    read,
+    agent,
+    browser,
+    edit,
+    search,
+    web,
+    "azure-mcp/*",
+    "context7/*",
+    "microsoft-learn/*",
+    "pylance-mcp-server/*",
+    todo,
+    vscode.mermaid-chat-features/renderMermaidDiagram,
+    ms-python.python/getPythonEnvironmentInfo,
+    ms-python.python/getPythonExecutableCommand,
+    ms-python.python/installPythonPackage,
+    ms-python.python/configurePythonEnvironment,
   ]
 ---
 
