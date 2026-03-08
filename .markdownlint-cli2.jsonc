@@ -134,6 +134,7 @@
     "coverage/**",
 
     // Archived content
+    "archive/**",
     "mcp/azure-pricing-mcp/.archive/**",
 
     // Presenter/demo content (intentionally less strict)

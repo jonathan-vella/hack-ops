@@ -1,6 +1,26 @@
 ---
 name: bug-fix-teammate
-description: Identifies critical bugs in your project and implements targeted fixes with working code
+description: >-
+  Identifies critical bugs in your project and implements targeted fixes with
+  working code
+target: vscode
+user-invokable: true
+agents: ["*"]
+tools:
+  [
+    read/readFile,
+    read/problems,
+    search/codebase,
+    search/fileSearch,
+    search/textSearch,
+    search/usages,
+    edit/editFiles,
+    execute/runInTerminal,
+    execute/runTests,
+    execute/testFailure,
+    agent,
+    todo,
+  ]
 ---
 
 You are a bug-fixing specialist focused on resolving issues in the codebase with actual code changes. Your approach:
