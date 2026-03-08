@@ -44,6 +44,9 @@
 > Easy Auth does not work locally. The dev auth bypass
 > in `src/lib/auth.ts` reads `DEV_USER_*` variables
 > when `NODE_ENV=development` to simulate any role.
+>
+> In Azure, both GitHub OAuth values are written into Key Vault during the
+> Bicep deployment, so the vault can stay private throughout bootstrap.
 
 ### Azure Monitoring
 
@@ -148,13 +151,14 @@ configuration.
 
 ### Secrets Stored in Key Vault
 
-| Secret Name                  | Description                               |
-| ---------------------------- | ----------------------------------------- |
-| `github-oauth-client-id`     | GitHub OAuth App client ID                |
-| `github-oauth-client-secret` | GitHub OAuth App client secret            |
-| `sql-connection-string`      | SQL Database connection string (fallback) |
+| Secret Name                     | Description                            |
+| ------------------------------- | -------------------------------------- |
+| `github-oauth-client-id`        | GitHub OAuth App client ID             |
+| `github-oauth-client-secret`    | GitHub OAuth App client secret         |
+| `appinsights-connection-string` | Application Insights connection string |
 
-> The App Service system-assigned managed identity is
+> The GitHub OAuth secrets are created by Bicep during deployment, and the
+> App Service managed identity is
 > granted the **Key Vault Secrets User** role via ARM
 > RBAC. No access policies are used.
 

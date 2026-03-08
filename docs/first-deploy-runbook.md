@@ -57,12 +57,16 @@ The first deployment creates all infrastructure including ACR, App Service
 `imageTag` parameter (`latest`) is used as a placeholder — there is no
 image in ACR yet, so App Service will fail to pull initially. This is expected.
 
+The deployment also writes the GitHub OAuth client ID and client secret into
+Key Vault through the ARM management plane. Do not temporarily open Key Vault
+network access just to create these secrets.
+
 ```bash
 az deployment group create \
   --resource-group "rg-hackops-us-dev" \
   --template-file infra/bicep/hackops/main.bicep \
   --parameters environment=dev projectName=hackops \
-    owner="<owner>" technicalContact="<email>" \
+    owner="<owner>" technicalContact="<email>" alertEmail="<email>" \
     githubOAuthClientId="<client-id>" githubOAuthClientSecret="<secret>" \
   --mode Incremental
 ```
@@ -122,7 +126,7 @@ az deployment group create \
   --template-file infra/bicep/hackops/main.bicep \
   --parameters environment=dev projectName=hackops \
     imageTag=first-deploy \
-    owner="<owner>" technicalContact="<email>" \
+    owner="<owner>" technicalContact="<email>" alertEmail="<email>" \
     githubOAuthClientId="<client-id>" githubOAuthClientSecret="<secret>" \
   --mode Incremental
 ```

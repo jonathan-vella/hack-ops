@@ -12,6 +12,8 @@
     Target environment (dev, staging, prod). Default: dev.
 .PARAMETER Location
     Azure region. Default: swedencentral.
+.PARAMETER ResourceGroupName
+    Optional resource group name override. Defaults to rg-{project}-{regionCode}-{environment}.
 .PARAMETER Owner
     Resource owner tag value. Required.
 .PARAMETER TechnicalContact
@@ -20,6 +22,8 @@
     Alert notification email for Action Group. Required.
 .PARAMETER GitHubOAuthClientId
     GitHub OAuth App client ID (from https://github.com/settings/developers).
+.PARAMETER GitHubOAuthClientSecret
+    GitHub OAuth App client secret. Stored in Key Vault during deployment.
 .PARAMETER ImageDigest
     Container image digest (sha256:...). Empty for bootstrap deploy.
 .PARAMETER AdminGithubIds
@@ -46,6 +50,8 @@ param(
 
     [string]$Location = 'swedencentral',
 
+    [string]$ResourceGroupName = '',
+
     [Parameter(Mandatory)]
     [string]$Owner,
 
@@ -62,6 +68,8 @@ param(
     [Parameter(Mandatory)]
     [string]$GitHubOAuthClientId,
 
+    [string]$GitHubOAuthClientSecret = '',
+
     [string]$ImageDigest = '',
 
     [string]$AdminGithubIds = '',
@@ -71,6 +79,34 @@ param(
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
+
+function ConvertTo-PlainText {
+    param(
+        [Parameter(Mandatory)]
+        [Security.SecureString]$SecureValue
+    )
+
+    return ([pscredential]::new('ignored', $SecureValue)).GetNetworkCredential().Password
+}
+
+function Get-RegionCode {
+    param(
+        [Parameter(Mandatory)]
+        [string]$AzureRegion
+    )
+
+    $regionCodes = @{
+        'swedencentral' = 'se'
+        'germanywestcentral' = 'gwc'
+        'northeurope' = 'ne'
+    }
+
+    if ($regionCodes.ContainsKey($AzureRegion)) {
+        return $regionCodes[$AzureRegion]
+    }
+
+    throw "Unsupported Location '$AzureRegion' for resource group naming. Pass -ResourceGroupName explicitly."
+}
 
 # When AutoApprove is set, override ShouldProcess to always proceed
 if ($AutoApprove) {
@@ -88,7 +124,8 @@ Write-Host "  Environment: $Environment"
 Write-Host "  Location:    $Location"
 Write-Host ''
 
-$rgName = "rg-$ProjectName-$Environment"
+$regionCode = Get-RegionCode -AzureRegion $Location
+$rgName = if ($ResourceGroupName) { $ResourceGroupName } else { "rg-$ProjectName-$regionCode-$Environment" }
 $deploymentName = "deploy-$ProjectName-$Phase-$(Get-Date -Format 'yyyyMMdd-HHmmss')"
 $templateFile = Join-Path $PSScriptRoot 'main.bicep'
 
@@ -113,6 +150,15 @@ Write-Host "  Subscription: $($account.name) ($($account.id))" -ForegroundColor 
 # Validate image digest format
 if ($ImageDigest -and -not $ImageDigest.StartsWith('sha256:')) {
     throw "ImageDigest must start with 'sha256:'. Got: $ImageDigest"
+}
+
+if (-not $GitHubOAuthClientSecret) {
+    $secureGitHubOAuthClientSecret = Read-Host -Prompt 'GitHub OAuth client secret' -AsSecureString
+    $GitHubOAuthClientSecret = ConvertTo-PlainText -SecureValue $secureGitHubOAuthClientSecret
+}
+
+if (-not $GitHubOAuthClientSecret) {
+    throw 'GitHubOAuthClientSecret is required.'
 }
 
 # ── Validate Bicep ──────────────────────────────────────────────────────
@@ -168,6 +214,7 @@ az deployment group what-if `
                  technicalContact=$TechnicalContact `
                  alertEmail=$AlertEmail `
                  githubOAuthClientId=$GitHubOAuthClientId `
+                 githubOAuthClientSecret=$GitHubOAuthClientSecret `
                  imageDigest=$ImageDigest `
                  adminGithubIds=$AdminGithubIds
 
@@ -193,6 +240,7 @@ az deployment group create `
                  technicalContact=$TechnicalContact `
                  alertEmail=$AlertEmail `
                  githubOAuthClientId=$GitHubOAuthClientId `
+                 githubOAuthClientSecret=$GitHubOAuthClientSecret `
                  imageDigest=$ImageDigest `
                  adminGithubIds=$AdminGithubIds `
     --mode Incremental
@@ -265,6 +313,6 @@ if (-not $ImageDigest) {
 
 Write-Host ''
 Write-Host 'Next steps:' -ForegroundColor Cyan
-Write-Host '  1. Run scripts/setup-github-oauth.sh to populate GitHub OAuth secrets in Key Vault'
-Write-Host '  2. Push a container image to ACR and redeploy with -ImageDigest'
+Write-Host '  1. Push a container image to ACR and redeploy with -ImageDigest'
+Write-Host '  2. Verify GitHub Easy Auth against the deployed site'
 Write-Host ''

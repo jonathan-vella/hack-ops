@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.41.2.15936",
-      "templateHash": "14056148676977614706"
+      "templateHash": "15206332930256569958"
     }
   },
   "parameters": {
@@ -82,6 +82,12 @@
       "type": "string",
       "metadata": {
         "description": "GitHub OAuth App client ID (register at https://github.com/settings/developers)."
+      }
+    },
+    "githubOAuthClientSecret": {
+      "type": "securestring",
+      "metadata": {
+        "description": "GitHub OAuth App client secret. Stored in Key Vault during deployment."
       }
     },
     "adminGithubIds": {
@@ -8532,6 +8538,12 @@
           },
           "appInsightsConnectionString": {
             "value": "[reference(resourceId('Microsoft.Resources/deployments', format('monitoring-{0}', uniqueString(deployment().name))), '2025-04-01').outputs.appInsightsConnectionString.value]"
+          },
+          "githubOAuthClientId": {
+            "value": "[parameters('githubOAuthClientId')]"
+          },
+          "githubOAuthClientSecret": {
+            "value": "[parameters('githubOAuthClientSecret')]"
           }
         },
         "template": {
@@ -8542,7 +8554,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.41.2.15936",
-              "templateHash": "12563039922864922985"
+              "templateHash": "13411846989093130310"
             }
           },
           "parameters": {
@@ -8606,6 +8618,18 @@
               "metadata": {
                 "description": "Application Insights connection string to store as KV secret."
               }
+            },
+            "githubOAuthClientId": {
+              "type": "string",
+              "metadata": {
+                "description": "GitHub OAuth App client ID to store as a Key Vault secret."
+              }
+            },
+            "githubOAuthClientSecret": {
+              "type": "securestring",
+              "metadata": {
+                "description": "GitHub OAuth App client secret to store as a Key Vault secret."
+              }
             }
           },
           "variables": {
@@ -8665,6 +8689,30 @@
               "name": "[format('{0}/{1}', variables('kvName'), 'appinsights-connection-string')]",
               "properties": {
                 "value": "[parameters('appInsightsConnectionString')]",
+                "contentType": "text/plain"
+              },
+              "dependsOn": [
+                "keyVault"
+              ]
+            },
+            "githubOAuthClientIdSecret": {
+              "type": "Microsoft.KeyVault/vaults/secrets",
+              "apiVersion": "2023-07-01",
+              "name": "[format('{0}/{1}', variables('kvName'), 'github-oauth-client-id')]",
+              "properties": {
+                "value": "[parameters('githubOAuthClientId')]",
+                "contentType": "text/plain"
+              },
+              "dependsOn": [
+                "keyVault"
+              ]
+            },
+            "githubOAuthClientSecretSecret": {
+              "type": "Microsoft.KeyVault/vaults/secrets",
+              "apiVersion": "2023-07-01",
+              "name": "[format('{0}/{1}', variables('kvName'), 'github-oauth-client-secret')]",
+              "properties": {
+                "value": "[parameters('githubOAuthClientSecret')]",
                 "contentType": "text/plain"
               },
               "dependsOn": [

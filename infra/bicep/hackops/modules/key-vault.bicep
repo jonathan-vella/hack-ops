@@ -1,7 +1,7 @@
 // -----------------------------------------------------------------------
 // HackOps — Key Vault Module
 // Key Vault with Private Endpoint, DNS zone, UAMI RBAC, and secrets.
-// GitHub OAuth secrets are populated externally (setup-github-oauth.sh).
+// GitHub OAuth secrets are created during deployment to avoid manual KV writes.
 // -----------------------------------------------------------------------
 
 @description('Deployment environment.')
@@ -34,6 +34,13 @@ param uamiPrincipalId string
 
 @description('Application Insights connection string to store as KV secret.')
 param appInsightsConnectionString string
+
+@description('GitHub OAuth App client ID to store as a Key Vault secret.')
+param githubOAuthClientId string
+
+@description('GitHub OAuth App client secret to store as a Key Vault secret.')
+@secure()
+param githubOAuthClientSecret string
 
 // ── Variables ───────────────────────────────────────────────────────────
 
@@ -126,14 +133,32 @@ resource kvSecretsRbac 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
 }
 
 // ── Secrets (Bicep-managed) ─────────────────────────────────────────────
-// GitHub OAuth secrets are populated externally via setup-github-oauth.sh.
-// Only the App Insights connection string is stored here at deploy time.
+// OAuth secrets are written via the ARM management plane so Key Vault can
+// remain private without requiring a manual firewall change for bootstrap.
 
 resource appInsightsSecret 'Microsoft.KeyVault/vaults/secrets@2023-07-01' = {
   parent: kvRef
   name: 'appinsights-connection-string'
   properties: {
     value: appInsightsConnectionString
+    contentType: 'text/plain'
+  }
+}
+
+resource githubOAuthClientIdSecret 'Microsoft.KeyVault/vaults/secrets@2023-07-01' = {
+  parent: kvRef
+  name: 'github-oauth-client-id'
+  properties: {
+    value: githubOAuthClientId
+    contentType: 'text/plain'
+  }
+}
+
+resource githubOAuthClientSecretSecret 'Microsoft.KeyVault/vaults/secrets@2023-07-01' = {
+  parent: kvRef
+  name: 'github-oauth-client-secret'
+  properties: {
+    value: githubOAuthClientSecret
     contentType: 'text/plain'
   }
 }

@@ -38,6 +38,10 @@ param alertEmail string
 @description('GitHub OAuth App client ID (register at https://github.com/settings/developers).')
 param githubOAuthClientId string
 
+@description('GitHub OAuth App client secret. Stored in Key Vault during deployment.')
+@secure()
+param githubOAuthClientSecret string
+
 @description('Comma-separated GitHub user IDs auto-assigned admin on first login.')
 param adminGithubIds string = ''
 
@@ -195,6 +199,8 @@ module keyVault 'modules/key-vault.bicep' = {
     logAnalyticsWorkspaceId: monitoring.outputs.logAnalyticsId
     uamiPrincipalId: identity.outputs.uamiPrincipalId
     appInsightsConnectionString: monitoring.outputs.appInsightsConnectionString
+    githubOAuthClientId: githubOAuthClientId
+    githubOAuthClientSecret: githubOAuthClientSecret
   }
 }
 

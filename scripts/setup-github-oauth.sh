@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-# Register a GitHub OAuth App for HackOps Easy Auth and store
-# credentials in Azure Key Vault. Idempotent — skips creation if
-# the OAuth App already exists (by client ID in Key Vault).
+# Register a GitHub OAuth App for HackOps Easy Auth and print
+# deployment parameters. Bicep stores the credentials in Azure
+# Key Vault during deployment, so direct KV writes are no longer needed.
 #
 # Prerequisites: gh auth login, az login, jq
 # Usage: ./scripts/setup-github-oauth.sh [--environment dev] [--project hackops]
@@ -24,7 +24,7 @@ usage() {
 Usage: $SCRIPT_NAME [OPTIONS]
 
 Register a GitHub OAuth App for HackOps Easy Auth and store
-credentials in Azure Key Vault.
+credentials during deployment.
 
 Options:
   -e, --environment ENV   Target environment (dev|staging|prod) [default: dev]
@@ -34,9 +34,9 @@ Options:
   -h, --help               Show this help
 
 Steps performed:
-  1. Check if OAuth credentials already exist in Key Vault
-  2. If not, create a GitHub OAuth App via gh api
-  3. Store client ID and secret in Key Vault
+  1. Resolve the expected App Service callback URL
+  2. Open the GitHub OAuth App registration page
+  3. Collect client ID and secret from GitHub
   4. Print values for Bicep deployment parameters
 USAGE
 }
@@ -71,14 +71,6 @@ if [[ -z "$RESOURCE_GROUP" ]]; then
 fi
 readonly RG_NAME="$RESOURCE_GROUP"
 
-# Discover Key Vault name from the resource group (Bicep uses uniqueString)
-readonly KV_NAME=$(az keyvault list --resource-group "$RG_NAME" --query '[0].name' -o tsv 2>/dev/null || echo "")
-if [[ -z "$KV_NAME" ]]; then
-  echo "  FAIL: No Key Vault found in $RG_NAME. Deploy infrastructure first." >&2
-  exit 1
-fi
-echo "  Key Vault: ${KV_NAME}"
-
 readonly APP_NAME="app-${PROJECT_NAME}-${ENVIRONMENT}"
 
 # ── Pre-flight ───────────────────────────────────────────────────────────
@@ -106,44 +98,6 @@ if ! az account show &>/dev/null 2>&1; then
   exit 1
 fi
 echo "  OK: az authenticated"
-
-# ── Check Existing Credentials ───────────────────────────────────────────
-
-echo ""
-echo "=== Checking Key Vault for Existing OAuth Credentials ==="
-
-EXISTING_CLIENT_ID=""
-if az keyvault secret show \
-    --vault-name "$KV_NAME" \
-    --name "github-oauth-client-id" \
-    --query value -o tsv &>/dev/null 2>&1; then
-  EXISTING_CLIENT_ID=$(az keyvault secret show \
-    --vault-name "$KV_NAME" \
-    --name "github-oauth-client-id" \
-    --query value -o tsv)
-  echo "  Found existing client ID: ${EXISTING_CLIENT_ID}"
-fi
-
-EXISTING_SECRET=""
-if az keyvault secret show \
-    --vault-name "$KV_NAME" \
-    --name "github-oauth-client-secret" \
-    --query value -o tsv &>/dev/null 2>&1; then
-  EXISTING_SECRET="(exists)"
-  echo "  Found existing client secret in Key Vault."
-fi
-
-if [[ -n "$EXISTING_CLIENT_ID" && -n "$EXISTING_SECRET" ]]; then
-  echo ""
-  echo "  OAuth App already configured. Use these for deployment:"
-  echo "    githubOAuthClientId = ${EXISTING_CLIENT_ID}"
-  echo "    githubOAuthClientSecret = (from Key Vault: ${KV_NAME})"
-  echo ""
-  echo "  To re-create, delete the secrets first:"
-  echo "    az keyvault secret delete --vault-name $KV_NAME --name github-oauth-client-id"
-  echo "    az keyvault secret delete --vault-name $KV_NAME --name github-oauth-client-secret"
-  exit 0
-fi
 
 # ── Resolve App Service Hostname ─────────────────────────────────────────
 
@@ -253,42 +207,22 @@ fi
 echo "  Client ID: ${CLIENT_ID}"
 echo "  Client Secret: (${#CLIENT_SECRET} chars)"
 
-# ── Store in Key Vault ───────────────────────────────────────────────────
-
-echo ""
-echo "=== Storing Credentials in Key Vault: ${KV_NAME} ==="
-
-az keyvault secret set \
-  --vault-name "$KV_NAME" \
-  --name "github-oauth-client-id" \
-  --value "$CLIENT_ID" \
-  --content-type "text/plain" \
-  --output none
-
-echo "  Stored: github-oauth-client-id"
-
-az keyvault secret set \
-  --vault-name "$KV_NAME" \
-  --name "github-oauth-client-secret" \
-  --value "$CLIENT_SECRET" \
-  --content-type "text/plain" \
-  --output none
-
-echo "  Stored: github-oauth-client-secret"
-
 # ── Print Deployment Parameters ──────────────────────────────────────────
 
 echo ""
 echo "=== Done ==="
 echo ""
-echo "  OAuth App registered and credentials stored in Key Vault."
+echo "  OAuth App registered. The Bicep deployment will write both values"
+echo "  into Key Vault through the management plane, so public Key Vault"
+echo "  access is not required for bootstrap or redeployments."
 echo ""
 echo "  Deploy with:"
 echo "    ./deploy.ps1 \\"
 echo "      -Owner \"...\" \\"
 echo "      -TechnicalContact \"...\" \\"
+echo "      -AlertEmail \"...\" \\"
 echo "      -GitHubOAuthClientId \"${CLIENT_ID}\" \\"
 echo "      -GitHubOAuthClientSecret \"${CLIENT_SECRET}\""
 echo ""
-echo "  Or use the Key Vault references directly (secret is already"
-echo "  stored for the Bicep authSettingV2Configuration)."
+echo "  GitHub Actions environments should keep the same values in"
+echo "  GITHUB_OAUTH_CLIENT_ID and GITHUB_OAUTH_CLIENT_SECRET."
