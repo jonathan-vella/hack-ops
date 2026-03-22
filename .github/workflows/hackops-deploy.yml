@@ -66,6 +66,7 @@ jobs:
       name: ${{ github.event.inputs.environment || 'dev' }}
     outputs:
       image-tag: ${{ steps.meta.outputs.sha }}
+      image-digest: ${{ steps.push.outputs.digest }}
     steps:
       - name: Determine image tag from SHA (P11)
         id: meta
@@ -129,10 +130,15 @@ jobs:
         run: az acr login --name "${{ vars.AZURE_ACR_NAME }}"
 
       - name: Tag and push image (SHA only — no latest, P12)
+        id: push
         run: |
           docker tag "hackops:${{ steps.meta.outputs.sha }}" \
             "${{ vars.AZURE_ACR_LOGIN_SERVER }}/hackops:${{ steps.meta.outputs.sha }}"
           docker push "${{ vars.AZURE_ACR_LOGIN_SERVER }}/hackops:${{ steps.meta.outputs.sha }}"
+          DIGEST=$(docker inspect --format='{{index .RepoDigests 0}}' \
+            "${{ vars.AZURE_ACR_LOGIN_SERVER }}/hackops:${{ steps.meta.outputs.sha }}" \
+            | sed 's/.*@//')
+          echo "digest=${DIGEST}" >> "$GITHUB_OUTPUT"
 
   # ── Deploy to dev ────────────────────────────────────────────────────
   deploy-dev:
@@ -145,6 +151,7 @@ jobs:
     with:
       environment: dev
       image-tag: ${{ needs.build.outputs.image-tag }}
+      image-digest: ${{ needs.build.outputs.image-digest }}
     secrets: inherit
 
   # ── Deploy to prod ───────────────────────────────────────────────────
@@ -158,4 +165,5 @@ jobs:
     with:
       environment: prod
       image-tag: ${{ needs.build.outputs.image-tag }}
+      image-digest: ${{ needs.build.outputs.image-digest }}
     secrets: inherit

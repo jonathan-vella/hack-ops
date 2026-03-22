@@ -54,8 +54,8 @@ az appservice plan delete \
 
 The first deployment creates all infrastructure including ACR, App Service
 (with container config), role assignments, and networking. The default
-`imageTag` parameter (`latest`) is used as a placeholder — there is no
-image in ACR yet, so App Service will fail to pull initially. This is expected.
+`imageDigest` parameter (empty string) means no image is pinned — App Service
+will fail to pull initially. This is expected.
 
 The deployment also writes the GitHub OAuth client ID and client secret into
 Key Vault through the ARM management plane. Do not temporarily open Key Vault
@@ -118,14 +118,18 @@ stores it in the registry. Verify the image exists:
 az acr repository show-tags --name "$ACR_NAME" --repository hackops -o table
 ```
 
-### 4. Redeploy Bicep with the real image tag
+### 4. Redeploy Bicep with the real image digest
 
 ```bash
+# Get the digest of the image you just pushed
+DIGEST=$(az acr manifest show-metadata hackops --registry "$ACR_NAME" \
+  --query digest -o tsv | head -1)
+
 az deployment group create \
   --resource-group "rg-hackops-us-dev" \
   --template-file infra/bicep/hackops/main.bicep \
   --parameters environment=dev projectName=hackops \
-    imageTag=first-deploy \
+    imageDigest="$DIGEST" \
     owner="<owner>" technicalContact="<email>" alertEmail="<email>" \
     githubOAuthClientId="<client-id>" githubOAuthClientSecret="<secret>" \
   --mode Incremental
@@ -186,7 +190,7 @@ automatically:
 1. Build container image in CI
 2. Scan with Grype (fail on HIGH/CRITICAL)
 3. Push to ACR with SHA tag
-4. Deploy Bicep with `imageTag=<sha>`
+4. Deploy Bicep with `imageDigest=<sha256:...>`
 5. Swap staging → production
 6. Verify health (auto-rollback on failure)
 
