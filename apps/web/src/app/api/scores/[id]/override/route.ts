@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import type { ScoresAPI, ApiResponse, CategoryScore } from "@hackops/shared";
 import { requireAuth, checkRole } from "@/lib/guards";
-import { queryOne } from "@/lib/sql";
+import { queryOne, transaction } from "@/lib/sql";
 import { auditLog } from "@/lib/audit";
 import { overrideScoreSchema } from "@/lib/validation/score";
 
