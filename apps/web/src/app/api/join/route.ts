@@ -55,7 +55,7 @@ export const POST = requireAuth(async (request, _context, auth) => {
   if (hackathons.length === 0) {
     return NextResponse.json(
       { error: "Invalid or expired event code", ok: false },
-      { status: 404 },
+      { status: 401 },
     );
   }
 

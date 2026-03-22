@@ -45,24 +45,34 @@ export const POST = requireAuth(
     const body = result.data;
 
     // Look up the hacker record to get their team and hackathon
-    const hackerRecords = await query<Record<string, unknown>>(
-      "SELECT * FROM hackers WHERE githubUserId = @uid",
-      { uid: auth.principal.userId },
+    // LOGIC-004: Filter by challengeId's hackathon to ensure correct team selection
+    const challenge = await queryOne<{ id: string; hackathonId: string }>(
+      "SELECT id, hackathonId FROM challenges WHERE id = @cid",
+      { cid: body.challengeId },
+    );
+    if (!challenge) {
+      return NextResponse.json(
+        { error: "Challenge not found", ok: false },
+        { status: 404 },
+      );
+    }
+
+    const hacker = await queryOne<Record<string, unknown>>(
+      "SELECT * FROM hackers WHERE githubUserId = @uid AND hackathonId = @hid",
+      { uid: auth.principal.userId, hid: challenge.hackathonId },
     );
 
-    if (hackerRecords.length === 0) {
+    if (!hacker) {
       return NextResponse.json(
         {
-          error: "You are not registered as a hacker in any hackathon",
+          error: "You are not registered as a hacker in this hackathon",
           ok: false,
         },
         { status: 403 },
       );
     }
 
-    // Find a hacker record that has a team assignment
-    const hacker = hackerRecords.find((h) => h.teamId != null);
-    if (!hacker) {
+    if (!hacker.teamId) {
       return NextResponse.json(
         { error: "You are not assigned to a team yet", ok: false },
         { status: 403 },
@@ -156,6 +166,7 @@ export const POST = requireAuth(
 export const GET = requireRole(
   "admin",
   "coach",
+  "hacker",
 )(async (request: NextRequest, _context, auth) => {
   const params = Object.fromEntries(request.nextUrl.searchParams.entries());
   const parseResult = listSubmissionsSchema.safeParse(params);
@@ -205,6 +216,30 @@ export const GET = requireRole(
   if (teamId) {
     sqlText += " AND teamId = @teamId";
     queryParams.teamId = teamId;
+  }
+
+  // LOGIC-013: Hackers can only see their own team's submissions
+  if (auth.role === "hacker") {
+    const hacker = await queryOne<{ teamId: string }>(
+      "SELECT teamId FROM hackers WHERE githubUserId = @uid AND hackathonId = @hid",
+      { uid: auth.principal.userId, hid: hackathonId },
+    );
+    if (!hacker) {
+      return NextResponse.json(
+        { error: "You are not registered in this hackathon", ok: false },
+        { status: 403 },
+      );
+    }
+    if (teamId && teamId !== hacker.teamId) {
+      return NextResponse.json(
+        { error: "You can only view your own team's submissions", ok: false },
+        { status: 403 },
+      );
+    }
+    if (!teamId) {
+      queryParams.teamId = hacker.teamId;
+      sqlText += " AND teamId = @teamId";
+    }
   }
 
   sqlText +=

@@ -5,10 +5,11 @@ import type {
   PageResponse,
   HackathonStatus,
 } from "@hackops/shared";
-import { requireAuth } from "@/lib/guards";
+import { requireAuth, requireRole } from "@/lib/guards";
 import { query, execute } from "@/lib/sql";
 import { auditLog } from "@/lib/audit";
 import { createHackathonSchema } from "@/lib/validation/hackathon";
+import { isGlobalAdmin } from "@/lib/roles";
 
 async function generateUniqueEventCode(): Promise<string> {
   const maxAttempts = 50;
@@ -104,7 +105,10 @@ export const POST = requireAuth(async (request, _context, auth) => {
   return NextResponse.json(response, { status: 201 });
 });
 
-export const GET = requireAuth(async (request, _context, _auth) => {
+export const GET = requireAuth(async (request, _context, auth) => {
+  // LOGIC-001/002: Scope listing by role
+  const isAdmin = await isGlobalAdmin(auth.principal.userId);
+
   const status = request.nextUrl.searchParams.get(
     "status",
   ) as HackathonStatus | null;
@@ -114,8 +118,19 @@ export const GET = requireAuth(async (request, _context, _auth) => {
   );
   const offset = Number(request.nextUrl.searchParams.get("offset")) || 0;
 
-  let sqlText = "SELECT * FROM hackathons WHERE 1=1";
+  let sqlText: string;
   const params: Record<string, unknown> = {};
+
+  if (isAdmin) {
+    // Global admins see all hackathons
+    sqlText = "SELECT * FROM hackathons WHERE 1=1";
+  } else {
+    // Non-admins only see hackathons they have a role in
+    sqlText = `SELECT h.* FROM hackathons h
+      INNER JOIN roles r ON r.hackathonId = h.id
+      WHERE r.githubUserId = @uid`;
+    params.uid = auth.principal.userId;
+  }
 
   if (status) {
     sqlText += " AND status = @status";
@@ -129,11 +144,11 @@ export const GET = requireAuth(async (request, _context, _auth) => {
 
   const resources = await query<HackathonsAPI.HackathonRecord>(sqlText, params);
 
-  // Strip eventCode from listing responses — event codes are admin-only
-  // and should not be exposed to all authenticated users
   const sanitized = resources.map(({ eventCode: _ec, ...rest }) => rest);
 
-  const response: ApiResponse<PageResponse<Omit<HackathonsAPI.HackathonRecord, "eventCode">>> = {
+  const response: ApiResponse<
+    PageResponse<Omit<HackathonsAPI.HackathonRecord, "eventCode">>
+  > = {
     data: {
       items: sanitized,
       continuationToken:

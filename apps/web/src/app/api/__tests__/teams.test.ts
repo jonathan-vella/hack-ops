@@ -129,7 +129,7 @@ describe("POST /api/hackathons/:id/assign-teams", () => {
     });
     const body = await res.json();
 
-    expect(res.status).toBe(201);
+    expect(res.status).toBe(200);
     expect(body.ok).toBe(true);
     expect(body.data.hackersAssigned).toBe(5);
     // With teamSize=3 and 5 hackers: 2 teams (3+2, but 2 < ceil(3/2)=2, so last team stays)

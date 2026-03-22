@@ -93,7 +93,7 @@ export const PATCH = requireRole("admin")(async (
           error: `Invalid transition: ${existing.status} → ${body.status}. Allowed: ${allowed.join(", ") || "none"}`,
           ok: false,
         },
-        { status: 422 },
+        { status: 409 },
       );
     }
   }

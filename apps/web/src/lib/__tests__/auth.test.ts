@@ -66,23 +66,19 @@ describe("getAuthPrincipal", () => {
     vi.unstubAllEnvs();
   });
 
-  it("returns empty strings for missing claims", () => {
+  it("returns null for empty claims (no userId)", () => {
     const payload = { claims: [] as unknown[] };
     const headers = new Headers({
       "x-ms-client-principal": encodePayload(payload),
     });
     const result = getAuthPrincipal(headers);
-    expect(result).toEqual({
-      userId: "",
-      githubLogin: "",
-      email: "",
-      avatarUrl: "",
-    });
+    expect(result).toBeNull();
   });
 
   describe("dev bypass", () => {
     beforeEach(() => {
       vi.stubEnv("NODE_ENV", "development");
+      vi.stubEnv("DEV_AUTH_BYPASS_ENABLED", "true");
       vi.stubEnv("DEV_USER_ID", "dev-123");
       vi.stubEnv("DEV_USER_LOGIN", "dev-login");
       vi.stubEnv("DEV_USER_EMAIL", "dev@test.com");
@@ -115,6 +111,12 @@ describe("getAuthPrincipal", () => {
       const result = getAuthPrincipal(new Headers());
       expect(result?.githubLogin).toBe("dev-user");
       expect(result?.email).toBe("dev@example.com");
+    });
+
+    it("returns null when DEV_AUTH_BYPASS_ENABLED is not set", () => {
+      delete process.env.DEV_AUTH_BYPASS_ENABLED;
+      const result = getAuthPrincipal(new Headers());
+      expect(result).toBeNull();
     });
   });
 });

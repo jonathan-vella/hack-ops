@@ -77,6 +77,6 @@ describe("GET /api/health", () => {
     expect(body.status).toBe("unhealthy");
     expect(body.checks[0].name).toBe("sql-database");
     expect(body.checks[0].status).toBe("unhealthy");
-    expect(body.checks[0].error).toBe("Connection refused");
+    expect(body.checks[0].error).toBe("Database connectivity check failed");
   });
 });

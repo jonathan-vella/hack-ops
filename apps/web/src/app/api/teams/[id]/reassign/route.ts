@@ -1,11 +1,12 @@
 import { NextResponse } from "next/server";
 import type { ApiResponse, TeamsAPI } from "@hackops/shared";
-import { requireRole } from "@/lib/guards";
+import { requireAuth, checkRole } from "@/lib/guards";
 import { queryOne, transaction } from "@/lib/sql";
 import { auditLog } from "@/lib/audit";
 import { reassignSchema } from "@/lib/validation/team";
 
-export const PATCH = requireRole("admin")(async (request, context, auth) => {
+// SEC-003: Use requireAuth + resource-derived scope instead of requireRole
+export const PATCH = requireAuth(async (request, context, auth) => {
   const { id: sourceTeamId } = await context.params;
 
   let raw: unknown;
@@ -49,6 +50,14 @@ export const PATCH = requireRole("admin")(async (request, context, auth) => {
       { status: 404 },
     );
   }
+
+  // SEC-003: Derive hackathonId from the resource, not from query params
+  const roleCheck = await checkRole(
+    auth.principal,
+    sourceTeam.hackathonId,
+    "admin",
+  );
+  if (roleCheck instanceof NextResponse) return roleCheck;
 
   // Read target team
   const targetTeam = await queryOne<{
