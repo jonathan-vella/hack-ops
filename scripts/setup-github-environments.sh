@@ -301,6 +301,30 @@ gh variable set AZURE_ALERT_EMAIL --repo "$REPO" --env "$ENV_NAME" --body "$TECH
 gh variable set ADMIN_GITHUB_IDS --repo "$REPO" --env "$ENV_NAME" --body "$ADMIN_GITHUB_IDS"
 echo "  8 variables written"
 
+# ── Assign Azure RBAC roles to deployer identity ───────────────────
+echo "Assigning RBAC roles to deployer identity..."
+RG_SCOPE="/subscriptions/${SUBSCRIPTION_ID}/resourceGroups/${RESOURCE_GROUP}"
+
+az role assignment create \
+  --assignee "$CLIENT_ID" \
+  --role "Contributor" \
+  --scope "$RG_SCOPE" \
+  --only-show-errors || echo "  Contributor: already assigned or insufficient permission"
+
+az role assignment create \
+  --assignee "$CLIENT_ID" \
+  --role "User Access Administrator" \
+  --scope "$RG_SCOPE" \
+  --only-show-errors || echo "  User Access Administrator: already assigned or insufficient permission"
+
+ACR_SCOPE="${RG_SCOPE}/providers/Microsoft.ContainerRegistry/registries/${ACR_NAME}"
+az role assignment create \
+  --assignee "$CLIENT_ID" \
+  --role "AcrPush" \
+  --scope "$ACR_SCOPE" \
+  --only-show-errors || echo "  AcrPush: already assigned or insufficient permission"
+echo "  3 RBAC roles assigned"
+
 echo ""
 echo "=== Done ==="
 echo ""

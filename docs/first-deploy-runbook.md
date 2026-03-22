@@ -175,6 +175,12 @@ az role assignment create \
   --role "Contributor" \
   --scope "/subscriptions/<sub-id>/resourceGroups/rg-hackops-se-dev"
 
+# User Access Administrator on RG (create RBAC assignments in Bicep)
+az role assignment create \
+  --assignee "6507ac72-518a-4974-b834-3479efc93f4c" \
+  --role "User Access Administrator" \
+  --scope "/subscriptions/<sub-id>/resourceGroups/rg-hackops-se-dev"
+
 # AcrPush on ACR (push container images)
 az role assignment create \
   --assignee "6507ac72-518a-4974-b834-3479efc93f4c" \
