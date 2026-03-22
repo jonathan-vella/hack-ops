@@ -16,6 +16,10 @@ on:
         description: "Container image tag (SHA) to deploy"
         required: true
         type: string
+      image-digest:
+        description: "Container image digest (sha256:...) for immutable deploy"
+        required: true
+        type: string
 
 permissions:
   id-token: write
@@ -45,11 +49,11 @@ jobs:
             --resource-group "${{ vars.AZURE_RESOURCE_GROUP }}" \
             --template-file infra/bicep/hackops/main.bicep \
             --parameters environment=${{ inputs.environment }} projectName=hackops \
-              imageTag=${{ inputs.image-tag }} \
+              imageDigest=${{ inputs.image-digest }} \
               owner="${{ vars.AZURE_OWNER }}" \
               technicalContact="${{ vars.AZURE_TECHNICAL_CONTACT }}" \
-              githubOAuthClientId="${{ secrets.GITHUB_OAUTH_CLIENT_ID }}" \
-              githubOAuthClientSecret="${{ secrets.GITHUB_OAUTH_CLIENT_SECRET }}" \
+              githubOAuthClientId="${{ secrets.OAUTH_CLIENT_ID }}" \
+              githubOAuthClientSecret="${{ secrets.OAUTH_CLIENT_SECRET }}" \
               adminGithubIds="${{ vars.ADMIN_GITHUB_IDS }}" \
             --mode Incremental
 

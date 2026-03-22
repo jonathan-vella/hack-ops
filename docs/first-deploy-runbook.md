@@ -54,8 +54,8 @@ az appservice plan delete \
 
 The first deployment creates all infrastructure including ACR, App Service
 (with container config), role assignments, and networking. The default
-`imageTag` parameter (`latest`) is used as a placeholder — there is no
-image in ACR yet, so App Service will fail to pull initially. This is expected.
+`imageDigest` parameter (empty string) means no image is pinned — App Service
+will fail to pull initially. This is expected.
 
 The deployment also writes the GitHub OAuth client ID and client secret into
 Key Vault through the ARM management plane. Do not temporarily open Key Vault
@@ -118,14 +118,18 @@ stores it in the registry. Verify the image exists:
 az acr repository show-tags --name "$ACR_NAME" --repository hackops -o table
 ```
 
-### 4. Redeploy Bicep with the real image tag
+### 4. Redeploy Bicep with the real image digest
 
 ```bash
+# Get the digest of the image you just pushed
+DIGEST=$(az acr manifest show-metadata hackops --registry "$ACR_NAME" \
+  --query digest -o tsv | head -1)
+
 az deployment group create \
   --resource-group "rg-hackops-us-dev" \
   --template-file infra/bicep/hackops/main.bicep \
   --parameters environment=dev projectName=hackops \
-    imageTag=first-deploy \
+    imageDigest="$DIGEST" \
     owner="<owner>" technicalContact="<email>" alertEmail="<email>" \
     githubOAuthClientId="<client-id>" githubOAuthClientSecret="<secret>" \
   --mode Incremental
@@ -148,37 +152,34 @@ Expected: `200 OK` with `status: "ok"` (or `"warming"` within first 60s).
 
 ### 6. Configure GitHub environment secrets and variables
 
-Run the bootstrap script to auto-populate all GitHub environment
-secrets and variables from the Bicep deployment outputs:
+Run the bootstrap script. It auto-detects tenant, subscription, OIDC
+client-id, resource group, owner, technical-contact, admin GitHub ID,
+and all Bicep deployment outputs. Only OAuth secrets need to be provided
+(Key Vault is network-locked from outside the VNet):
 
 ```bash
-./scripts/setup-github-environments.sh --env dev \
-  --resource-group rg-hackops-us-dev \
-  --client-id <OIDC-client-id> \
-  --tenant-id <Azure-AD-tenant-id> \
-  --subscription-id <subscription-id> \
+bash scripts/setup-github-environments.sh dev \
   --oauth-client-id <GitHub-OAuth-client-id> \
-  --oauth-client-secret <GitHub-OAuth-client-secret> \
-  --owner "<owner-name>" \
-  --technical-contact "<email>" \
-  --admin-github-ids "<comma-separated-github-ids>"
+  --oauth-client-secret <GitHub-OAuth-client-secret>
 ```
 
-The script reads ACR name, login server, and App Service name
-from the latest successful Bicep deployment outputs automatically.
+Use `--dry-run` to preview without writing. Any auto-detected value
+can be overridden with explicit flags (run `--help` for details).
 
-Also grant `AcrPush` to the GitHub OIDC identity so CI/CD can
-push images:
+Grant the CI/CD identity (`hackops-cicd-deployer`) the roles it needs:
 
 ```bash
-OIDC_CLIENT_ID="<github-oidc-app-registration-client-id>"
-OIDC_SP_OBJECT_ID=$(az ad sp show --id "$OIDC_CLIENT_ID" --query id -o tsv)
-
+# Contributor on RG (Bicep deploys + slot management)
 az role assignment create \
-  --assignee-object-id "$OIDC_SP_OBJECT_ID" \
-  --assignee-principal-type ServicePrincipal \
+  --assignee "6507ac72-518a-4974-b834-3479efc93f4c" \
+  --role "Contributor" \
+  --scope "/subscriptions/<sub-id>/resourceGroups/rg-hackops-se-dev"
+
+# AcrPush on ACR (push container images)
+az role assignment create \
+  --assignee "6507ac72-518a-4974-b834-3479efc93f4c" \
   --role "AcrPush" \
-  --scope "/subscriptions/<sub-id>/resourceGroups/rg-hackops-us-dev/providers/Microsoft.ContainerRegistry/registries/$ACR_NAME"
+  --scope "/subscriptions/<sub-id>/resourceGroups/rg-hackops-se-dev/providers/Microsoft.ContainerRegistry/registries/<acr-name>"
 ```
 
 ### 7. Enable automated CI/CD
@@ -189,7 +190,7 @@ automatically:
 1. Build container image in CI
 2. Scan with Grype (fail on HIGH/CRITICAL)
 3. Push to ACR with SHA tag
-4. Deploy Bicep with `imageTag=<sha>`
+4. Deploy Bicep with `imageDigest=<sha256:...>`
 5. Swap staging → production
 6. Verify health (auto-rollback on failure)
 

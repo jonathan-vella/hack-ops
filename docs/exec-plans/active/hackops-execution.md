@@ -281,7 +281,7 @@ so agents 12–15 have the skills/instructions they were designed to use.
 
 #### H2: Azure AD setup (OIDC for CI/CD)
 
-- [x] H2.1: Create app registration `hackops-github-oidc` (appId: `6507ac72-518a-4974-b834-3479efc93f4c`)
+- [x] H2.1: Create app registration `hackops-cicd-deployer` (appId: `6507ac72-518a-4974-b834-3479efc93f4c`)
 - [x] H2.2: Add federated credential for `repo:jonathan-vella/hack-ops:environment:dev`
 - [x] H2.3: Grant `Contributor` + `User Access Administrator`
       on `rg-hackops-us-dev` to OIDC SP `3c413e61...`
