@@ -5,7 +5,7 @@ import type {
   PageResponse,
   HackathonStatus,
 } from "@hackops/shared";
-import { requireAuth, requireRole } from "@/lib/guards";
+import { requireAuth } from "@/lib/guards";
 import { query, execute } from "@/lib/sql";
 import { auditLog } from "@/lib/audit";
 import { createHackathonSchema } from "@/lib/validation/hackathon";
