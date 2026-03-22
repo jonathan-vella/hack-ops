@@ -68,7 +68,7 @@ function parseMarkdownH2Blocks(text) {
       .map((line) => line.trim())
       .filter((line) => line.startsWith("## "))
       // Strip optional trailing HTML comments like <!-- Optional, add at end -->
-      .map((h) => h.replace(/\s*<!--.*?-->\s*$/, "").trim());
+      .map((h) => h.replace(/\s*<!--[\s\S]*?-->\s*$/, "").trim());
 
     if (headings.length > 0) {
       result.set(artifactName, headings);
