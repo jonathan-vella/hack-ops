@@ -52,6 +52,7 @@ jobs:
               imageDigest=${{ inputs.image-digest }} \
               owner="${{ vars.AZURE_OWNER }}" \
               technicalContact="${{ vars.AZURE_TECHNICAL_CONTACT }}" \
+              alertEmail="${{ vars.AZURE_ALERT_EMAIL }}" \
               githubOAuthClientId="${{ secrets.OAUTH_CLIENT_ID }}" \
               githubOAuthClientSecret="${{ secrets.OAUTH_CLIENT_SECRET }}" \
               adminGithubIds="${{ vars.ADMIN_GITHUB_IDS }}" \

@@ -297,8 +297,9 @@ gh variable set AZURE_RESOURCE_GROUP --repo "$REPO" --env "$ENV_NAME" --body "$R
 gh variable set AZURE_WEBAPP_NAME --repo "$REPO" --env "$ENV_NAME" --body "$WEBAPP_NAME"
 gh variable set AZURE_OWNER --repo "$REPO" --env "$ENV_NAME" --body "$OWNER"
 gh variable set AZURE_TECHNICAL_CONTACT --repo "$REPO" --env "$ENV_NAME" --body "$TECHNICAL_CONTACT"
+gh variable set AZURE_ALERT_EMAIL --repo "$REPO" --env "$ENV_NAME" --body "$TECHNICAL_CONTACT"
 gh variable set ADMIN_GITHUB_IDS --repo "$REPO" --env "$ENV_NAME" --body "$ADMIN_GITHUB_IDS"
-echo "  7 variables written"
+echo "  8 variables written"
 
 echo ""
 echo "=== Done ==="
