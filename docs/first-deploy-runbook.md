@@ -146,14 +146,26 @@ curl -s "https://app-hackops-dev.azurewebsites.net/api/health" | jq .
 
 Expected: `200 OK` with `status: "ok"` (or `"warming"` within first 60s).
 
-### 6. Configure GitHub environment variables
+### 6. Configure GitHub environment secrets and variables
 
-Add these to each GitHub environment (dev, prod):
+Run the bootstrap script to auto-populate all GitHub environment
+secrets and variables from the Bicep deployment outputs:
 
-| Variable                 | Example Value                   |
-| ------------------------ | ------------------------------- |
-| `AZURE_ACR_NAME`         | `crhackopsdev123abc`            |
-| `AZURE_ACR_LOGIN_SERVER` | `crhackopsdev123abc.azurecr.io` |
+```bash
+./scripts/setup-github-environments.sh --env dev \
+  --resource-group rg-hackops-us-dev \
+  --client-id <OIDC-client-id> \
+  --tenant-id <Azure-AD-tenant-id> \
+  --subscription-id <subscription-id> \
+  --oauth-client-id <GitHub-OAuth-client-id> \
+  --oauth-client-secret <GitHub-OAuth-client-secret> \
+  --owner "<owner-name>" \
+  --technical-contact "<email>" \
+  --admin-github-ids "<comma-separated-github-ids>"
+```
+
+The script reads ACR name, login server, and App Service name
+from the latest successful Bicep deployment outputs automatically.
 
 Also grant `AcrPush` to the GitHub OIDC identity so CI/CD can
 push images:
