@@ -175,7 +175,7 @@ After the first successful deploy, subsequent pushes to `main` will
 automatically:
 
 1. Build container image in CI
-2. Scan with Trivy (fail on CRITICAL/HIGH)
+2. Scan with Grype (fail on HIGH/CRITICAL)
 3. Push to ACR with SHA tag
 4. Deploy Bicep with `imageTag=<sha>`
 5. Swap staging → production
