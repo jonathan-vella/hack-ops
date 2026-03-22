@@ -33,7 +33,6 @@ See the [conductor agent](../.github/agents/01-conductor.agent.md) for orchestra
 | [Security Checklist](security-checklist.md)     | Security invariants           |
 | [Local Dev Guide](local-dev-guide.md)           | Local setup step-by-step      |
 | [First-Deploy Runbook](first-deploy-runbook.md) | Container migration runbook   |
-| [Backlog Setup](exec-plans/backlog-setup.md)    | GitHub Project board config   |
 
 ---
 
