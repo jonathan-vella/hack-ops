@@ -162,18 +162,20 @@ bash scripts/setup-github-environments.sh dev \
 Use `--dry-run` to preview without writing. Any auto-detected value
 can be overridden with explicit flags (run `--help` for details).
 
-Also grant `AcrPush` to the GitHub OIDC identity so CI/CD can
-push images:
+Grant the CI/CD identity (`hackops-cicd-deployer`) the roles it needs:
 
 ```bash
-OIDC_CLIENT_ID="<github-oidc-app-registration-client-id>"
-OIDC_SP_OBJECT_ID=$(az ad sp show --id "$OIDC_CLIENT_ID" --query id -o tsv)
-
+# Contributor on RG (Bicep deploys + slot management)
 az role assignment create \
-  --assignee-object-id "$OIDC_SP_OBJECT_ID" \
-  --assignee-principal-type ServicePrincipal \
+  --assignee "6507ac72-518a-4974-b834-3479efc93f4c" \
+  --role "Contributor" \
+  --scope "/subscriptions/<sub-id>/resourceGroups/rg-hackops-se-dev"
+
+# AcrPush on ACR (push container images)
+az role assignment create \
+  --assignee "6507ac72-518a-4974-b834-3479efc93f4c" \
   --role "AcrPush" \
-  --scope "/subscriptions/<sub-id>/resourceGroups/rg-hackops-us-dev/providers/Microsoft.ContainerRegistry/registries/$ACR_NAME"
+  --scope "/subscriptions/<sub-id>/resourceGroups/rg-hackops-se-dev/providers/Microsoft.ContainerRegistry/registries/<acr-name>"
 ```
 
 ### 7. Enable automated CI/CD

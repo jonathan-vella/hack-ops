@@ -5,7 +5,7 @@
 #
 # Auto-detects almost everything from Azure CLI context:
 #   - tenant-id, subscription-id from `az account show`
-#   - OIDC client-id from app registration named "hackops-github-oidc"
+#   - OIDC client-id from app registration named "hackops-cicd-deployer"
 #   - resource group from `rg-hackops-*` naming convention
 #   - owner, technical-contact from resource group tags
 #   - ACR name/server, App Service name from Bicep deployment outputs
@@ -45,7 +45,7 @@ Required (cannot be auto-detected — Key Vault is network-locked):
 
 Optional overrides (auto-detected if omitted):
   --resource-group       Azure resource group (auto: rg-hackops-*-<env>)
-  --client-id            OIDC app registration client ID (auto: hackops-github-oidc)
+  --client-id            OIDC app registration client ID (auto: hackops-cicd-deployer)
   --tenant-id            Azure AD tenant ID (auto: az account show)
   --subscription-id      Azure subscription ID (auto: az account show)
   --owner                Resource owner tag (auto: RG tag 'owner')
@@ -136,10 +136,10 @@ fi
 # ── Auto-detect OIDC app registration ───────────────────────────────
 echo "[2/7] OIDC app registration..."
 if [[ -z "$CLIENT_ID" ]]; then
-  CLIENT_ID=$(az ad app list --display-name hackops-github-oidc \
+  CLIENT_ID=$(az ad app list --display-name hackops-cicd-deployer \
     --query "[0].appId" -o tsv 2>/dev/null || true)
   if [[ -z "$CLIENT_ID" || "$CLIENT_ID" == "None" ]]; then
-    echo "  Error: Could not find app registration 'hackops-github-oidc'"
+    echo "  Error: Could not find app registration 'hackops-cicd-deployer'"
     echo "  Provide --client-id manually"
     exit 1
   fi
