@@ -148,24 +148,19 @@ Expected: `200 OK` with `status: "ok"` (or `"warming"` within first 60s).
 
 ### 6. Configure GitHub environment secrets and variables
 
-Run the bootstrap script to auto-populate all GitHub environment
-secrets and variables from the Bicep deployment outputs:
+Run the bootstrap script. It auto-detects tenant, subscription, OIDC
+client-id, resource group, owner, technical-contact, admin GitHub ID,
+and all Bicep deployment outputs. Only OAuth secrets need to be provided
+(Key Vault is network-locked from outside the VNet):
 
 ```bash
-./scripts/setup-github-environments.sh --env dev \
-  --resource-group rg-hackops-us-dev \
-  --client-id <OIDC-client-id> \
-  --tenant-id <Azure-AD-tenant-id> \
-  --subscription-id <subscription-id> \
+bash scripts/setup-github-environments.sh dev \
   --oauth-client-id <GitHub-OAuth-client-id> \
-  --oauth-client-secret <GitHub-OAuth-client-secret> \
-  --owner "<owner-name>" \
-  --technical-contact "<email>" \
-  --admin-github-ids "<comma-separated-github-ids>"
+  --oauth-client-secret <GitHub-OAuth-client-secret>
 ```
 
-The script reads ACR name, login server, and App Service name
-from the latest successful Bicep deployment outputs automatically.
+Use `--dry-run` to preview without writing. Any auto-detected value
+can be overridden with explicit flags (run `--help` for details).
 
 Also grant `AcrPush` to the GitHub OIDC identity so CI/CD can
 push images:
