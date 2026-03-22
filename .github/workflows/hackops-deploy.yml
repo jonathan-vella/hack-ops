@@ -1,12 +1,12 @@
 # HackOps Deploy Workflow
 # Builds container image, pushes to ACR, deploys via Bicep + slot swap.
 # - dev: auto-deploys on push to main (staging slot swap)
-# - prod: manual dispatch with approval gate
+# - production: manual dispatch with approval gate
 #
 # Prerequisites:
 #   1. Azure AD app registration with federated credential for this repo
-#   2. GitHub environments "dev" and "prod" configured with OIDC secrets
-#   3. "prod" environment has required-reviewers protection rule
+#   2. GitHub environments "dev" and "production" configured with OIDC secrets
+#   3. "production" environment has required-reviewers protection rule
 #   4. OIDC identity has AcrPush on ACR (see docs/first-deploy-runbook.md)
 #
 # OIDC setup (per environment):
@@ -42,7 +42,7 @@ on:
         type: choice
         options:
           - dev
-          - prod
+          - production
         default: dev
 
 permissions:
@@ -228,9 +228,9 @@ jobs:
     needs: build
     if: >-
       github.event_name == 'workflow_dispatch' &&
-      github.event.inputs.environment == 'prod'
+      github.event.inputs.environment == 'production'
     environment:
-      name: prod
+      name: production
       url: https://${{ vars.AZURE_WEBAPP_NAME || 'app-hackops-prod' }}.azurewebsites.net
     steps:
       - name: Checkout repository
@@ -248,7 +248,7 @@ jobs:
           az deployment group create \
             --resource-group "${{ vars.AZURE_RESOURCE_GROUP }}" \
             --template-file infra/bicep/hackops/main.bicep \
-            --parameters environment=prod projectName=hackops \
+            --parameters environment=production projectName=hackops \
               imageTag=${{ needs.build.outputs.image-tag }} \
               owner="${{ vars.AZURE_OWNER }}" \
               technicalContact="${{ vars.AZURE_TECHNICAL_CONTACT }}" \
