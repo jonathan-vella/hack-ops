@@ -48,8 +48,8 @@ jobs:
               imageTag=${{ inputs.image-tag }} \
               owner="${{ vars.AZURE_OWNER }}" \
               technicalContact="${{ vars.AZURE_TECHNICAL_CONTACT }}" \
-              githubOAuthClientId="${{ secrets.GITHUB_OAUTH_CLIENT_ID }}" \
-              githubOAuthClientSecret="${{ secrets.GITHUB_OAUTH_CLIENT_SECRET }}" \
+              githubOAuthClientId="${{ secrets.OAUTH_CLIENT_ID }}" \
+              githubOAuthClientSecret="${{ secrets.OAUTH_CLIENT_SECRET }}" \
               adminGithubIds="${{ vars.ADMIN_GITHUB_IDS }}" \
             --mode Incremental
 

@@ -285,8 +285,8 @@ echo "Writing secrets..."
 gh secret set AZURE_CLIENT_ID --repo "$REPO" --env "$ENV_NAME" --body "$CLIENT_ID"
 gh secret set AZURE_TENANT_ID --repo "$REPO" --env "$ENV_NAME" --body "$TENANT_ID"
 gh secret set AZURE_SUBSCRIPTION_ID --repo "$REPO" --env "$ENV_NAME" --body "$SUBSCRIPTION_ID"
-gh secret set GITHUB_OAUTH_CLIENT_ID --repo "$REPO" --env "$ENV_NAME" --body "$OAUTH_CLIENT_ID"
-gh secret set GITHUB_OAUTH_CLIENT_SECRET --repo "$REPO" --env "$ENV_NAME" --body "$OAUTH_CLIENT_SECRET"
+gh secret set OAUTH_CLIENT_ID --repo "$REPO" --env "$ENV_NAME" --body "$OAUTH_CLIENT_ID"
+gh secret set OAUTH_CLIENT_SECRET --repo "$REPO" --env "$ENV_NAME" --body "$OAUTH_CLIENT_SECRET"
 echo "  5 secrets written"
 
 # ── Write variables ─────────────────────────────────────────────────

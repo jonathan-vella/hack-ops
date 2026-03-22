@@ -24,8 +24,8 @@
 #   ADMIN_GITHUB_IDS       — Comma-separated GitHub user IDs for admin auto-assign
 #
 # Environment secrets (per environment):
-#   GITHUB_OAUTH_CLIENT_ID     — GitHub OAuth App client ID
-#   GITHUB_OAUTH_CLIENT_SECRET — GitHub OAuth App client secret
+#   OAUTH_CLIENT_ID            — GitHub OAuth App client ID
+#   OAUTH_CLIENT_SECRET        — GitHub OAuth App client secret
 
 name: HackOps Deploy
 
