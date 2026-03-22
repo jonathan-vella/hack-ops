@@ -49,7 +49,7 @@
       "recommendation": "Pin to a specific release tag (e.g. aquasecurity/trivy-action@0.28.0) or a commit SHA for maximum reproducibility. This aligns with the GitHub Actions supply-chain hardening guidance.",
       "risk": "Low probability, medium impact — unlikely but would run untrusted code in CI",
       "status": "resolved",
-      "resolution": "Pinned to aquasecurity/trivy-action@0.28.0"
+      "resolution": "Replaced Trivy with anchore/scan-action@v7 (Grype). Pinned to major version tag per project conventions."
     },
     {
       "id": "CS-002",
@@ -59,7 +59,8 @@
       "description": "The deploy workflow builds, scans (Trivy), and pushes the container image but does not generate a Software Bill of Materials (SBOM) or sign the image (e.g. with cosign/notation). For a hackathon management tool this is acceptable, but it leaves no audit trail for image provenance beyond the SHA tag.",
       "recommendation": "Consider adding 'trivy image --format spdx-json' for SBOM generation and/or cosign signing in a future hardening pass. Not blocking for initial deploy.",
       "risk": "No immediate operational risk; compliance gap only",
-      "status": "accepted"
+      "status": "resolved",
+      "resolution": "Added anchore/sbom-action@v0 (Syft) to generate SPDX JSON SBOM and upload as build artifact. Image signing deferred."
     },
     {
       "id": "CS-003",

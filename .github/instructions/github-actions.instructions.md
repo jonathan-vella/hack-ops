@@ -65,13 +65,14 @@ concurrency:
 
 ## Existing Workflows
 
-| Workflow               | Purpose                               | Trigger                      |
-| ---------------------- | ------------------------------------- | ---------------------------- |
-| `lint.yml`             | Markdown lint + code quality          | PR + push to main            |
-| `agent-validation.yml` | Agent/skill/VS Code config validation | Changes to agents/skills     |
-| `entropy-check.yml`    | Doc count/reference drift detection   | Weekly schedule + dispatch   |
-| `hackops-ci.yml`       | App lint, test, build validation      | Changes to apps/ + packages/ |
-| `hackops-deploy.yml`   | Deploy to Azure App Service (OIDC)    | After CI success + dispatch  |
+| Workflow                  | Purpose                                | Trigger                      |
+| ------------------------- | -------------------------------------- | ---------------------------- |
+| `lint.yml`                | Markdown lint + code quality           | PR + push to main            |
+| `agent-validation.yml`    | Agent/skill/VS Code config validation  | Changes to agents/skills     |
+| `entropy-check.yml`       | Doc count/reference drift detection    | Weekly schedule + dispatch   |
+| `hackops-ci.yml`          | App lint, test, build validation       | Changes to apps/ + packages/ |
+| `hackops-deploy.yml`      | Deploy to Azure App Service (OIDC)     | After CI success + dispatch  |
+| `_deploy-environment.yml` | Reusable deploy (slot swap + rollback) | Called by hackops-deploy.yml |
 
 ## Validation Scripts
 

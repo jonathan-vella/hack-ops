@@ -35,6 +35,11 @@ RUN npm run build --workspace @hackops/web
 FROM node:24-alpine AS runtime
 WORKDIR /app
 
+# Patch OS-level CVEs (e.g. zlib) and remove npm/npx (not needed at runtime)
+# to eliminate bundled npm transitive CVEs (node-tar, minimatch)
+RUN apk upgrade --no-cache && \
+    rm -rf /usr/local/lib/node_modules/npm /usr/local/bin/npm /usr/local/bin/npx
+
 # Non-root user (P18)
 RUN addgroup --system --gid 1001 nodejs && \
     adduser --system --uid 1001 nextjs

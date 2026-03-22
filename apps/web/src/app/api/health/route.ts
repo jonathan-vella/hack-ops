@@ -58,7 +58,7 @@ export async function GET() {
         status: "ok",
         responseTimeMs: Date.now() - start,
       });
-    } catch (_err) {
+    } catch {
       overall = "unhealthy";
       checks.push({
         name: "sql-database",

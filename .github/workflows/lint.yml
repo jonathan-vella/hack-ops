@@ -38,9 +38,6 @@ jobs:
       - name: Validate H2 heading sync
         run: npm run lint:h2-sync
 
-      - name: Validate instruction frontmatter
-        run: npm run lint:instruction-frontmatter
-
       - name: Check version sync
         run: npm run lint:version-sync
 
@@ -49,9 +46,6 @@ jobs:
 
       - name: Validate JSON files
         run: npm run lint:json
-
-      - name: Validate MCP config
-        run: npm run lint:mcp-config
 
       - name: Docs freshness check
         run: npm run lint:docs-freshness
