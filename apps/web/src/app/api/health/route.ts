@@ -58,13 +58,13 @@ export async function GET() {
         status: "ok",
         responseTimeMs: Date.now() - start,
       });
-    } catch (err) {
+    } catch (_err) {
       overall = "unhealthy";
       checks.push({
         name: "sql-database",
         status: "unhealthy",
         responseTimeMs: Date.now() - start,
-        error: err instanceof Error ? err.message : "Unknown error",
+        error: "Database connectivity check failed",
       });
     }
   }

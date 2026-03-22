@@ -23,13 +23,14 @@ vi.mock("@/lib/audit", () => ({
   auditLog: vi.fn(),
 }));
 
-import { query, queryOne, execute } from "@/lib/sql";
+import { query, queryOne, execute, transaction } from "@/lib/sql";
 import { getAuthPrincipal } from "@/lib/auth";
 import { resolveRole } from "@/lib/roles";
 
 const mockQuery = vi.mocked(query);
 const mockQueryOne = vi.mocked(queryOne);
 const mockExecute = vi.mocked(execute);
+const mockTransaction = vi.mocked(transaction);
 const mockGetAuth = vi.mocked(getAuthPrincipal);
 const mockResolveRole = vi.mocked(resolveRole);
 
@@ -313,6 +314,9 @@ describe("GET /api/progression", () => {
     mockGetAuth.mockReturnValue(hackerPrincipal);
     mockResolveRole.mockResolvedValue("hacker");
 
+    // SEC-004: queryOne for hacker ownership check
+    mockQueryOne.mockResolvedValueOnce({ teamId: "t1" });
+
     mockQueryOne.mockResolvedValueOnce({
       id: "prog-t1",
       teamId: "t1",
@@ -340,6 +344,8 @@ describe("GET /api/progression", () => {
   it("returns 404 when no progression exists", async () => {
     mockGetAuth.mockReturnValue(hackerPrincipal);
     mockResolveRole.mockResolvedValue("hacker");
+    // SEC-004: hacker ownership check
+    mockQueryOne.mockResolvedValueOnce({ teamId: "t1" });
     mockQueryOne.mockResolvedValueOnce(null);
 
     const { GET } = await import("../progression/route");
@@ -362,15 +368,15 @@ describe("POST /api/submissions", () => {
     mockGetAuth.mockReturnValue(hackerPrincipal);
     // requireAuth — no role check needed, just auth
 
-    // query: hacker records
-    mockQuery.mockResolvedValueOnce([
-      {
-        id: "hkr-1",
-        hackathonId: "h1",
-        githubUserId: "user-hacker-1",
-        teamId: "t1",
-      },
-    ]);
+    // queryOne: challenge lookup (LOGIC-004)
+    mockQueryOne.mockResolvedValueOnce({ id: "c1", hackathonId: "h1" });
+    // queryOne: hacker for this hackathon
+    mockQueryOne.mockResolvedValueOnce({
+      id: "hkr-1",
+      hackathonId: "h1",
+      githubUserId: "user-hacker-1",
+      teamId: "t1",
+    });
     // queryOne: hackathon
     mockQueryOne.mockResolvedValueOnce({ id: "h1", status: "active" });
 
@@ -403,15 +409,15 @@ describe("POST /api/submissions", () => {
   it("rejects submission for locked challenge (challenge-gate)", async () => {
     mockGetAuth.mockReturnValue(hackerPrincipal);
 
-    // query: hacker records
-    mockQuery.mockResolvedValueOnce([
-      {
-        id: "hkr-1",
-        hackathonId: "h1",
-        githubUserId: "user-hacker-1",
-        teamId: "t1",
-      },
-    ]);
+    // queryOne: challenge lookup
+    mockQueryOne.mockResolvedValueOnce({ id: "c3", hackathonId: "h1" });
+    // queryOne: hacker
+    mockQueryOne.mockResolvedValueOnce({
+      id: "hkr-1",
+      hackathonId: "h1",
+      githubUserId: "user-hacker-1",
+      teamId: "t1",
+    });
     // queryOne: hackathon
     mockQueryOne.mockResolvedValueOnce({ id: "h1", status: "active" });
     // challenge-gate: challenge order
@@ -437,15 +443,15 @@ describe("POST /api/submissions", () => {
   it("rejects submission when hacker has no team", async () => {
     mockGetAuth.mockReturnValue(hackerPrincipal);
 
-    // query: hacker records — no team assignment
-    mockQuery.mockResolvedValueOnce([
-      {
-        id: "hkr-1",
-        hackathonId: "h1",
-        githubUserId: "user-hacker-1",
-        teamId: null,
-      },
-    ]);
+    // queryOne: challenge lookup
+    mockQueryOne.mockResolvedValueOnce({ id: "c1", hackathonId: "h1" });
+    // queryOne: hacker — no team assignment
+    mockQueryOne.mockResolvedValueOnce({
+      id: "hkr-1",
+      hackathonId: "h1",
+      githubUserId: "user-hacker-1",
+      teamId: null,
+    });
 
     const { POST } = await import("../submissions/route");
     const req = createRequest("POST", "http://localhost/api/submissions", {
@@ -462,14 +468,15 @@ describe("POST /api/submissions", () => {
   it("rejects submission when hackathon is not active", async () => {
     mockGetAuth.mockReturnValue(hackerPrincipal);
 
-    mockQuery.mockResolvedValueOnce([
-      {
-        id: "hkr-1",
-        hackathonId: "h1",
-        githubUserId: "user-hacker-1",
-        teamId: "t1",
-      },
-    ]);
+    // queryOne: challenge lookup
+    mockQueryOne.mockResolvedValueOnce({ id: "c1", hackathonId: "h1" });
+    // queryOne: hacker
+    mockQueryOne.mockResolvedValueOnce({
+      id: "hkr-1",
+      hackathonId: "h1",
+      githubUserId: "user-hacker-1",
+      teamId: "t1",
+    });
     mockQueryOne.mockResolvedValueOnce({ id: "h1", status: "draft" });
 
     const { POST } = await import("../submissions/route");
@@ -569,10 +576,15 @@ describe("PATCH /api/submissions/:id (review)", () => {
       ]),
     });
 
-    // execute: UPDATE submission to approved
-    mockExecute.mockResolvedValueOnce(1);
-    // execute: INSERT score record
-    mockExecute.mockResolvedValueOnce(1);
+    // LOGIC-006: transaction wraps approval + score insert
+    mockTransaction.mockImplementationOnce(async (fn) => {
+      const tx = {
+        query: vi.fn(),
+        queryOne: vi.fn(),
+        execute: vi.fn().mockResolvedValue(1),
+      };
+      await fn(tx);
+    });
 
     // advanceProgression calls:
     // queryOne: challenge order
@@ -611,8 +623,8 @@ describe("PATCH /api/submissions/:id (review)", () => {
     expect(body.data.state).toBe("approved");
     expect(body.data.scores).toHaveLength(2);
 
-    // Verify advanceProgression updated progression
-    expect(mockExecute).toHaveBeenCalledTimes(3);
+    // Verify transaction was used for atomic approval
+    expect(mockTransaction).toHaveBeenCalledTimes(1);
   });
 
   it("rejects submission (no scores)", async () => {

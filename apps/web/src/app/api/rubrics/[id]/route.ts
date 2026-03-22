@@ -24,6 +24,7 @@ export const GET = requireAuth(async (_request, context, auth) => {
     resource.hackathonId as string,
     "admin",
     "coach",
+    "hacker",
   );
   if (roleCheck instanceof NextResponse) return roleCheck;
 

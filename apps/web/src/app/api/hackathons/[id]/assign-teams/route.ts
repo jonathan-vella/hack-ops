@@ -59,6 +59,17 @@ export const POST = requireRole("admin")(async (request, context, auth) => {
     );
   }
 
+  // LOGIC-003: Enforce active hackathon status before team assignment
+  if (hackathon.status !== "active") {
+    return NextResponse.json(
+      {
+        error: "Teams can only be assigned when the hackathon is active",
+        ok: false,
+      },
+      { status: 409 },
+    );
+  }
+
   let overrideTeamSize: number | undefined;
   try {
     const raw = await request.json();
@@ -163,5 +174,5 @@ export const POST = requireRole("admin")(async (request, context, auth) => {
     data: responseData,
     ok: true,
   };
-  return NextResponse.json(response, { status: 201 });
+  return NextResponse.json(response, { status: 200 });
 });

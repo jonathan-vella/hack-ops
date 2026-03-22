@@ -21,6 +21,10 @@ CREATE TABLE hackathons (
   INDEX IX_hackathons_eventCode (eventCode) WHERE status != 'archived'
 );
 
+-- LOGIC-018: Event code uniqueness at DB level for non-archived hackathons
+CREATE UNIQUE INDEX UQ_hackathons_eventCode_active
+  ON hackathons(eventCode) WHERE status != 'archived';
+
 -- ── teams ───────────────────────────────────────────────────────────────
 
 CREATE TABLE teams (
@@ -48,7 +52,9 @@ CREATE TABLE hackers (
   joinedAt        DATETIME2       NOT NULL,
 
   INDEX IX_hackers_hackathonId (hackathonId),
-  INDEX IX_hackers_githubUserId (githubUserId)
+  INDEX IX_hackers_githubUserId (githubUserId),
+  -- LOGIC-008: One hacker record per user per hackathon
+  CONSTRAINT UQ_hackers_hackathon_user UNIQUE (hackathonId, githubUserId)
 );
 
 -- ── challenges ──────────────────────────────────────────────────────────
@@ -153,6 +159,7 @@ CREATE TABLE config (
 
 CREATE TABLE roles (
   id              NVARCHAR(128)   NOT NULL PRIMARY KEY,
+  -- LOGIC-009: FK to hackathons (nullable for __global__ admin roles)
   hackathonId     NVARCHAR(128)   NOT NULL,
   githubUserId    NVARCHAR(128)   NOT NULL,
   githubLogin     NVARCHAR(100)   NOT NULL,
@@ -163,7 +170,9 @@ CREATE TABLE roles (
   assignedAt      DATETIME2       NOT NULL,
 
   INDEX IX_roles_hackathonId (hackathonId, assignedAt DESC),
-  INDEX IX_roles_githubUserId (githubUserId)
+  INDEX IX_roles_githubUserId (githubUserId),
+  -- LOGIC-008: One role per user per hackathon
+  CONSTRAINT UQ_roles_hackathon_user UNIQUE (hackathonId, githubUserId)
 );
 
 -- ── progressions ────────────────────────────────────────────────────────
@@ -178,7 +187,9 @@ CREATE TABLE progressions (
   -- Row version for optimistic concurrency
   rowVersion          ROWVERSION      NOT NULL,
 
-  INDEX IX_progressions_teamId_hackathonId (teamId, hackathonId)
+  INDEX IX_progressions_teamId_hackathonId (teamId, hackathonId),
+  -- LOGIC-008: One progression per team per hackathon
+  CONSTRAINT UQ_progressions_team_hackathon UNIQUE (teamId, hackathonId)
 );
 
 -- ── audit_log ───────────────────────────────────────────────────────────

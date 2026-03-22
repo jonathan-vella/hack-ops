@@ -99,7 +99,7 @@ describe("POST /api/join", () => {
     });
     const res = await POST(req, { params: Promise.resolve({}) });
 
-    expect(res.status).toBe(404);
+    expect(res.status).toBe(401);
     const body = await res.json();
     expect(body.error).toContain("Invalid or expired");
   });

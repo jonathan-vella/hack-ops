@@ -9,7 +9,7 @@ export const GET = requireRole(
   "admin",
   "coach",
   "hacker",
-)(async (request: NextRequest, _context, _auth) => {
+)(async (request: NextRequest, _context, auth) => {
   const params = Object.fromEntries(request.nextUrl.searchParams.entries());
   const parseResult = getProgressionSchema.safeParse(params);
 
@@ -28,6 +28,24 @@ export const GET = requireRole(
   }
 
   const { hackathonId, teamId } = parseResult.data;
+
+  // SEC-004: Hackers can only view their own team's progression
+  if (auth.role === "hacker") {
+    const hacker = await queryOne<{ teamId: string }>(
+      "SELECT teamId FROM hackers WHERE githubUserId = @uid AND hackathonId = @hid",
+      { uid: auth.principal.userId, hid: hackathonId },
+    );
+    if (!hacker || hacker.teamId !== teamId) {
+      return NextResponse.json(
+        {
+          error:
+            "Access denied. You can only view your own team's progression.",
+          ok: false,
+        },
+        { status: 403 },
+      );
+    }
+  }
 
   const r = await queryOne<Record<string, unknown>>(
     "SELECT * FROM progressions WHERE teamId = @teamId AND hackathonId = @hackathonId",

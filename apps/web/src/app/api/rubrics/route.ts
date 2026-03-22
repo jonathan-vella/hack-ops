@@ -113,6 +113,7 @@ export const POST = requireRole("admin")(async (
 export const GET = requireRole(
   "admin",
   "coach",
+  "hacker",
 )(async (request: NextRequest, _context, auth) => {
   const hackathonId =
     request.nextUrl.searchParams.get("hackathonId") ?? auth.hackathonId;

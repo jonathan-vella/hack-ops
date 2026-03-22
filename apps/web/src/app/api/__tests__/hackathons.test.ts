@@ -18,6 +18,7 @@ vi.mock("@/lib/roles", () => ({
   resolveRole: vi.fn(),
   getDevRole: vi.fn().mockReturnValue(null),
   isPrimaryAdmin: vi.fn(),
+  isGlobalAdmin: vi.fn().mockResolvedValue(true),
 }));
 vi.mock("@/lib/audit", () => ({
   auditLog: vi.fn(),
@@ -227,7 +228,7 @@ describe("PATCH /api/hackathons/:id", () => {
     });
     const body = await res.json();
 
-    expect(res.status).toBe(422);
+    expect(res.status).toBe(409);
     expect(body.error).toContain("Invalid transition");
   });
 
@@ -248,7 +249,7 @@ describe("PATCH /api/hackathons/:id", () => {
       params: Promise.resolve({ id: "h1" }),
     });
 
-    expect(res.status).toBe(422);
+    expect(res.status).toBe(409);
   });
 
   it("returns 403 for non-admin role", async () => {

@@ -104,6 +104,15 @@ export const ADMIN_PRINCIPAL = createAuthHeader("admin");
 export const COACH_PRINCIPAL = createAuthHeader("coach");
 export const HACKER_PRINCIPAL = createAuthHeader("hacker");
 
+/** Build headers object for API requests with auth. */
+export function authHeaders(role: TestRole): Record<string, string> {
+  return {
+    "x-ms-client-principal": createAuthHeader(role),
+    "x-ms-client-principal-idp": "github",
+    "content-type": "application/json",
+  };
+}
+
 /**
  * Intercept all requests from a Playwright Page and inject the
  * Easy Auth header for the specified role.
@@ -114,12 +123,8 @@ export async function withAuth(page: Page, role: TestRole): Promise<void> {
     const headers = {
       ...route.request().headers(),
       "x-ms-client-principal": headerValue,
+      "x-ms-client-principal-idp": "github",
     };
     await route.continue({ headers });
   });
-}
-
-/** Extra headers object for use with page.request or APIRequestContext. */
-export function authHeaders(role: TestRole): Record<string, string> {
-  return { "x-ms-client-principal": createAuthHeader(role) };
 }
